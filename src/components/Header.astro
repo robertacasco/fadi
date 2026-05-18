@@ -69,7 +69,7 @@ const currentPath = Astro.url.pathname;
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(26, 31, 46, 0.95);
+    background: rgba(250, 248, 245, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
@@ -171,7 +171,7 @@ const currentPath = Astro.url.pathname;
 
   .nav-link--announcements:hover {
     background: var(--gold-dim);
-    color: var(--gold-light);
+    color: var(--gold);
   }
 
   /* CTA tel */
@@ -181,7 +181,7 @@ const currentPath = Astro.url.pathname;
     gap: 0.4rem;
     font-size: 0.82rem;
     font-weight: 700;
-    color: var(--bg);
+    color: #1a1f2e; /* Deep navy text color for readability on gold background */
     background: var(--gold);
     padding: 0.45rem 1rem;
     border-radius: 4px;
@@ -193,7 +193,7 @@ const currentPath = Astro.url.pathname;
 
   .header-tel:hover {
     background: var(--gold-light);
-    color: var(--bg);
+    color: #1a1f2e;
   }
 
   /* Hamburger */

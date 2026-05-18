@@ -151,6 +151,11 @@ const galleryImages = await Promise.all(
     padding: 5rem 0 4rem;
     border-bottom: 1px solid var(--border);
     overflow: hidden;
+    background-image: 
+      linear-gradient(to right, rgba(250, 248, 245, 0.96) 30%, rgba(250, 248, 245, 0.8) 100%),
+      url('../img/sfondi/fioreria.jpg');
+    background-size: cover;
+    background-position: center;
   }
   .hero-grid {
     display: grid;
@@ -179,7 +184,6 @@ const galleryImages = await Promise.all(
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 70% 80% at 0% 50%, rgba(184,150,110,0.06) 0%, transparent 60%);
     pointer-events: none;
   }
   .page-hero-title {
@@ -219,6 +223,7 @@ const galleryImages = await Promise.all(
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
   }
   .fioreria-services h3 {
     font-family: var(--font-serif);
@@ -258,6 +263,7 @@ const galleryImages = await Promise.all(
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 2rem;
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
   }
   .fioreria-contact-header {
     display: flex;
@@ -292,10 +298,10 @@ const galleryImages = await Promise.all(
     background: rgba(184,150,110,0.06);
     border: 1px solid var(--border);
     border-radius: 4px;
-    transition: border-color var(--transition), background var(--transition);
+    transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
   }
   .fioreria-phone-link svg { color: var(--gold); flex-shrink: 0; }
-  .fioreria-phone-link:hover { border-color: var(--gold); background: rgba(184,150,110,0.1); }
+  .fioreria-phone-link:hover { border-color: var(--gold); background: rgba(184,150,110,0.1); box-shadow: 0 4px 12px rgba(184, 150, 110, 0.08); }
   .fn { display: block; font-family: var(--font-serif); font-size: 1rem; font-weight: 600; color: var(--text); line-height: 1.2; }
   .fl { display: block; font-size: 0.72rem; color: var(--text-muted); }
   .fioreria-address {
@@ -314,6 +320,7 @@ const galleryImages = await Promise.all(
     border-left: 3px solid var(--gold);
     border-radius: var(--radius);
     padding: 1.5rem 1.5rem 1.5rem 2rem;
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
   }
   .quote-mark {
     font-family: var(--font-serif);
@@ -373,11 +380,13 @@ const galleryImages = await Promise.all(
     cursor: pointer;
     background: var(--bg-card);
     padding: 0;
-    transition: border-color var(--transition), transform var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
   .gallery-item:hover {
     border-color: var(--gold);
     transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(184, 150, 110, 0.12);
   }
   .gallery-img {
     width: 100%;

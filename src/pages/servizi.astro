@@ -123,12 +123,16 @@ const services = [
     padding: 5rem 0 4rem;
     border-bottom: 1px solid var(--border);
     overflow: hidden;
+    background-image: 
+      linear-gradient(to bottom, rgba(250, 248, 245, 0.88) 0%, var(--bg) 100%),
+      url('../img/sfondi/servizi.jpg');
+    background-size: cover;
+    background-position: center;
   }
   .page-hero::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(184,150,110,0.06) 0%, transparent 70%);
     pointer-events: none;
   }
   .page-hero-title {
@@ -156,11 +160,13 @@ const services = [
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 1.75rem;
-    transition: border-color var(--transition), transform var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
   .srv-card:hover {
     border-color: var(--gold);
     transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(184, 150, 110, 0.08);
   }
   .srv-icon {
     width: 48px;

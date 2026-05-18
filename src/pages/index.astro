@@ -170,6 +170,7 @@ import Hero from '../components/Hero.astro';
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
     flex-wrap: wrap;
   }
 
@@ -216,11 +217,14 @@ import Hero from '../components/Hero.astro';
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 1.25rem 1.5rem;
-    transition: border-color var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
 
   .about-card:hover {
-    border-color: var(--gold-dim);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(184, 150, 110, 0.08);
   }
 
   .about-card-icon {
@@ -270,17 +274,24 @@ import Hero from '../components/Hero.astro';
     border-radius: var(--radius);
     padding: 2rem;
     text-decoration: none;
-    transition: border-color var(--transition), transform var(--transition), background var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), transform var(--transition), background var(--transition), box-shadow var(--transition);
   }
 
   .service-card:hover {
     border-color: var(--gold);
     transform: translateY(-4px);
-    background: rgba(184,150,110,0.04);
+    background: rgba(184,150,110,0.02);
+    box-shadow: 0 8px 30px rgba(184, 150, 110, 0.1);
   }
 
   .service-card--gold {
     border-color: rgba(184,150,110,0.35);
+    background: rgba(184, 150, 110, 0.04);
+  }
+
+  .service-card--gold:hover {
+    background: rgba(184, 150, 110, 0.08);
   }
 
   .service-card-icon {

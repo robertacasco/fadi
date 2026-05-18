@@ -157,12 +157,16 @@ import Layout from '../layouts/Layout.astro';
     padding: 5rem 0 4rem;
     border-bottom: 1px solid var(--border);
     overflow: hidden;
+    background-image: 
+      linear-gradient(to bottom, rgba(250, 248, 245, 0.88) 0%, var(--bg) 100%),
+      url('../img/sfondi/contatti.jpg');
+    background-size: cover;
+    background-position: center;
   }
   .page-hero::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 70% 80% at 100% 50%, rgba(184,150,110,0.05) 0%, transparent 60%);
     pointer-events: none;
   }
   .page-hero-title {
@@ -226,11 +230,13 @@ import Layout from '../layouts/Layout.astro';
     border: 1px solid var(--border);
     border-radius: var(--radius);
     text-decoration: none;
-    transition: border-color var(--transition), transform var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
   .phone-item-full:hover {
     border-color: var(--gold);
     transform: translateX(4px);
+    box-shadow: 0 6px 24px rgba(184, 150, 110, 0.08);
   }
   .phone-icon-wrap {
     width: 40px;
@@ -271,9 +277,14 @@ import Layout from '../layouts/Layout.astro';
     border: 1px solid var(--border);
     border-radius: var(--radius);
     text-decoration: none;
-    transition: border-color var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
-  .email-item:hover { border-color: var(--gold); }
+  .email-item:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(184, 150, 110, 0.08);
+  }
   .email-item svg { color: var(--gold); flex-shrink: 0; }
   .em {
     display: block;
@@ -298,11 +309,12 @@ import Layout from '../layouts/Layout.astro';
     font-size: 0.9rem;
     color: var(--text);
     text-decoration: none;
-    transition: border-color var(--transition), color var(--transition);
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: border-color var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
   .social-link svg:first-child { color: var(--gold); }
   .social-link svg:last-child { color: var(--text-muted); }
-  .social-link:hover { border-color: var(--gold); color: var(--gold-light); }
+  .social-link:hover { border-color: var(--gold); color: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(184, 150, 110, 0.08); }
   /* Map col */
   .contatti-map-col {
     display: flex;
@@ -316,6 +328,7 @@ import Layout from '../layouts/Layout.astro';
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 1.75rem;
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
   }
   .address-header {
     display: flex;
@@ -358,6 +371,7 @@ import Layout from '../layouts/Layout.astro';
     border: 1px solid rgba(184,150,110,0.25);
     border-radius: var(--radius);
     padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(184, 150, 110, 0.04);
   }
   .h24-dot {
     width: 10px;

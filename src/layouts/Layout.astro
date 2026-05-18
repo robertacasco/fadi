@@ -43,15 +43,15 @@ const { title, description = "L'Agenzia Funebre FADI opera a Dasà (VV) dal 1991
       }
 
       :root {
-        --bg:        #1a1f2e;
-        --bg-soft:   #1f2538;
-        --bg-card:   rgba(255, 255, 255, 0.04);
-        --text:      #f5f0eb;
-        --text-muted:#b0a99f;
+        --bg:        #FAF8F5;
+        --bg-soft:   #F3EFEA;
+        --bg-card:   #ffffff;
+        --text:      #2C2620;
+        --text-muted:#70665C;
         --gold:      #b8966e;
-        --gold-light:#d4b896;
-        --gold-dim:  rgba(184, 150, 110, 0.2);
-        --border:    rgba(184, 150, 110, 0.18);
+        --gold-light:#C9AA83;
+        --gold-dim:  rgba(184, 150, 110, 0.08);
+        --border:    rgba(184, 150, 110, 0.22);
         --font-serif:'Playfair Display', Georgia, serif;
         --font-sans: 'Lato', system-ui, sans-serif;
         --radius:    6px;
@@ -151,14 +151,14 @@ const { title, description = "L'Agenzia Funebre FADI opera a Dasà (VV) dal 1991
 
       .btn-gold {
         background: var(--gold);
-        color: var(--bg);
+        color: #1a1f2e; /* Original deep navy for sharp and premium gold-foil reading */
       }
 
       .btn-gold:hover {
         background: var(--gold-light);
-        color: var(--bg);
+        color: #1a1f2e;
         transform: translateY(-1px);
-        box-shadow: 0 6px 24px rgba(184, 150, 110, 0.3);
+        box-shadow: 0 6px 24px rgba(184, 150, 110, 0.2);
       }
 
       .btn-outline {
@@ -169,7 +169,7 @@ const { title, description = "L'Agenzia Funebre FADI opera a Dasà (VV) dal 1991
 
       .btn-outline:hover {
         background: var(--gold-dim);
-        color: var(--gold-light);
+        color: var(--gold);
         transform: translateY(-1px);
       }
 
@@ -177,12 +177,14 @@ const { title, description = "L'Agenzia Funebre FADI opera a Dasà (VV) dal 1991
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        transition: border-color var(--transition), transform var(--transition);
+        box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+        transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
       }
 
       .card:hover {
         border-color: var(--gold);
         transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(184, 150, 110, 0.1);
       }
 
       @media (max-width: 768px) {
