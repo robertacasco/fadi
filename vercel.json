@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/annunci-funebri/:path*", "destination": "https://testaf.lab.cas-per.it/annunci-funebri/:path*" },
+    { "source": "/annuncio/:path*", "destination": "https://testaf.lab.cas-per.it/annuncio/:path*" },
+    { "source": "/diretta/:path*", "destination": "https://testaf.lab.cas-per.it/diretta/:path*" },
+    { "source": "/wp-content/:path*", "destination": "https://testaf.lab.cas-per.it/wp-content/:path*" },
+    { "source": "/wp-includes/:path*", "destination": "https://testaf.lab.cas-per.it/wp-includes/:path*" }
+  ]
+}

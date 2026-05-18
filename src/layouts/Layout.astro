@@ -1,0 +1,202 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "L'Agenzia Funebre FADI opera a Dasà (VV) dal 1991 offrendo servizi funebri di alta qualità con professionalità e discrezione. Disponibili 24 ore su 24." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:type" content="website" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+
+    <style is:global>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg:        #1a1f2e;
+        --bg-soft:   #1f2538;
+        --bg-card:   rgba(255, 255, 255, 0.04);
+        --text:      #f5f0eb;
+        --text-muted:#b0a99f;
+        --gold:      #b8966e;
+        --gold-light:#d4b896;
+        --gold-dim:  rgba(184, 150, 110, 0.2);
+        --border:    rgba(184, 150, 110, 0.18);
+        --font-serif:'Playfair Display', Georgia, serif;
+        --font-sans: 'Lato', system-ui, sans-serif;
+        --radius:    6px;
+        --transition:0.3s ease;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1, h2, h3, h4 {
+        font-family: var(--font-serif);
+        line-height: 1.25;
+        color: var(--text);
+      }
+
+      a {
+        color: var(--gold);
+        text-decoration: none;
+        transition: color var(--transition);
+      }
+
+      a:hover {
+        color: var(--gold-light);
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      .section {
+        padding: 5rem 0;
+      }
+
+      .section-label {
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 0.75rem;
+      }
+
+      .section-title {
+        font-size: clamp(1.75rem, 4vw, 2.75rem);
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+      }
+
+      .section-text {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        max-width: 680px;
+        line-height: 1.8;
+      }
+
+      .divider {
+        width: 48px;
+        height: 2px;
+        background: var(--gold);
+        margin: 1.5rem 0;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 2rem;
+        border-radius: var(--radius);
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        transition: all var(--transition);
+        cursor: pointer;
+        border: none;
+      }
+
+      .btn-gold {
+        background: var(--gold);
+        color: var(--bg);
+      }
+
+      .btn-gold:hover {
+        background: var(--gold-light);
+        color: var(--bg);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 24px rgba(184, 150, 110, 0.3);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--gold);
+        border: 1px solid var(--gold);
+      }
+
+      .btn-outline:hover {
+        background: var(--gold-dim);
+        color: var(--gold-light);
+        transform: translateY(-1px);
+      }
+
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        transition: border-color var(--transition), transform var(--transition);
+      }
+
+      .card:hover {
+        border-color: var(--gold);
+        transform: translateY(-3px);
+      }
+
+      @media (max-width: 768px) {
+        .section {
+          padding: 3.5rem 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
