@@ -2,6 +2,15 @@
 import Layout from '../layouts/Layout.astro';
 import { Image } from 'astro:assets';
 import fioreriaLogo from '../img/fadi-fioreria.png';
+
+// Dynamically import all images from the gallery directory
+const imageGlob = import.meta.glob<{ default: ImageMetadata }>('../img/galleria fioreria/*.{jpeg,jpg,png,webp}');
+const galleryImages = await Promise.all(
+  Object.keys(imageGlob).map(async (path) => {
+    const module = await imageGlob[path]();
+    return module.default;
+  })
+);
 ---
 
 <Layout
@@ -90,6 +99,43 @@ import fioreriaLogo from '../img/fadi-fioreria.png';
       </div>
     </div>
   </section>
+
+  <!-- GALLERY SECTION -->
+  <section class="section gallery-section" id="fioreria-galleria">
+    <div class="container">
+      <div class="gallery-header">
+        <p class="section-label">La nostra vetrina</p>
+        <h2 class="section-title" style="font-size: 1.8rem; text-align: center;">Composizioni & Creazioni</h2>
+        <div class="divider" style="margin: 1.25rem auto 3rem; width: 60px;"></div>
+      </div>
+
+      <div class="gallery-grid">
+        {galleryImages.map((image, idx) => (
+          <button class="gallery-item" data-index={idx} data-large={image.src} aria-label={`Vedi immagine composizione ${idx + 1}`}>
+            <Image 
+              src={image} 
+              alt={`Composizione Floreale FADI ${idx + 1}`} 
+              width={400} 
+              height={300} 
+              format="webp"
+              class="gallery-img"
+            />
+            <div class="gallery-item-overlay">
+              <span class="zoom-icon">🔍</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LIGHTBOX MODAL -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Visualizzatore immagini">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Chiudi visualizzatore">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Immagine precedente">‹</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="Visualizzazione ingrandita" />
+    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Immagine successiva">›</button>
+  </div>
 
   <section class="fioreria-cta">
     <div class="container fioreria-cta-inner">
@@ -304,4 +350,260 @@ import fioreriaLogo from '../img/fadi-fioreria.png';
     .page-hero-deco { display: none; }
     .hero-grid { grid-template-columns: 1fr; gap: 2rem; }
   }
+
+  /* Gallery Section */
+  .gallery-section {
+    border-top: 1px solid var(--border);
+    padding: 5rem 0;
+  }
+  .gallery-header {
+    text-align: center;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+  .gallery-item {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    cursor: pointer;
+    background: var(--bg-card);
+    padding: 0;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+  .gallery-item:hover {
+    border-color: var(--gold);
+    transform: translateY(-4px);
+  }
+  .gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--transition);
+  }
+  .gallery-item:hover .gallery-img {
+    transform: scale(1.05);
+  }
+  .gallery-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(26, 31, 46, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+  .gallery-item:hover .gallery-item-overlay {
+    opacity: 1;
+  }
+  .zoom-icon {
+    font-size: 1.5rem;
+    color: var(--text);
+    background: rgba(184, 150, 110, 0.9);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  /* Lightbox Modal */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(13, 17, 23, 0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .lightbox.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lightbox-img {
+    max-width: 90%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    user-select: none;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color var(--transition);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox-close:hover {
+    color: var(--text);
+  }
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition), color var(--transition);
+    user-select: none;
+  }
+  .lightbox-nav:hover {
+    background: rgba(184, 150, 110, 0.2);
+    color: var(--gold-light);
+    border-color: var(--gold);
+  }
+  .lightbox-prev {
+    left: 20px;
+    padding-right: 4px;
+  }
+  .lightbox-next {
+    right: 20px;
+    padding-left: 4px;
+  }
+  
+  @media (max-width: 768px) {
+    .lightbox-nav {
+      width: 44px;
+      height: 44px;
+      font-size: 1.8rem;
+    }
+    .lightbox-prev {
+      left: 10px;
+    }
+    .lightbox-next {
+      right: 10px;
+    }
+    .lightbox-img {
+      max-width: 95%;
+      max-height: 75vh;
+    }
+  }
 </style>
+
+<script>
+  // Lightbox functionality
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const closeBtn = document.getElementById('lightbox-close');
+  const prevBtn = document.getElementById('lightbox-prev');
+  const nextBtn = document.getElementById('lightbox-next');
+  const galleryItems = document.querySelectorAll('.gallery-item');
+
+  let currentIndex = 0;
+  const imageUrls: string[] = [];
+
+  // Collect all large image URLs
+  galleryItems.forEach((item) => {
+    const largeUrl = item.getAttribute('data-large');
+    if (largeUrl) {
+      imageUrls.push(largeUrl);
+    }
+  });
+
+  function showImage(index: number) {
+    if (index < 0) {
+      currentIndex = imageUrls.length - 1;
+    } else if (index >= imageUrls.length) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+
+    if (lightboxImg && imageUrls[currentIndex]) {
+      lightboxImg.src = imageUrls[currentIndex];
+      lightboxImg.alt = `Composizione Floreale FADI ${currentIndex + 1}`;
+    }
+  }
+
+  function openLightbox(index: number) {
+    if (!lightbox) return;
+    showImage(index);
+    lightbox.classList.add('active');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lightboxImg) lightboxImg.src = '';
+  }
+
+  // Attach click listeners to gallery items
+  galleryItems.forEach((item, index) => {
+    item.addEventListener('click', () => {
+      openLightbox(index);
+    });
+  });
+
+  // Close button click
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeLightbox();
+  });
+
+  // Previous button click
+  prevBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showImage(currentIndex - 1);
+  });
+
+  // Next button click
+  nextBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showImage(currentIndex + 1);
+  });
+
+  // Background click to close
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      closeLightbox();
+    }
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox || !lightbox.classList.contains('active')) return;
+
+    if (e.key === 'Escape') {
+      closeLightbox();
+    } else if (e.key === 'ArrowLeft') {
+      showImage(currentIndex - 1);
+    } else if (e.key === 'ArrowRight') {
+      showImage(currentIndex + 1);
+    }
+  });
+</script>
