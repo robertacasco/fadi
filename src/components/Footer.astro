@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import logoImage from '../img/logo-fadi.png';
 ---
 
 <footer class="site-footer">
@@ -7,11 +9,9 @@
     <!-- Top row -->
     <div class="footer-top">
       <div class="footer-brand">
-        <span class="footer-cross" aria-hidden="true">✝</span>
-        <div>
-          <div class="footer-name">FADI</div>
-          <div class="footer-tagline">Onoranze Funebri</div>
-        </div>
+        <a href="/" class="footer-logo-link" aria-label="Onoranze Funebri FADI — Home">
+          <Image src={logoImage} alt="Onoranze Funebri FADI" class="footer-logo" />
+        </a>
       </div>
 
       <div class="footer-cols">
@@ -114,28 +114,20 @@
     gap: 0.75rem;
   }
 
-  .footer-cross {
-    font-size: 1.6rem;
-    color: var(--gold);
-    opacity: 0.7;
-    margin-top: 2px;
+  .footer-logo-link {
+    display: block;
   }
 
-  .footer-name {
-    font-family: var(--font-serif);
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: var(--text);
+  .footer-logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform var(--transition);
   }
 
-  .footer-tagline {
-    font-size: 0.6rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 700;
-    margin-top: 2px;
+  .footer-logo-link:hover .footer-logo {
+    transform: scale(1.02);
   }
 
   /* Cols */

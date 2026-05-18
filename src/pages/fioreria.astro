@@ -147,15 +147,16 @@ const galleryImages = await Promise.all(
 
 <style>
   :root {
-    --fioreria-green: #2e5a44;
-    --fioreria-green-light: #41785c;
-    --fioreria-green-dim: rgba(46, 90, 68, 0.05);
-    --fioreria-border-green: rgba(46, 90, 68, 0.18);
+    --fioreria-green: #7ba68e; /* Sage green matching the leaf image precisely */
+    --fioreria-green-light: #9cc2ae;
+    --fioreria-green-dark: #416b54; /* Darker sage green for high-contrast and text readability */
+    --fioreria-green-dim: rgba(123, 166, 142, 0.05);
+    --fioreria-border-green: rgba(123, 166, 142, 0.22);
   }
 
   /* Override global elements on this page */
   .section-label {
-    color: var(--fioreria-green) !important;
+    color: var(--fioreria-green-dark) !important;
   }
   .divider {
     background: var(--fioreria-green) !important;
@@ -167,7 +168,7 @@ const galleryImages = await Promise.all(
     border-bottom: 1px solid var(--fioreria-border-green);
     overflow: hidden;
     background-image: 
-      linear-gradient(to right, rgba(250, 248, 245, 0.96) 30%, rgba(250, 248, 245, 0.8) 100%),
+      linear-gradient(to right, rgba(123, 166, 142, 0.28) 0%, rgba(250, 248, 245, 0.92) 50%, var(--bg) 100%),
       url('../img/sfondi/fioreria.jpg');
     background-size: cover;
     background-position: center;
@@ -244,7 +245,7 @@ const galleryImages = await Promise.all(
     font-family: var(--font-serif);
     font-size: 1.05rem;
     margin-bottom: 1.25rem;
-    color: var(--fioreria-green-light);
+    color: var(--fioreria-green-dark);
   }
   .fioreria-list {
     list-style: none;
@@ -263,7 +264,7 @@ const galleryImages = await Promise.all(
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--fioreria-green);
+    background: var(--fioreria-green-dark);
     flex-shrink: 0;
   }
   .fioreria-side {
@@ -286,7 +287,7 @@ const galleryImages = await Promise.all(
     gap: 0.75rem;
     margin-bottom: 0.75rem;
   }
-  .fioreria-icon { font-size: 1.3rem; color: var(--fioreria-green); }
+  .fioreria-icon { font-size: 1.3rem; color: var(--fioreria-green-dark); }
   .fioreria-contact-header h3 {
     font-family: var(--font-serif);
     font-size: 1.1rem;
@@ -315,11 +316,11 @@ const galleryImages = await Promise.all(
     border-radius: 4px;
     transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
   }
-  .fioreria-phone-link svg { color: var(--fioreria-green); flex-shrink: 0; }
+  .fioreria-phone-link svg { color: var(--fioreria-green-dark); flex-shrink: 0; }
   .fioreria-phone-link:hover { 
     border-color: var(--fioreria-green); 
-    background: rgba(46, 90, 68, 0.1); 
-    box-shadow: 0 4px 12px rgba(46, 90, 68, 0.08); 
+    background: rgba(123, 166, 142, 0.12); 
+    box-shadow: 0 4px 12px rgba(123, 166, 142, 0.08); 
   }
   .fn { display: block; font-family: var(--font-serif); font-size: 1rem; font-weight: 600; color: var(--text); line-height: 1.2; }
   .fl { display: block; font-size: 0.72rem; color: var(--text-muted); }
@@ -332,7 +333,7 @@ const galleryImages = await Promise.all(
     padding-top: 1rem;
     border-top: 1px solid var(--fioreria-border-green);
   }
-  .fioreria-address svg { color: var(--fioreria-green); flex-shrink: 0; }
+  .fioreria-address svg { color: var(--fioreria-green-dark); flex-shrink: 0; }
   .fioreria-quote {
     background: var(--bg-card);
     border: 1px solid var(--fioreria-border-green);
@@ -371,12 +372,12 @@ const galleryImages = await Promise.all(
   }
   .fioreria-cta p { color: var(--text-muted); font-size: 0.95rem; }
   .fioreria-cta .btn-outline {
-    color: var(--fioreria-green);
-    border: 1px solid var(--fioreria-green);
+    color: var(--fioreria-green-dark);
+    border: 1px solid var(--fioreria-green-dark);
   }
   .fioreria-cta .btn-outline:hover {
     background: var(--fioreria-green-dim);
-    color: var(--fioreria-green-light);
+    color: var(--fioreria-green-dark);
   }
 
   @media (max-width: 900px) {
@@ -414,7 +415,7 @@ const galleryImages = await Promise.all(
   .gallery-item:hover {
     border-color: var(--fioreria-green);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(46, 90, 68, 0.12);
+    box-shadow: 0 8px 24px rgba(123, 166, 142, 0.18);
   }
   .gallery-img {
     width: 100%;
@@ -516,7 +517,7 @@ const galleryImages = await Promise.all(
     user-select: none;
   }
   .lightbox-nav:hover {
-    background: rgba(46, 90, 68, 0.2);
+    background: rgba(123, 166, 142, 0.2);
     color: var(--fioreria-green-light);
     border-color: var(--fioreria-green);
   }
