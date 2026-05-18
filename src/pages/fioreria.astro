@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import fioreriaLogo from '../img/fadi-fioreria.png';
 ---
 
 <Layout
@@ -7,14 +9,19 @@ import Layout from '../layouts/Layout.astro';
   description="La fioreria FADI opera dal 1991. Composizioni floreali personalizzate, fiori e corone funebri. Chiama 0963 353321."
 >
   <section class="page-hero">
-    <div class="container">
-      <p class="section-label">Non solo servizi funebri</p>
-      <h1 class="page-hero-title">Un fiore per onorare il ricordo del tuo caro</h1>
-      <div class="divider"></div>
-      <p class="page-hero-sub">
-        Nata nel 1991, la fioreria FADI opera da 30 anni nel mondo floreale,
-        migliorando e incrementando costantemente i propri servizi.
-      </p>
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <p class="section-label">Non solo servizi funebri</p>
+        <h1 class="page-hero-title">Un fiore per onorare il ricordo del tuo caro</h1>
+        <div class="divider"></div>
+        <p class="page-hero-sub">
+          Nata nel 1991, la fioreria FADI opera da 30 anni nel mondo floreale,
+          migliorando e incrementando costantemente i propri servizi.
+        </p>
+      </div>
+      <div class="hero-image-wrap">
+        <Image src={fioreriaLogo} alt="Fioreria FADI" class="hero-image" />
+      </div>
     </div>
     <div class="page-hero-deco" aria-hidden="true">✿</div>
   </section>
@@ -98,6 +105,29 @@ import Layout from '../layouts/Layout.astro';
     padding: 5rem 0 4rem;
     border-bottom: 1px solid var(--border);
     overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .hero-image-wrap {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    background: var(--bg-card);
+  }
+  .hero-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+  .hero-image-wrap:hover .hero-image {
+    transform: scale(1.03);
   }
   .page-hero::before {
     content: '';
@@ -272,5 +302,6 @@ import Layout from '../layouts/Layout.astro';
     .fioreria-grid { grid-template-columns: 1fr; gap: 2.5rem; }
     .fioreria-side { position: static; }
     .page-hero-deco { display: none; }
+    .hero-grid { grid-template-columns: 1fr; gap: 2rem; }
   }
 </style>

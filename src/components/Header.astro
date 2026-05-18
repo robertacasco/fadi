@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import logoImage from '../img/logo-fadi.png';
+
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/fioreria', label: 'Fioreria' },
@@ -15,11 +18,7 @@ const currentPath = Astro.url.pathname;
 
     <!-- Logo / Brand -->
     <a href="/" class="brand" aria-label="Onoranze Funebri FADI — Home">
-      <span class="brand-cross" aria-hidden="true">✝</span>
-      <div class="brand-text">
-        <span class="brand-name">FADI</span>
-        <span class="brand-sub">Onoranze Funebri</span>
-      </div>
+      <Image src={logoImage} alt="Onoranze Funebri FADI" class="brand-logo" />
     </a>
 
     <!-- Navigation Desktop -->
@@ -91,6 +90,18 @@ const currentPath = Astro.url.pathname;
     color: var(--text);
     text-decoration: none;
     flex-shrink: 0;
+  }
+
+  .brand-logo {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform var(--transition);
+  }
+
+  .brand:hover .brand-logo {
+    transform: scale(1.02);
   }
 
   .brand-cross {
