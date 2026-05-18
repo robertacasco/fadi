@@ -69,17 +69,17 @@ const currentPath = Astro.url.pathname;
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(250, 248, 245, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(184, 150, 110, 0.12); /* Translucent premium gold backing tint */
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(184, 150, 110, 0.28); /* Slightly richer gold border for definition */
   }
 
   .header-inner {
     display: flex;
     align-items: center;
     gap: 2rem;
-    height: 70px;
+    height: 85px; /* Increased header height for luxury scale */
   }
 
   /* Brand */
@@ -93,7 +93,7 @@ const currentPath = Astro.url.pathname;
   }
 
   .brand-logo {
-    height: 42px;
+    height: 54px; /* Increased logo height for gorgeous visibility */
     width: auto;
     object-fit: contain;
     display: block;
