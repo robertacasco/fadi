@@ -1760,9 +1760,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         fotocordoglioBtn.innerHTML = `<span class="spinner-inline"></span> Foto ${i + 1}/${selectedFiles.length}...`;
 
         const fileData = new FormData();
-        fileData.append('photo', file);
-        fileData.append('image', file);
-        fileData.append('file', file);
+        fileData.append('foto', file);
 
         const uploadRes = await fetch(`/casper-api/public/v1/fotocordogli/albums/${albumId}/add-photo`, {
           method: 'POST',
