@@ -670,74 +670,84 @@ function fotoUrl(item: any): string {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.25rem;
-    margin-top: 3.5rem;
+    gap: 0.75rem;
+    margin-top: 4rem;
     padding-top: 2.5rem;
     border-top: 1px solid var(--border);
   }
 
   .pagination-nav button {
-    min-width: 42px;
+    width: 42px;
     height: 42px;
-    padding: 0 0.6rem;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg-card);
     color: var(--text-muted);
-    font-family: var(--font-serif);
-    font-size: 1rem;
-    font-weight: 400;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     align-items: center;
     justify-content: center;
     letter-spacing: 0.02em;
+    box-shadow: 0 2px 6px rgba(44, 38, 32, 0.02);
+    position: relative;
+    overflow: hidden;
   }
 
   .pagination-nav button:hover:not(:disabled) {
-    color: var(--gold);
+    color: var(--gold-light);
+    border-color: var(--gold-light);
     background: var(--gold-dim);
-    border-radius: 6px;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(184, 150, 110, 0.15);
   }
 
   .pagination-nav button.active {
     background: var(--gold);
-    color: #fff;
+    color: #1a1f2e;
     font-weight: 700;
-    border-radius: 6px;
-    box-shadow: 0 2px 10px rgba(184, 150, 110, 0.35);
+    border-color: var(--gold);
+    box-shadow: 0 6px 16px rgba(184, 150, 110, 0.3);
+    transform: translateY(-1px);
   }
 
   .pagination-nav button:disabled {
-    opacity: 0.28;
+    opacity: 0.25;
     cursor: not-allowed;
-  }
-
-  /* Prev / Next arrows get a subtle border */
-  .pagination-nav button[aria-label="←"],
-  .pagination-nav button[aria-label="→"] {
-    font-family: var(--font-sans);
-    font-size: 1.1rem;
-    border: 1px solid var(--border);
-    border-radius: 50%;
+    background: transparent;
+    border-color: var(--border);
     color: var(--text-muted);
+    box-shadow: none;
+    transform: none;
   }
 
-  .pagination-nav button[aria-label="←"]:hover:not(:disabled),
-  .pagination-nav button[aria-label="→"]:hover:not(:disabled) {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: var(--gold-dim);
+  .pagination-arrow-svg {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: block;
+  }
+
+  .pagination-nav button[aria-label="Pagina precedente"]:hover:not(:disabled) .pagination-arrow-svg {
+    transform: translateX(-4px);
+  }
+
+  .pagination-nav button[aria-label="Pagina successiva"]:hover:not(:disabled) .pagination-arrow-svg {
+    transform: translateX(4px);
   }
 
   .pagination-ellipsis {
     color: var(--text-muted);
-    font-size: 0.9rem;
-    padding: 0 0.15rem;
-    line-height: 42px;
-    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    padding: 0 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    font-family: var(--font-sans);
     user-select: none;
+    font-weight: 600;
   }
 
   /* ── Powered by ── */
@@ -752,11 +762,14 @@ function fotoUrl(item: any): string {
     color: var(--gold);
     text-decoration: none;
     opacity: 0.55;
-    transition: opacity var(--transition);
+    transition: opacity var(--transition), color var(--transition);
     font-family: var(--font-sans);
   }
 
-  .powered-by a:hover { opacity: 1; }
+  .powered-by a:hover {
+    opacity: 1;
+    color: var(--gold-light);
+  }
 
   @media (max-width: 768px) {
     .necrologi-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -765,7 +778,8 @@ function fotoUrl(item: any): string {
     .search-box input { padding: 0.85rem 2.5rem 0.85rem 2.75rem; font-size: 0.95rem; }
     .search-icon { left: 1rem; }
     .advanced-search-toggle { width: 100%; justify-content: center; }
-    .pagination-nav button { min-width: 38px; height: 38px; font-size: 0.95rem; }
+    .pagination-nav button { width: 38px; height: 38px; font-size: 0.9rem; }
+    .pagination-ellipsis { height: 38px; font-size: 0.9rem; }
     .adv-field { min-width: 100%; }
   }
 </style>
@@ -823,10 +837,22 @@ function fotoUrl(item: any): string {
 
       const addBtn = (label: string | number, page: number, isActive = false, disabled = false) => {
         const btn = document.createElement('button');
-        btn.textContent = String(label);
+        
+        let ariaLabel = '';
+        if (label === '←') {
+          btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pagination-arrow-svg"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+          ariaLabel = 'Pagina precedente';
+        } else if (label === '→') {
+          btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pagination-arrow-svg"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+          ariaLabel = 'Pagina successiva';
+        } else {
+          btn.textContent = String(label);
+          ariaLabel = `Pagina ${label}`;
+        }
+        
         if (isActive) btn.classList.add('active');
         btn.disabled = disabled;
-        btn.setAttribute('aria-label', typeof label === 'number' ? `Pagina ${label}` : String(label));
+        btn.setAttribute('aria-label', ariaLabel);
         if (!disabled && !isActive) {
           btn.addEventListener('click', () => {
             currentPage = page;
