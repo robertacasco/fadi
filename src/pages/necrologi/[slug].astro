@@ -545,7 +545,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           Scegli la tua composizione floreale da inviare alla famiglia in segno di vicinanza.<br/>
           Noi penseremo a consegnarla presso la casa funeraria o il luogo dove riposa la salma.<br/>
           <strong>La consegna sarà garantita se l'ordine ci perverrà almeno 3 ore prima del servizio funebre.</strong><br/>
-          Per urgenze contattare il numero <a href="tel:0963353321" class="gold-link">0963 353321</a>
+          Per urgenze contattare il numero <a href="tel:0963353321" class="gold-link">0963 353321</a> o <a href="tel:3398970915" class="gold-link">339 8970915</a>
         </p>
         <p class="fiori-disclaimer">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;opacity:0.6"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -553,10 +553,11 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         </p>
       </div>
 
-      <div class="fiori-grid">
+      <!-- PRODUCT GRID -->
+      <div class="fiori-grid" id="fiori-grid">
 
         <!-- PRODOTTO 1: Bouquet -->
-        <div class="fiori-card" data-product="Bouquet di Fiori Bianchi" data-price="45">
+        <div class="fiori-card" data-product="Bouquet di Fiori Bianchi" data-price="45,00">
           <div class="fiori-card-img-wrap">
             <img src="/fiori/bouquet.png" alt="Bouquet di Fiori Bianchi" class="fiori-card-img" loading="lazy" />
           </div>
@@ -571,7 +572,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         </div>
 
         <!-- PRODOTTO 2: Corona -->
-        <div class="fiori-card" data-product="Corona Funebre" data-price="120">
+        <div class="fiori-card" data-product="Corona Funebre" data-price="120,00">
           <div class="fiori-card-img-wrap">
             <img src="/fiori/corona.png" alt="Corona Funebre" class="fiori-card-img" loading="lazy" />
           </div>
@@ -586,7 +587,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         </div>
 
         <!-- PRODOTTO 3: Cuscino -->
-        <div class="fiori-card" data-product="Cuscino Floreale" data-price="80">
+        <div class="fiori-card" data-product="Cuscino Floreale" data-price="80,00">
           <div class="fiori-card-img-wrap">
             <img src="/fiori/cuscino.png" alt="Cuscino Floreale" class="fiori-card-img" loading="lazy" />
           </div>
@@ -601,7 +602,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         </div>
 
         <!-- PRODOTTO 4: Composizione Alta -->
-        <div class="fiori-card" data-product="Composizione Alta in Vaso" data-price="65">
+        <div class="fiori-card" data-product="Composizione Alta in Vaso" data-price="65,00">
           <div class="fiori-card-img-wrap">
             <img src="/fiori/composizione.png" alt="Composizione Alta in Vaso" class="fiori-card-img" loading="lazy" />
           </div>
@@ -616,45 +617,139 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         </div>
 
       </div><!-- /fiori-grid -->
+
+      <!-- INLINE ORDER FORM — hidden until a product is selected -->
+      <div id="fiori-inline-form-wrap" class="fiori-inline-form-wrap" style="display:none;">
+        <div class="fiori-inline-form-inner card">
+
+          <!-- Selected product header -->
+          <div class="fiori-inline-product-header">
+            <div>
+              <span class="fiori-inline-label">Composizione selezionata</span>
+              <h3 id="fiori-inline-product-name" class="fiori-inline-product-name"></h3>
+              <p id="fiori-inline-product-price" class="fiori-inline-product-price"></p>
+            </div>
+            <button type="button" id="fiori-cancel-btn" class="fiori-cancel-btn" aria-label="Annulla selezione">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Cambia composizione
+            </button>
+          </div>
+
+          <form id="fiori-order-form" class="memorial-form fiori-order-form-grid" novalidate>
+
+            <!-- Il tuo nome -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label" for="fiori-mittente">
+                Il tuo nome <span class="fiori-req">*</span>
+              </label>
+              <input type="text" id="fiori-mittente" name="mittente" class="form-input" placeholder="Nome e cognome del mittente" required />
+            </div>
+
+            <!-- Nome defunto (auto-filled, readonly) -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label" for="fiori-defunto">
+                Nome e cognome defunto <span class="fiori-req">*</span>
+                <span class="fiori-field-hint">Inserire il nome del defunto a cui è dedicato il tuo pensiero</span>
+              </label>
+              <input type="text" id="fiori-defunto" name="defunto" class="form-input fiori-readonly-input" readonly />
+            </div>
+
+            <!-- Scritta sul nastro -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label" for="fiori-nastro">
+                Scritta sul nastro
+                <span class="fiori-field-hint">Il testo verrà inserito sul nastro che accompagnerà la composizione floreale</span>
+              </label>
+              <input type="text" id="fiori-nastro" name="nastro" class="form-input" placeholder="Scritta sul nastro – max 40 caratteri" maxlength="40" />
+              <div class="fiori-char-count"><span id="nastro-count">0</span>/40</div>
+            </div>
+
+            <!-- Biglietto -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label" for="fiori-biglietto">
+                Biglietto
+                <span class="fiori-field-hint">Il testo verrà inserito su un biglietto che accompagnerà la composizione floreale e le firme. Per messaggi molto lunghi utilizzare il servizio "LASCIA UN CORDOGLIO". Sarà nostra cura recapitarlo alla famiglia.</span>
+              </label>
+              <textarea id="fiori-biglietto" name="biglietto" class="form-textarea" rows="2" placeholder="Biglietto – personalizzazione max 70 caratteri" maxlength="70"></textarea>
+              <div class="fiori-char-count"><span id="biglietto-count">0</span>/70</div>
+            </div>
+
+            <!-- Luogo di consegna -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label" for="fiori-luogo">
+                Luogo di consegna <span class="fiori-req">*</span>
+                <span class="fiori-field-hint">Indicaci dove desideri che venga consegnata la composizione floreale (chiesa)</span>
+              </label>
+              <textarea id="fiori-luogo" name="luogo" class="form-textarea" rows="2" placeholder="Luogo di consegna – Inserisci l'indirizzo" required></textarea>
+            </div>
+
+            <!-- Note -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label" for="fiori-note">
+                Note
+                <span class="fiori-field-hint">Inserisci qui eventuali richieste particolari (tipologie di fiori da utilizzare, colori, ecc…)</span>
+              </label>
+              <input type="text" id="fiori-note" name="note" class="form-input" placeholder="Note" />
+            </div>
+
+            <!-- Price summary -->
+            <div class="fiori-price-summary fiori-form-full">
+              <div class="fiori-price-row">
+                <span id="fiori-summary-label">Prezzo del prodotto</span>
+                <span id="fiori-summary-price"></span>
+              </div>
+              <div class="fiori-price-row fiori-price-total">
+                <span>Totale</span>
+                <span id="fiori-summary-total"></span>
+              </div>
+            </div>
+
+            <!-- Metodo di pagamento -->
+            <div class="form-group fiori-form-full">
+              <label class="form-label">Metodo di pagamento <span class="fiori-req">*</span></label>
+              <div class="fiori-payment-options">
+                <label class="fiori-payment-option" id="pay-iban-label">
+                  <input type="radio" name="pagamento" value="IBAN" id="fiori-pay-iban" required />
+                  <span class="fiori-payment-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </span>
+                  <span>Bonifico IBAN</span>
+                </label>
+                <label class="fiori-payment-option" id="pay-carta-label">
+                  <input type="radio" name="pagamento" value="Carta di credito" id="fiori-pay-carta" />
+                  <span class="fiori-payment-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="7" cy="15" r="1" fill="currentColor"/><circle cx="11" cy="15" r="1" fill="currentColor"/></svg>
+                  </span>
+                  <span>Carta di credito</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Privacy -->
+            <div class="form-group checkbox-group fiori-form-full" style="margin-top:0.25rem;margin-bottom:0.5rem;">
+              <label class="checkbox-label" style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;font-size:0.85rem;color:var(--text-muted);user-select:none;">
+                <input type="checkbox" id="fiori-privacy" name="privacy" required style="accent-color:var(--burgundy,#6b1426);width:18px;height:18px;margin:3px 0 0 0;cursor:pointer;" />
+                <span>Acconsento al trattamento dei miei dati personali (<a href="https://www.iubenda.com/privacy-policy/37937373" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">clicca qui per maggiori dettagli</a>).</span>
+              </label>
+            </div>
+
+            <div class="form-status fiori-form-full" id="fiori-order-status"></div>
+
+            <div class="fiori-form-full fiori-submit-row">
+              <button type="submit" class="btn btn-gold" id="fiori-order-submit-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.32 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Invia richiesta via WhatsApp
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div><!-- /fiori-inline-form-wrap -->
+
     </div>
   </section>
 
-  <!-- MODAL ORDINE FIORI -->
-  <div id="fiori-modal-overlay" class="fiori-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="fiori-modal-title">
-    <div class="fiori-modal-box">
-      <button type="button" id="fiori-modal-close" class="fiori-modal-close" aria-label="Chiudi">&times;</button>
-      <div class="fiori-modal-header">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <div>
-          <h3 id="fiori-modal-title">Completa il tuo ordine</h3>
-          <p id="fiori-modal-product-name" class="fiori-modal-product-name"></p>
-        </div>
-      </div>
-      <form id="fiori-order-form" class="memorial-form" novalidate>
-        <div class="form-group">
-          <label class="form-label" for="fiori-nome">Nome e Cognome *</label>
-          <input type="text" id="fiori-nome" name="nome" class="form-input" placeholder="Il tuo nome completo" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="fiori-telefono">Telefono *</label>
-          <input type="tel" id="fiori-telefono" name="telefono" class="form-input" placeholder="Es. 333 1234567" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="fiori-note">Note (opzionale)</label>
-          <textarea id="fiori-note" name="note" class="form-textarea" rows="2" placeholder="Es. dedica da inserire nel bigliettino..."></textarea>
-        </div>
-        <div class="form-group checkbox-group" style="margin-top:0.5rem;margin-bottom:0.75rem;">
-          <label class="checkbox-label" style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;font-size:0.85rem;color:var(--text-muted);user-select:none;">
-            <input type="checkbox" id="fiori-privacy" name="privacy" required style="accent-color:var(--burgundy,#6b1426);width:18px;height:18px;margin:3px 0 0 0;cursor:pointer;" />
-            <span>Acconsento al trattamento dei miei dati personali (<a href="https://www.iubenda.com/privacy-policy/37937373" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">clicca qui per maggiori dettagli</a>).</span>
-          </label>
-        </div>
-        <div class="form-status" id="fiori-order-status"></div>
-        <button type="submit" class="btn btn-gold btn-block" id="fiori-order-submit-btn" style="margin-top:0.5rem;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.32 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          Invia richiesta via WhatsApp
-        </button>
-      </form>
+
     </div>
   </div>
 
@@ -1607,6 +1702,15 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     transform: scale(1.04);
   }
 
+  .fiori-card-selected {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 0 2px var(--gold), 0 8px 24px rgba(184,150,110,0.18) !important;
+  }
+
+  .fiori-card-selected .fiori-order-btn {
+    background: var(--text) !important;
+  }
+
   .fiori-card-body {
     padding: 1.1rem 1.2rem 1.2rem;
     display: flex;
@@ -1737,6 +1841,181 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     color: var(--gold);
     text-decoration: underline;
     font-weight: 600;
+  }
+
+  /* INLINE ORDER FORM */
+  .fiori-inline-form-wrap {
+    margin-top: 2.5rem;
+    animation: slideUpModal 0.3s ease;
+  }
+
+  .fiori-inline-form-inner {
+    padding: 2rem 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card-bg);
+  }
+
+  .fiori-inline-product-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .fiori-inline-label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+  }
+
+  .fiori-inline-product-name {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--text);
+    margin: 0 0 0.15rem;
+  }
+
+  .fiori-inline-product-price {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin: 0;
+  }
+
+  .fiori-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+
+  .fiori-cancel-btn:hover {
+    border-color: var(--burgundy);
+    color: var(--burgundy);
+  }
+
+  .fiori-order-form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .fiori-form-full { width: 100%; }
+
+  .fiori-req { color: var(--burgundy); }
+
+  .fiori-field-hint {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+    line-height: 1.45;
+  }
+
+  .fiori-readonly-input {
+    background: var(--bg-soft) !important;
+    color: var(--text-muted) !important;
+    cursor: default !important;
+    font-weight: 600;
+  }
+
+  .fiori-char-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 0.2rem;
+  }
+
+  /* Price summary */
+  .fiori-price-summary {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 0;
+    margin: 0.75rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .fiori-price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .fiori-price-total {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  /* Payment options */
+  .fiori-payment-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+
+  .fiori-payment-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1.1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text);
+    transition: all var(--transition);
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .fiori-payment-option:has(input:checked) {
+    border-color: var(--gold);
+    background: rgba(184,150,110,0.07);
+    color: var(--gold);
+  }
+
+  .fiori-payment-option input[type="radio"] {
+    accent-color: var(--gold);
+    width: 16px;
+    height: 16px;
+    margin: 0;
+  }
+
+  .fiori-payment-icon {
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+  }
+
+  .fiori-submit-row {
+    margin-top: 0.5rem;
+  }
+
+  .fiori-submit-row .btn {
+    padding: 0.9rem 2.5rem;
   }
 
   @media (max-width: 900px) {
@@ -2377,67 +2656,94 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   // ============================================
-  // FIORI / FLOWER ORDER MODAL
+  // FIORI / FLOWER ORDER — INLINE FORM
   // ============================================
-  const fioriModalOverlay = document.getElementById('fiori-modal-overlay');
-  const fioriModalClose   = document.getElementById('fiori-modal-close');
-  const fioriOrderForm    = document.getElementById('fiori-order-form');
-  const fioriProductLabel = document.getElementById('fiori-modal-product-name');
-  const fioriOrderStatus  = document.getElementById('fiori-order-status');
-  const fioriSubmitBtn    = document.getElementById('fiori-order-submit-btn');
+  const fioriFormWrap    = document.getElementById('fiori-inline-form-wrap');
+  const fioriOrderForm   = document.getElementById('fiori-order-form');
+  const fioriOrderStatus = document.getElementById('fiori-order-status');
+  const fioriCancelBtn   = document.getElementById('fiori-cancel-btn');
 
   let selectedFlowerProduct = '';
   let selectedFlowerPrice   = '';
 
-  function openFioriModal(productName, productPrice) {
+  function showFioriForm(productName, productPrice) {
     selectedFlowerProduct = productName;
     selectedFlowerPrice   = productPrice;
-    if (fioriProductLabel) {
-      fioriProductLabel.textContent = `${productName} — € ${productPrice}`;
+
+    // Product header
+    const nameEl  = document.getElementById('fiori-inline-product-name');
+    const priceEl = document.getElementById('fiori-inline-product-price');
+    if (nameEl)  nameEl.textContent  = productName;
+    if (priceEl) priceEl.textContent = `€ ${productPrice} IVA inclusa`;
+
+    // Auto-fill defunto field
+    const defuntoInput = document.getElementById('fiori-defunto');
+    if (defuntoInput) defuntoInput.value = nomeDefuntoCompleto || '';
+
+    // Price summary
+    const summaryLabel = document.getElementById('fiori-summary-label');
+    const summaryPrice = document.getElementById('fiori-summary-price');
+    const summaryTotal = document.getElementById('fiori-summary-total');
+    if (summaryLabel) summaryLabel.textContent = `Prezzo del prodotto €${productPrice} x 1`;
+    if (summaryPrice) summaryPrice.textContent = `€${productPrice}`;
+    if (summaryTotal) summaryTotal.textContent = `€${productPrice}`;
+
+    // Reset form fields (except defunto)
+    const mittente = document.getElementById('fiori-mittente');
+    const nastro   = document.getElementById('fiori-nastro');
+    const biglietto= document.getElementById('fiori-biglietto');
+    const luogo    = document.getElementById('fiori-luogo');
+    const note     = document.getElementById('fiori-note');
+    const privacy  = document.getElementById('fiori-privacy');
+    if (mittente)  mittente.value  = '';
+    if (nastro)    nastro.value    = '';
+    if (biglietto) biglietto.value = '';
+    if (luogo)     luogo.value     = '';
+    if (note)      note.value      = '';
+    if (privacy)   privacy.checked = false;
+    document.querySelectorAll('input[name="pagamento"]').forEach(r => r.checked = false);
+    document.getElementById('nastro-count') && (document.getElementById('nastro-count').textContent = '0');
+    document.getElementById('biglietto-count') && (document.getElementById('biglietto-count').textContent = '0');
+    if (fioriOrderStatus) { fioriOrderStatus.style.display = 'none'; fioriOrderStatus.textContent = ''; }
+
+    // Show form and scroll to it
+    if (fioriFormWrap) {
+      fioriFormWrap.style.display = 'block';
+      setTimeout(() => fioriFormWrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
     }
-    if (fioriOrderStatus) {
-      fioriOrderStatus.style.display = 'none';
-      fioriOrderStatus.textContent = '';
-    }
-    if (fioriOrderForm) fioriOrderForm.reset();
-    if (fioriModalOverlay) {
-      fioriModalOverlay.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
+
+    // Highlight selected card
+    document.querySelectorAll('.fiori-card').forEach(card => {
+      card.classList.toggle('fiori-card-selected', card.dataset.product === productName);
+    });
   }
 
-  function closeFioriModal() {
-    if (fioriModalOverlay) {
-      fioriModalOverlay.style.display = 'none';
-      document.body.style.overflow = '';
-    }
+  function hideFioriForm() {
+    if (fioriFormWrap) fioriFormWrap.style.display = 'none';
+    document.querySelectorAll('.fiori-card').forEach(c => c.classList.remove('fiori-card-selected'));
   }
 
-  // Open modal on each "Scegli" button
+  // "Scegli" buttons
   document.querySelectorAll('.fiori-order-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const product = btn.dataset.product || '';
-      const price   = btn.dataset.price   || '';
-      openFioriModal(product, price);
+      showFioriForm(btn.dataset.product || '', btn.dataset.price || '');
     });
   });
 
-  // Close on X button
-  fioriModalClose?.addEventListener('click', closeFioriModal);
+  // Cancel button
+  fioriCancelBtn?.addEventListener('click', hideFioriForm);
 
-  // Close on overlay click (outside box)
-  fioriModalOverlay?.addEventListener('click', (e) => {
-    if (e.target === fioriModalOverlay) closeFioriModal();
+  // Char counters
+  document.getElementById('fiori-nastro')?.addEventListener('input', function() {
+    const el = document.getElementById('nastro-count');
+    if (el) el.textContent = this.value.length;
+  });
+  document.getElementById('fiori-biglietto')?.addEventListener('input', function() {
+    const el = document.getElementById('biglietto-count');
+    if (el) el.textContent = this.value.length;
   });
 
-  // Close on Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && fioriModalOverlay?.style.display === 'flex') {
-      closeFioriModal();
-    }
-  });
-
-  // Form submit → open WhatsApp
+  // Form submit → WhatsApp
   fioriOrderForm?.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -2451,33 +2757,47 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       return;
     }
 
-    const nome     = document.getElementById('fiori-nome')?.value.trim()    || '';
-    const telefono = document.getElementById('fiori-telefono')?.value.trim() || '';
-    const note     = document.getElementById('fiori-note')?.value.trim()     || '';
+    const mittente  = document.getElementById('fiori-mittente')?.value.trim()  || '';
+    const defunto   = document.getElementById('fiori-defunto')?.value.trim()   || '';
+    const nastro    = document.getElementById('fiori-nastro')?.value.trim()    || '';
+    const biglietto = document.getElementById('fiori-biglietto')?.value.trim() || '';
+    const luogo     = document.getElementById('fiori-luogo')?.value.trim()     || '';
+    const note      = document.getElementById('fiori-note')?.value.trim()      || '';
+    const pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || '';
 
-    if (!nome || !telefono) {
+    if (!mittente || !luogo) {
       if (fioriOrderStatus) {
         fioriOrderStatus.className = 'form-status status-error';
         fioriOrderStatus.style.display = 'block';
-        fioriOrderStatus.textContent = 'Nome e telefono sono obbligatori.';
+        fioriOrderStatus.textContent = 'Il tuo nome e il luogo di consegna sono obbligatori.';
+      }
+      return;
+    }
+
+    if (!pagamento) {
+      if (fioriOrderStatus) {
+        fioriOrderStatus.className = 'form-status status-error';
+        fioriOrderStatus.style.display = 'block';
+        fioriOrderStatus.textContent = 'Seleziona un metodo di pagamento.';
       }
       return;
     }
 
     // Build WhatsApp message
-    const defuntoLabel = nomeDefuntoCompleto ? ` per ${nomeDefuntoCompleto}` : '';
-    let msg = `🌸 *Ordine composizione floreale${defuntoLabel}*\n\n`;
+    let msg = `🌸 *Ordine composizione floreale*\n\n`;
     msg += `*Composizione:* ${selectedFlowerProduct}\n`;
     msg += `*Prezzo:* € ${selectedFlowerPrice}\n\n`;
-    msg += `*Nome:* ${nome}\n`;
-    msg += `*Telefono:* ${telefono}\n`;
-    if (note) msg += `*Note:* ${note}\n`;
+    msg += `*Mittente:* ${mittente}\n`;
+    msg += `*Defunto:* ${defunto}\n`;
+    if (nastro)    msg += `*Scritta sul nastro:* ${nastro}\n`;
+    if (biglietto) msg += `*Biglietto:* ${biglietto}\n`;
+    msg += `*Luogo di consegna:* ${luogo}\n`;
+    if (note)      msg += `*Note:* ${note}\n`;
+    msg += `*Pagamento:* ${pagamento}\n`;
     msg += `\n_Inviato tramite servizifadi.it_`;
 
-    const waNumber = '390963353321'; // +39 0963 353321
+    const waNumber = '390963353321';
     const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-
     window.open(waUrl, '_blank', 'noopener,noreferrer');
-    closeFioriModal();
   });
 </script>
