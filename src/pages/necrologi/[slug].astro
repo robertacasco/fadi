@@ -146,6 +146,13 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
             </svg>
             Invia una Foto
           </a>
+          <a href="#invia-fiori" class="btn btn-outline-gold" style="width: 100%; justify-content: center; padding: 0.9rem 0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22c0 0-8-5.333-8-12a8 8 0 0 1 16 0c0 6.667-8 12-8 12z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Invia dei Fiori
+          </a>
         </div>
       </div>
 
@@ -358,9 +365,137 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     </div>
   </section>
 
+  <!-- =========================================
+       SEZIONE FIORI / FLOWER E-COMMERCE
+       ========================================= -->
+  <section class="section fiori-section" id="invia-fiori">
+    <div class="container">
+      <div class="text-center section-header">
+        <span class="section-label">Fioreria FADI</span>
+        <h2 class="section-title">Ordina una Composizione Floreale</h2>
+        <div class="divider mx-auto"></div>
+        <p class="fiori-intro-text">
+          Scegli la tua composizione floreale da inviare alla famiglia in segno di vicinanza.<br/>
+          Noi penseremo a consegnarla presso la casa funeraria o il luogo dove riposa la salma.<br/>
+          <strong>La consegna sarà garantita se l'ordine ci perverrà almeno 3 ore prima del servizio funebre.</strong><br/>
+          Per urgenze contattare il numero <a href="tel:0963353321" class="gold-link">0963 353321</a>
+        </p>
+        <p class="fiori-disclaimer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;opacity:0.6"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          In base alla stagione, i fiori potrebbero essere diversi da quelli rappresentati in figura. L'immagine è puramente indicativa.
+        </p>
+      </div>
+
+      <div class="fiori-grid">
+
+        <!-- PRODOTTO 1: Bouquet -->
+        <div class="fiori-card" data-product="Bouquet di Fiori Bianchi" data-price="45">
+          <div class="fiori-card-img-wrap">
+            <img src="/fiori/bouquet.png" alt="Bouquet di Fiori Bianchi" class="fiori-card-img" loading="lazy" />
+          </div>
+          <div class="fiori-card-body">
+            <h4 class="fiori-card-name">Bouquet di Fiori Bianchi</h4>
+            <p class="fiori-card-desc">Elegante composizione di rose e gigli bianchi, simbolo di purezza e commiato.</p>
+            <div class="fiori-card-footer">
+              <span class="fiori-price">€ 45,00</span>
+              <button type="button" class="btn btn-gold fiori-order-btn" data-product="Bouquet di Fiori Bianchi" data-price="45,00">Scegli</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODOTTO 2: Corona -->
+        <div class="fiori-card" data-product="Corona Funebre" data-price="120">
+          <div class="fiori-card-img-wrap">
+            <img src="/fiori/corona.png" alt="Corona Funebre" class="fiori-card-img" loading="lazy" />
+          </div>
+          <div class="fiori-card-body">
+            <h4 class="fiori-card-name">Corona Funebre</h4>
+            <p class="fiori-card-desc">Corona circolare in crisantemi bianchi e verdi, tributo tradizionale di rispetto.</p>
+            <div class="fiori-card-footer">
+              <span class="fiori-price">€ 120,00</span>
+              <button type="button" class="btn btn-gold fiori-order-btn" data-product="Corona Funebre" data-price="120,00">Scegli</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODOTTO 3: Cuscino -->
+        <div class="fiori-card" data-product="Cuscino Floreale" data-price="80">
+          <div class="fiori-card-img-wrap">
+            <img src="/fiori/cuscino.png" alt="Cuscino Floreale" class="fiori-card-img" loading="lazy" />
+          </div>
+          <div class="fiori-card-body">
+            <h4 class="fiori-card-name">Cuscino Floreale</h4>
+            <p class="fiori-card-desc">Cuscino di rose bianche e verde decorativo, simbolo di pace eterna.</p>
+            <div class="fiori-card-footer">
+              <span class="fiori-price">€ 80,00</span>
+              <button type="button" class="btn btn-gold fiori-order-btn" data-product="Cuscino Floreale" data-price="80,00">Scegli</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODOTTO 4: Composizione Alta -->
+        <div class="fiori-card" data-product="Composizione Alta in Vaso" data-price="65">
+          <div class="fiori-card-img-wrap">
+            <img src="/fiori/composizione.png" alt="Composizione Alta in Vaso" class="fiori-card-img" loading="lazy" />
+          </div>
+          <div class="fiori-card-body">
+            <h4 class="fiori-card-name">Composizione Alta in Vaso</h4>
+            <p class="fiori-card-desc">Elegante composizione verticale di gigli e orchidee bianchi in vaso decorativo.</p>
+            <div class="fiori-card-footer">
+              <span class="fiori-price">€ 65,00</span>
+              <button type="button" class="btn btn-gold fiori-order-btn" data-product="Composizione Alta in Vaso" data-price="65,00">Scegli</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /fiori-grid -->
+    </div>
+  </section>
+
+  <!-- MODAL ORDINE FIORI -->
+  <div id="fiori-modal-overlay" class="fiori-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="fiori-modal-title">
+    <div class="fiori-modal-box">
+      <button type="button" id="fiori-modal-close" class="fiori-modal-close" aria-label="Chiudi">&times;</button>
+      <div class="fiori-modal-header">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div>
+          <h3 id="fiori-modal-title">Completa il tuo ordine</h3>
+          <p id="fiori-modal-product-name" class="fiori-modal-product-name"></p>
+        </div>
+      </div>
+
+      <form id="fiori-order-form" class="memorial-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="fiori-nome">Nome e Cognome *</label>
+          <input type="text" id="fiori-nome" name="nome" class="form-input" placeholder="Il tuo nome completo" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fiori-telefono">Telefono *</label>
+          <input type="tel" id="fiori-telefono" name="telefono" class="form-input" placeholder="Es. 333 1234567" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fiori-note">Note (opzionale)</label>
+          <textarea id="fiori-note" name="note" class="form-textarea" rows="2" placeholder="Es. dedica da inserire nel bigliettino..."></textarea>
+        </div>
+        <div class="form-group checkbox-group" style="margin-top:0.5rem;margin-bottom:0.75rem;">
+          <label class="checkbox-label" style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;font-size:0.85rem;color:var(--text-muted);user-select:none;">
+            <input type="checkbox" id="fiori-privacy" name="privacy" required style="accent-color:var(--burgundy,#6b1426);width:18px;height:18px;margin:3px 0 0 0;cursor:pointer;" />
+            <span>Acconsento al trattamento dei miei dati personali (<a href="https://www.iubenda.com/privacy-policy/37937373" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">clicca qui per maggiori dettagli</a>).</span>
+          </label>
+        </div>
+        <div class="form-status" id="fiori-order-status"></div>
+        <button type="submit" class="btn btn-gold btn-block" id="fiori-order-submit-btn" style="margin-top:0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.32 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Invia richiesta via WhatsApp
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Interactive Forms Section -->
   <!-- Interactive Forms Section -->
   <section class="section interactive-memorial-section" id="interactive-area">
+
     <div class="container interactive-grid">
       <!-- CONDOLENCE FORM COLUMN -->
       <div class="condolence-column" id="cordoglio" style="width: 100%;">
@@ -1407,6 +1542,233 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     border: 0;
   }
 
+  /* ==========================================
+     FIORI / FLOWER E-COMMERCE SECTION
+     ========================================== */
+  .fiori-section {
+    background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%);
+    border-top: 1px solid var(--border);
+  }
+
+  .fiori-intro-text {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    max-width: 680px;
+    margin: 1.25rem auto 0.5rem;
+  }
+
+  .fiori-disclaimer {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    opacity: 0.75;
+    max-width: 600px;
+    margin: 0.5rem auto 0;
+    font-style: italic;
+  }
+
+  .fiori-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .fiori-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .fiori-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  }
+
+  .fiori-card-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f8f6f2;
+  }
+
+  .fiori-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .fiori-card:hover .fiori-card-img {
+    transform: scale(1.04);
+  }
+
+  .fiori-card-body {
+    padding: 1.1rem 1.2rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.4rem;
+  }
+
+  .fiori-card-name {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .fiori-card-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+  }
+
+  .fiori-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .fiori-price {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+  }
+
+  .fiori-order-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.06em;
+  }
+
+  /* FIORI MODAL */
+  .fiori-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeInOverlay 0.2s ease;
+  }
+
+  @keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .fiori-modal-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    width: 100%;
+    max-width: 460px;
+    position: relative;
+    animation: slideUpModal 0.25s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  @keyframes slideUpModal {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fiori-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .fiori-modal-close:hover {
+    color: var(--text);
+    background: var(--bg-soft);
+  }
+
+  .fiori-modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-right: 2rem;
+  }
+
+  .fiori-modal-header h3 {
+    margin: 0 0 0.2rem;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+
+  .fiori-modal-product-name {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .gold-link {
+    color: var(--gold);
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .fiori-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 540px) {
+    .fiori-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .fiori-card-body {
+      padding: 0.85rem;
+    }
+    .fiori-card-name {
+      font-size: 0.88rem;
+    }
+    .fiori-card-footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .fiori-order-btn {
+      width: 100%;
+      text-align: center;
+    }
+    .fiori-modal-box {
+      padding: 1.5rem 1.25rem;
+    }
+  }
+
   /* Presets Modal Styles */
   :global(.presets-modal-overlay) {
     display: none;
@@ -1509,7 +1871,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 </style>
 
 <!-- Client Side Forms and Actions -->
-<script define:vars={{ slug, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '' }}>
+<script define:vars={{ slug, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '', nomeDefuntoCompleto: nomeCompleto || '' }}>
   const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
   
   // 1. SUBMIT CONDOLENCE ACTION
@@ -2013,4 +2375,109 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       });
     });
   }
+
+  // ============================================
+  // FIORI / FLOWER ORDER MODAL
+  // ============================================
+  const fioriModalOverlay = document.getElementById('fiori-modal-overlay');
+  const fioriModalClose   = document.getElementById('fiori-modal-close');
+  const fioriOrderForm    = document.getElementById('fiori-order-form');
+  const fioriProductLabel = document.getElementById('fiori-modal-product-name');
+  const fioriOrderStatus  = document.getElementById('fiori-order-status');
+  const fioriSubmitBtn    = document.getElementById('fiori-order-submit-btn');
+
+  let selectedFlowerProduct = '';
+  let selectedFlowerPrice   = '';
+
+  function openFioriModal(productName, productPrice) {
+    selectedFlowerProduct = productName;
+    selectedFlowerPrice   = productPrice;
+    if (fioriProductLabel) {
+      fioriProductLabel.textContent = `${productName} — € ${productPrice}`;
+    }
+    if (fioriOrderStatus) {
+      fioriOrderStatus.style.display = 'none';
+      fioriOrderStatus.textContent = '';
+    }
+    if (fioriOrderForm) fioriOrderForm.reset();
+    if (fioriModalOverlay) {
+      fioriModalOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeFioriModal() {
+    if (fioriModalOverlay) {
+      fioriModalOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+
+  // Open modal on each "Scegli" button
+  document.querySelectorAll('.fiori-order-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const product = btn.dataset.product || '';
+      const price   = btn.dataset.price   || '';
+      openFioriModal(product, price);
+    });
+  });
+
+  // Close on X button
+  fioriModalClose?.addEventListener('click', closeFioriModal);
+
+  // Close on overlay click (outside box)
+  fioriModalOverlay?.addEventListener('click', (e) => {
+    if (e.target === fioriModalOverlay) closeFioriModal();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && fioriModalOverlay?.style.display === 'flex') {
+      closeFioriModal();
+    }
+  });
+
+  // Form submit → open WhatsApp
+  fioriOrderForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const privacyOk = document.getElementById('fiori-privacy')?.checked ?? false;
+    if (!privacyOk) {
+      if (fioriOrderStatus) {
+        fioriOrderStatus.className = 'form-status status-error';
+        fioriOrderStatus.style.display = 'block';
+        fioriOrderStatus.textContent = 'È necessario accettare l\'informativa sulla privacy.';
+      }
+      return;
+    }
+
+    const nome     = document.getElementById('fiori-nome')?.value.trim()    || '';
+    const telefono = document.getElementById('fiori-telefono')?.value.trim() || '';
+    const note     = document.getElementById('fiori-note')?.value.trim()     || '';
+
+    if (!nome || !telefono) {
+      if (fioriOrderStatus) {
+        fioriOrderStatus.className = 'form-status status-error';
+        fioriOrderStatus.style.display = 'block';
+        fioriOrderStatus.textContent = 'Nome e telefono sono obbligatori.';
+      }
+      return;
+    }
+
+    // Build WhatsApp message
+    const defuntoLabel = nomeDefuntoCompleto ? ` per ${nomeDefuntoCompleto}` : '';
+    let msg = `🌸 *Ordine composizione floreale${defuntoLabel}*\n\n`;
+    msg += `*Composizione:* ${selectedFlowerProduct}\n`;
+    msg += `*Prezzo:* € ${selectedFlowerPrice}\n\n`;
+    msg += `*Nome:* ${nome}\n`;
+    msg += `*Telefono:* ${telefono}\n`;
+    if (note) msg += `*Note:* ${note}\n`;
+    msg += `\n_Inviato tramite servizifadi.it_`;
+
+    const waNumber = '390963353321'; // +39 0963 353321
+    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    closeFioriModal();
+  });
 </script>
