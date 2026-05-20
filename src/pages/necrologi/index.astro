@@ -1,28 +1,23 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 
-const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
-const apiUrl = 'https://api.cas-per.it/api/public/v1/annunci?limit=100';
+// SSR: dati sempre freschi dall'API
+export const prerender = false;
 
-let annunci = [];
-let error = null;
+const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
+
+let annunci: any[] = [];
+let error: string | null = null;
 
 try {
-  const res = await fetch(apiUrl, {
-    headers: {
-      'X-API-Key': apiKey,
-      'Accept': 'application/json'
-    }
+  const res = await fetch('https://api.cas-per.it/api/public/v1/annunci?limit=200', {
+    headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
   });
-
-  if (!res.ok) {
-    throw new Error(`Errore API: ${res.status} ${res.statusText}`);
-  }
-
+  if (!res.ok) throw new Error(`Errore API: ${res.status} ${res.statusText}`);
   const json = await res.json();
   annunci = json.data || [];
 } catch (err: any) {
-  console.error('Error fetching annunci at build time:', err);
+  console.error('Error fetching annunci:', err);
   error = err.message || 'Impossibile caricare gli annunci in questo momento.';
 }
 
@@ -37,9 +32,7 @@ function formatMorte(dateStr: string) {
       'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
       'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
     ];
-    if (monthIndex >= 0 && monthIndex < 12) {
-      return `${day} ${months[monthIndex]} ${year}`;
-    }
+    if (monthIndex >= 0 && monthIndex < 12) return `${day} ${months[monthIndex]} ${year}`;
   }
   return dateStr;
 }
@@ -50,21 +43,24 @@ function formatCerimonia(dateTimeStr: string) {
     const d = new Date(dateTimeStr);
     if (isNaN(d.getTime())) return '';
     const day = d.getDate();
-    const months = [
-      'Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu',
-      'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'
-    ];
+    const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
     const hour = String(d.getHours()).padStart(2, '0');
-    const min = String(d.getMinutes()).padStart(2, '0');
+    const min  = String(d.getMinutes()).padStart(2, '0');
     return `${day} ${months[d.getMonth()]} alle ore ${hour}:${min}`;
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
+}
+
+// Costruisce l'URL della foto con cache-buster basato su updated_at
+function fotoUrl(item: any): string {
+  const url = item?.defunto?.foto_url;
+  if (!url) return '';
+  const ts = item.updated_at ? new Date(item.updated_at).getTime() : '';
+  return ts ? `${url}?v=${ts}` : url;
 }
 ---
 
-<Layout 
-  title="Necrologi e Annunci Funebri — FADI" 
+<Layout
+  title="Necrologi e Annunci Funebri — FADI"
   description="Registro dei necrologi e annunci funebri dell'Agenzia Funebre FADI. Consulta i dettagli dei funerali, invia cordogli privati ed apponi la tua firma di presenza."
 >
   <section class="section necrologi-hero">
@@ -80,6 +76,7 @@ function formatCerimonia(dateTimeStr: string) {
 
   <section class="necrologi-list-section">
     <div class="container">
+
       <!-- Search and Filter Bar -->
       <div class="search-bar-container">
         <div class="search-box">
@@ -87,15 +84,13 @@ function formatCerimonia(dateTimeStr: string) {
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input 
-            type="text" 
-            id="necrologi-search" 
-            placeholder="Cerca per nome o cognome..." 
+          <input
+            type="text"
+            id="necrologi-search"
+            placeholder="Cerca per nome o cognome..."
             aria-label="Cerca necrologi"
           />
-          <button id="search-clear-btn" class="search-clear-btn" aria-label="Cancella ricerca" style="display: none;">
-            &times;
-          </button>
+          <button id="search-clear-btn" class="search-clear-btn" aria-label="Cancella ricerca" style="display: none;">&times;</button>
         </div>
         <div class="search-results-info">
           Trovati <span id="visible-count">{annunci.length}</span> annunci funebri
@@ -118,26 +113,26 @@ function formatCerimonia(dateTimeStr: string) {
       {!error && annunci.length > 0 && (
         <div class="necrologi-grid" id="necrologi-grid">
           {annunci.map((item: any) => {
-            const defunto = item.defunto || {};
+            const defunto  = item.defunto  || {};
             const annuncio = item.annuncio || {};
             const funerale = item.funerale || {};
-            const rosario = item.rosario || {};
-            const paese = annuncio.paese || 'Dasà';
+            const rosario  = item.rosario  || {};
+            const paese    = annuncio.paese || 'Dasà';
             const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
-            const haFoto = !!defunto.foto_url;
+            const haFoto   = !!defunto.foto_url;
+            const imgSrc   = fotoUrl(item);
             const dataMorteIta = formatMorte(defunto.data_morte);
-            
+
             return (
-              <article 
-                class="necrologio-card card" 
+              <article
+                class="necrologio-card card"
                 data-nominativo={nomeCompleto.toLowerCase()}
               >
                 <a href={`/necrologi/${item.slug}/`} class="card-main-link">
-                  {/* Image Container with Frame */}
                   <div class="card-img-wrapper">
                     {haFoto ? (
-                      <img 
-                        src={defunto.foto_url} 
+                      <img
+                        src={imgSrc}
                         alt={`Foto di ${nomeCompleto}`}
                         class="card-img"
                         loading="lazy"
@@ -147,11 +142,9 @@ function formatCerimonia(dateTimeStr: string) {
                         <div class="placeholder-cross">✝</div>
                       </div>
                     )}
-                    {/* Decorative Frame Overlay */}
                     <div class="card-img-border"></div>
                   </div>
 
-                  {/* Card Info Content */}
                   <div class="card-info">
                     <span class="card-location">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -162,7 +155,7 @@ function formatCerimonia(dateTimeStr: string) {
                     </span>
 
                     <h2 class="card-name">{nomeCompleto}</h2>
-                    
+
                     <div class="card-meta">
                       {dataMorteIta && (
                         <div class="meta-row">
@@ -180,7 +173,6 @@ function formatCerimonia(dateTimeStr: string) {
 
                     <div class="card-divider"></div>
 
-                    {/* Ceremonies Previews */}
                     <div class="card-ceremonies">
                       {funerale.data_ora ? (
                         <div class="ceremony-preview">
@@ -190,7 +182,7 @@ function formatCerimonia(dateTimeStr: string) {
                           </div>
                         </div>
                       ) : null}
-                      
+
                       {rosario.data_ora ? (
                         <div class="ceremony-preview">
                           <span class="ceremony-icon ceremony-icon--rosario" title="Rosario">📿</span>
@@ -211,14 +203,9 @@ function formatCerimonia(dateTimeStr: string) {
                   </div>
                 </a>
 
-                {/* Card Action Buttons */}
                 <div class="card-actions">
-                  <a href={`/necrologi/${item.slug}/`} class="btn-card btn-card-primary">
-                    Visualizza Dettaglio
-                  </a>
-                  <a href={`/necrologi/${item.slug}/#cordoglio`} class="btn-card btn-card-outline">
-                    Invia Cordoglio
-                  </a>
+                  <a href={`/necrologi/${item.slug}/`} class="btn-card btn-card-primary">Visualizza Dettaglio</a>
+                  <a href={`/necrologi/${item.slug}/#cordoglio`} class="btn-card btn-card-outline">Invia Cordoglio</a>
                 </div>
               </article>
             );
@@ -236,6 +223,10 @@ function formatCerimonia(dateTimeStr: string) {
         <p>Non ci sono annunci corrispondenti ai criteri di ricerca inseriti.</p>
         <button id="clear-search-btn-bottom" class="btn btn-outline btn-sm">Cancella filtro</button>
       </div>
+
+      <!-- Pagination -->
+      <nav class="pagination-nav" id="pagination-nav" aria-label="Paginazione annunci"></nav>
+
     </div>
   </section>
 </Layout>
@@ -247,14 +238,8 @@ function formatCerimonia(dateTimeStr: string) {
     padding: 4.5rem 0 3.5rem;
   }
 
-  .text-center {
-    text-align: center;
-  }
-
-  .mx-auto {
-    margin-left: auto;
-    margin-right: auto;
-  }
+  .text-center { text-align: center; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
 
   .necrologi-list-section {
     padding: 3.5rem 0 5rem;
@@ -294,7 +279,7 @@ function formatCerimonia(dateTimeStr: string) {
     color: var(--text);
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 30px; /* Fully rounded search pill */
+    border-radius: 30px;
     box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
     transition: all var(--transition);
     outline: none;
@@ -318,9 +303,7 @@ function formatCerimonia(dateTimeStr: string) {
     transition: color var(--transition);
   }
 
-  .search-clear-btn:hover {
-    color: var(--gold);
-  }
+  .search-clear-btn:hover { color: var(--gold); }
 
   .search-results-info {
     font-size: 0.85rem;
@@ -336,11 +319,11 @@ function formatCerimonia(dateTimeStr: string) {
   /* Grid Layout */
   .necrologi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2.5rem;
   }
 
-  /* Card Customizations */
+  /* Card */
   .necrologio-card {
     display: flex;
     flex-direction: column;
@@ -359,7 +342,7 @@ function formatCerimonia(dateTimeStr: string) {
   .card-img-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 3.2 / 4; /* Portrait oriented frame */
+    aspect-ratio: 3.2 / 4;
     background-color: var(--bg-soft);
     overflow: hidden;
   }
@@ -371,9 +354,7 @@ function formatCerimonia(dateTimeStr: string) {
     transition: transform var(--transition);
   }
 
-  .necrologio-card:hover .card-img {
-    transform: scale(1.03);
-  }
+  .necrologio-card:hover .card-img { transform: scale(1.03); }
 
   .card-img-placeholder {
     width: 100%;
@@ -381,7 +362,7 @@ function formatCerimonia(dateTimeStr: string) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--bg-soft) 0%, rgba(184, 150, 110, 0.05) 100%);
+    background: linear-gradient(135deg, var(--bg-soft) 0%, rgba(184,150,110,0.05) 100%);
   }
 
   .placeholder-cross {
@@ -391,7 +372,6 @@ function formatCerimonia(dateTimeStr: string) {
     font-family: var(--font-serif);
   }
 
-  /* Luxurious Gold Border Frame overlay */
   .card-img-border {
     position: absolute;
     inset: 12px;
@@ -400,11 +380,8 @@ function formatCerimonia(dateTimeStr: string) {
     transition: border-color var(--transition);
   }
 
-  .necrologio-card:hover .card-img-border {
-    border-color: rgba(184, 150, 110, 0.6);
-  }
+  .necrologio-card:hover .card-img-border { border-color: rgba(184, 150, 110, 0.6); }
 
-  /* Info block */
   .card-info {
     padding: 1.75rem 1.5rem;
     display: flex;
@@ -424,10 +401,6 @@ function formatCerimonia(dateTimeStr: string) {
     margin-bottom: 0.75rem;
   }
 
-  .card-location svg {
-    opacity: 0.8;
-  }
-
   .card-name {
     font-size: 1.45rem;
     font-weight: 600;
@@ -437,9 +410,7 @@ function formatCerimonia(dateTimeStr: string) {
     transition: color var(--transition);
   }
 
-  .necrologio-card:hover .card-name {
-    color: var(--gold);
-  }
+  .necrologio-card:hover .card-name { color: var(--gold); }
 
   .card-meta {
     display: flex;
@@ -456,14 +427,8 @@ function formatCerimonia(dateTimeStr: string) {
     padding-bottom: 2px;
   }
 
-  .meta-label {
-    color: var(--text-muted);
-  }
-
-  .meta-value {
-    font-weight: 600;
-    color: var(--text);
-  }
+  .meta-label { color: var(--text-muted); }
+  .meta-value { font-weight: 600; color: var(--text); }
 
   .card-divider {
     height: 1px;
@@ -471,7 +436,6 @@ function formatCerimonia(dateTimeStr: string) {
     margin: 0.25rem 0 1.25rem;
   }
 
-  /* Ceremonies styling */
   .card-ceremonies {
     display: flex;
     flex-direction: column;
@@ -480,11 +444,7 @@ function formatCerimonia(dateTimeStr: string) {
     color: var(--text-muted);
   }
 
-  .ceremony-preview {
-    display: flex;
-    gap: 0.65rem;
-    align-items: flex-start;
-  }
+  .ceremony-preview { display: flex; gap: 0.65rem; align-items: flex-start; }
 
   .ceremony-icon {
     font-size: 0.95rem;
@@ -496,29 +456,12 @@ function formatCerimonia(dateTimeStr: string) {
     text-align: center;
   }
 
-  .ceremony-icon--rosario {
-    font-size: 0.85rem;
-  }
+  .ceremony-icon--rosario { font-size: 0.85rem; }
+  .ceremony-text { line-height: 1.4; }
+  .ceremony-text strong { color: var(--text); font-weight: 600; }
+  .ceremony-preview--empty { justify-content: center; padding: 0.5rem 0; }
+  .italic { font-style: italic; }
 
-  .ceremony-text {
-    line-height: 1.4;
-  }
-
-  .ceremony-text strong {
-    color: var(--text);
-    font-weight: 600;
-  }
-
-  .ceremony-preview--empty {
-    justify-content: center;
-    padding: 0.5rem 0;
-  }
-
-  .italic {
-    font-style: italic;
-  }
-
-  /* Card Actions block */
   .card-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -546,21 +489,11 @@ function formatCerimonia(dateTimeStr: string) {
     border-right: 1px solid var(--border);
   }
 
-  .btn-card-primary:hover {
-    background: var(--gold);
-    color: #1a1f2e; /* Navy for premium contrast */
-  }
+  .btn-card-primary:hover { background: var(--gold); color: #1a1f2e; }
+  .btn-card-outline { background: transparent; color: var(--gold); }
+  .btn-card-outline:hover { background: var(--gold-dim); }
 
-  .btn-card-outline {
-    background: transparent;
-    color: var(--gold);
-  }
-
-  .btn-card-outline:hover {
-    background: var(--gold-dim);
-  }
-
-  /* Error and Empty States */
+  /* States */
   .error-container, .empty-container, .no-results-container {
     padding: 4rem 1.5rem;
     background: var(--bg-card);
@@ -571,119 +504,189 @@ function formatCerimonia(dateTimeStr: string) {
     box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
   }
 
-  .error-message {
-    color: #c0392b;
+  .error-message { color: #c0392b; font-weight: 600; margin-bottom: 1.5rem; }
+  .empty-message { color: var(--text-muted); font-style: italic; }
+
+  .no-results-container svg { color: var(--gold); margin-bottom: 1rem; opacity: 0.6; }
+  .no-results-container h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .no-results-container p { color: var(--text-muted); margin-bottom: 1.5rem; }
+  .btn-sm { padding: 0.5rem 1.25rem; font-size: 0.8rem; }
+
+  /* ── Pagination ── */
+  .pagination-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 3.5rem;
+  }
+
+  .pagination-nav button {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .empty-message {
-    color: var(--text-muted);
-    font-style: italic;
-  }
-
-  .no-results-container svg {
+  .pagination-nav button:hover:not(:disabled) {
+    border-color: var(--gold);
     color: var(--gold);
-    margin-bottom: 1rem;
-    opacity: 0.6;
+    background: var(--gold-dim);
   }
 
-  .no-results-container h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+  .pagination-nav button.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #1a1f2e;
+    font-weight: 700;
   }
 
-  .no-results-container p {
+  .pagination-nav button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .pagination-ellipsis {
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
-
-  .btn-sm {
-    padding: 0.5rem 1.25rem;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    padding: 0 0.25rem;
+    line-height: 40px;
   }
 
   @media (max-width: 768px) {
-    .necrologi-grid {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    
-    .search-bar-container {
-      margin-bottom: 2rem;
-    }
-
-    .search-box input {
-      padding: 0.85rem 2.5rem 0.85rem 2.75rem;
-      font-size: 0.95rem;
-    }
-
-    .search-icon {
-      left: 1rem;
-    }
+    .necrologi-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .search-bar-container { margin-bottom: 2rem; }
+    .search-box input { padding: 0.85rem 2.5rem 0.85rem 2.75rem; font-size: 0.95rem; }
+    .search-icon { left: 1rem; }
+    .pagination-nav button { min-width: 36px; height: 36px; font-size: 0.82rem; }
   }
 </style>
 
 <script>
-  // Client-side search and filtering implementation
   document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('necrologi-search') as HTMLInputElement | null;
-    const clearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement | null;
-    const clearBtnBottom = document.getElementById('clear-search-btn-bottom') as HTMLButtonElement | null;
-    const grid = document.getElementById('necrologi-grid');
-    const cards = document.querySelectorAll('.necrologio-card');
-    const visibleCountEl = document.getElementById('visible-count');
-    const noResults = document.getElementById('no-results');
+    const searchInput     = document.getElementById('necrologi-search') as HTMLInputElement | null;
+    const clearBtn        = document.getElementById('search-clear-btn') as HTMLButtonElement | null;
+    const clearBtnBottom  = document.getElementById('clear-search-btn-bottom') as HTMLButtonElement | null;
+    const grid            = document.getElementById('necrologi-grid');
+    const visibleCountEl  = document.getElementById('visible-count');
+    const noResults       = document.getElementById('no-results');
+    const paginationNav   = document.getElementById('pagination-nav');
 
-    if (!searchInput || !cards.length) return;
+    const PER_PAGE = 12;
+    let currentPage = 1;
+    let filteredCards: HTMLElement[] = [];
 
-    function filterCards() {
-      const query = searchInput!.value.trim().toLowerCase();
-      let visibleCount = 0;
+    const allCards = Array.from(document.querySelectorAll('.necrologio-card')) as HTMLElement[];
 
-      // Toggle clear button visibility
-      if (clearBtn) {
-        clearBtn.style.display = query ? 'block' : 'none';
-      }
+    if (!allCards.length) return;
 
-      cards.forEach((cardEl) => {
-        const card = cardEl as HTMLElement;
-        const name = card.getAttribute('data-nominativo') || '';
-        
-        if (name.includes(query)) {
-          card.style.display = 'flex';
-          visibleCount++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
+    // ── Paginate ──────────────────────────────────────────────
+    function paginate() {
+      const total = filteredCards.length;
+      const totalPages = Math.ceil(total / PER_PAGE);
 
-      // Update count
-      if (visibleCountEl) {
-        visibleCountEl.textContent = String(visibleCount);
-      }
+      // Show only cards on current page
+      allCards.forEach(c => c.style.display = 'none');
+      const start = (currentPage - 1) * PER_PAGE;
+      filteredCards.slice(start, start + PER_PAGE).forEach(c => c.style.display = 'flex');
 
-      // Toggle no-results state
-      if (grid) {
-        if (visibleCount === 0) {
-          grid.style.display = 'none';
-          if (noResults) noResults.style.display = 'block';
-        } else {
-          grid.style.display = 'grid';
-          if (noResults) noResults.style.display = 'none';
-        }
-      }
+      // Update visible count
+      if (visibleCountEl) visibleCountEl.textContent = String(total);
+
+      // Show/hide states
+      if (grid) grid.style.display = total > 0 ? 'grid' : 'none';
+      if (noResults) noResults.style.display = total === 0 ? 'block' : 'none';
+
+      // Render pagination controls
+      renderPagination(totalPages);
     }
 
-    // Event listeners
-    searchInput.addEventListener('input', filterCards);
+    function renderPagination(totalPages: number) {
+      if (!paginationNav) return;
+      paginationNav.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const addBtn = (label: string | number, page: number, isActive = false, disabled = false) => {
+        const btn = document.createElement('button');
+        btn.textContent = String(label);
+        if (isActive) btn.classList.add('active');
+        btn.disabled = disabled;
+        btn.setAttribute('aria-label', typeof label === 'number' ? `Pagina ${label}` : String(label));
+        if (!disabled && !isActive) {
+          btn.addEventListener('click', () => {
+            currentPage = page;
+            paginate();
+            // Scroll to top of grid smoothly
+            grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+        paginationNav!.appendChild(btn);
+      };
+
+      const addEllipsis = () => {
+        const span = document.createElement('span');
+        span.className = 'pagination-ellipsis';
+        span.textContent = '…';
+        paginationNav!.appendChild(span);
+      };
+
+      // Prev
+      addBtn('←', currentPage - 1, false, currentPage === 1);
+
+      // Page numbers with ellipsis
+      const range: (number | '...')[] = [];
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          range.push(i);
+        } else if (range[range.length - 1] !== '...') {
+          range.push('...');
+        }
+      }
+
+      range.forEach(r => {
+        if (r === '...') { addEllipsis(); }
+        else { addBtn(r, r, r === currentPage); }
+      });
+
+      // Next
+      addBtn('→', currentPage + 1, false, currentPage === totalPages);
+    }
+
+    // ── Filter + reset page ────────────────────────────────────
+    function filterCards() {
+      const query = searchInput?.value.trim().toLowerCase() || '';
+      if (clearBtn) clearBtn.style.display = query ? 'block' : 'none';
+
+      filteredCards = allCards.filter(card => {
+        const name = card.getAttribute('data-nominativo') || '';
+        return name.includes(query);
+      });
+
+      currentPage = 1;
+      paginate();
+    }
+
+    // ── Init ──────────────────────────────────────────────────
+    filteredCards = allCards;
+    paginate();
+
+    // ── Events ────────────────────────────────────────────────
+    searchInput?.addEventListener('input', filterCards);
 
     function clearSearch() {
-      if (searchInput) {
-        searchInput.value = '';
-        filterCards();
-        searchInput.focus();
-      }
+      if (searchInput) { searchInput.value = ''; filterCards(); searchInput.focus(); }
     }
 
     clearBtn?.addEventListener('click', clearSearch);
