@@ -132,82 +132,84 @@ function formatCerimonia(dateTimeStr: string) {
                 class="necrologio-card card" 
                 data-nominativo={nomeCompleto.toLowerCase()}
               >
-                {/* Image Container with Frame */}
-                <div class="card-img-wrapper">
-                  {haFoto ? (
-                    <img 
-                      src={defunto.foto_url} 
-                      alt={`Foto di ${nomeCompleto}`}
-                      class="card-img"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div class="card-img-placeholder">
-                      <div class="placeholder-cross">✝</div>
-                    </div>
-                  )}
-                  {/* Decorative Frame Overlay */}
-                  <div class="card-img-border"></div>
-                </div>
-
-                {/* Card Info Content */}
-                <div class="card-info">
-                  <span class="card-location">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    {paese}
-                  </span>
-
-                  <h2 class="card-name">{nomeCompleto}</h2>
-                  
-                  <div class="card-meta">
-                    {dataMorteIta && (
-                      <div class="meta-row">
-                        <span class="meta-label">Mancato il:</span>
-                        <span class="meta-value">{dataMorteIta}</span>
+                <a href={`/necrologi/${item.slug}/`} class="card-main-link">
+                  {/* Image Container with Frame */}
+                  <div class="card-img-wrapper">
+                    {haFoto ? (
+                      <img 
+                        src={defunto.foto_url} 
+                        alt={`Foto di ${nomeCompleto}`}
+                        class="card-img"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="card-img-placeholder">
+                        <div class="placeholder-cross">✝</div>
                       </div>
                     )}
-                    {defunto.eta_visibile && defunto.eta && (
-                      <div class="meta-row">
-                        <span class="meta-label">Età:</span>
-                        <span class="meta-value">{defunto.eta} anni</span>
-                      </div>
-                    )}
+                    {/* Decorative Frame Overlay */}
+                    <div class="card-img-border"></div>
                   </div>
 
-                  <div class="card-divider"></div>
+                  {/* Card Info Content */}
+                  <div class="card-info">
+                    <span class="card-location">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      {paese}
+                    </span>
 
-                  {/* Ceremonies Previews */}
-                  <div class="card-ceremonies">
-                    {funerale.data_ora ? (
-                      <div class="ceremony-preview">
-                        <span class="ceremony-icon" title="Funerale">✝</span>
-                        <div class="ceremony-text">
-                          <strong>Funerale:</strong> {formatCerimonia(funerale.data_ora)}
-                        </div>
-                      </div>
-                    ) : null}
+                    <h2 class="card-name">{nomeCompleto}</h2>
                     
-                    {rosario.data_ora ? (
-                      <div class="ceremony-preview">
-                        <span class="ceremony-icon ceremony-icon--rosario" title="Rosario">📿</span>
-                        <div class="ceremony-text">
-                          <strong>Rosario:</strong> {formatCerimonia(rosario.data_ora)}
+                    <div class="card-meta">
+                      {dataMorteIta && (
+                        <div class="meta-row">
+                          <span class="meta-label">Mancato il:</span>
+                          <span class="meta-value">{dataMorteIta}</span>
                         </div>
-                      </div>
-                    ) : null}
+                      )}
+                      {defunto.eta_visibile && defunto.eta && (
+                        <div class="meta-row">
+                          <span class="meta-label">Età:</span>
+                          <span class="meta-value">{defunto.eta} anni</span>
+                        </div>
+                      )}
+                    </div>
 
-                    {!funerale.data_ora && !rosario.data_ora && (
-                      <div class="ceremony-preview ceremony-preview--empty">
-                        <div class="ceremony-text italic text-muted">
-                          Contattare l'agenzia per orari e dettagli.
+                    <div class="card-divider"></div>
+
+                    {/* Ceremonies Previews */}
+                    <div class="card-ceremonies">
+                      {funerale.data_ora ? (
+                        <div class="ceremony-preview">
+                          <span class="ceremony-icon" title="Funerale">✝</span>
+                          <div class="ceremony-text">
+                            <strong>Funerale:</strong> {formatCerimonia(funerale.data_ora)}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      ) : null}
+                      
+                      {rosario.data_ora ? (
+                        <div class="ceremony-preview">
+                          <span class="ceremony-icon ceremony-icon--rosario" title="Rosario">📿</span>
+                          <div class="ceremony-text">
+                            <strong>Rosario:</strong> {formatCerimonia(rosario.data_ora)}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {!funerale.data_ora && !rosario.data_ora && (
+                        <div class="ceremony-preview ceremony-preview--empty">
+                          <div class="ceremony-text italic text-muted">
+                            Contattare l'agenzia per orari e dettagli.
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </a>
 
                 {/* Card Action Buttons */}
                 <div class="card-actions">
@@ -344,6 +346,14 @@ function formatCerimonia(dateTimeStr: string) {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+  }
+
+  .card-main-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
   .card-img-wrapper {
