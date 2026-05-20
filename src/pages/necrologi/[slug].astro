@@ -1314,7 +1314,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   /* Manifesto Modal Styles */
-  .manifesto-modal-overlay {
+  :global(.manifesto-modal-overlay) {
     display: none;
     position: fixed;
     inset: 0;
@@ -1326,11 +1326,11 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  .manifesto-modal-overlay.active {
+  :global(.manifesto-modal-overlay.active) {
     display: flex !important;
     opacity: 1 !important;
   }
-  .manifesto-modal-content {
+  :global(.manifesto-modal-content) {
     position: relative;
     max-width: 90vw;
     max-height: 90vh;
@@ -1344,16 +1344,16 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     display: flex;
     flex-direction: column;
   }
-  .manifesto-modal-overlay.active .manifesto-modal-content {
+  :global(.manifesto-modal-overlay.active .manifesto-modal-content) {
     transform: scale(1) !important;
   }
-  .manifesto-modal-content img {
+  :global(.manifesto-modal-content img) {
     max-width: 100%;
     max-height: 80vh;
     object-fit: contain;
     border-radius: calc(var(--radius) - 4px);
   }
-  .manifesto-modal-caption {
+  :global(.manifesto-modal-caption) {
     text-align: center;
     margin-top: 0.75rem;
     font-family: var(--font-serif);
@@ -1361,7 +1361,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     font-weight: 600;
     color: var(--text);
   }
-  .close-manifesto-btn {
+  :global(.close-manifesto-btn) {
     position: absolute;
     top: -1.75rem;
     right: -1.75rem;
@@ -1380,7 +1380,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     justify-content: center;
     transition: all var(--transition);
   }
-  .close-manifesto-btn:hover {
+  :global(.close-manifesto-btn:hover) {
     background-color: var(--gold) !important;
     border-color: var(--gold) !important;
     transform: rotate(90deg);
