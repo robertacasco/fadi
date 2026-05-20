@@ -39,6 +39,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/casper-api/:path*", "destination": "https://api.cas-per.it/api/:path*" },
     { "source": "/diretta", "destination": "https://testaf.lab.cas-per.it/diretta/" },
     { "source": "/diretta/", "destination": "https://testaf.lab.cas-per.it/diretta/" },
     { "source": "/diretta/:path*", "destination": "https://testaf.lab.cas-per.it/diretta/:path*" },

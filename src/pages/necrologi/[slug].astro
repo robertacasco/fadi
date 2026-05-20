@@ -1067,7 +1067,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     if (!listContainer) return;
 
     try {
-      const res = await fetch(`https://api.cas-per.it/api/public/v1/firme/${slug}`, {
+      const res = await fetch(`/casper-api/public/v1/firme/${slug}`, {
         headers: {
           'X-API-Key': apiKey,
           'Accept': 'application/json'
@@ -1250,7 +1250,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const response = await fetch('https://api.cas-per.it/api/public/v1/cordogli', {
+      const response = await fetch('/casper-api/public/v1/cordogli', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1317,7 +1317,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const response = await fetch('https://api.cas-per.it/api/public/v1/firme', {
+      const response = await fetch('/casper-api/public/v1/firme', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
