@@ -546,7 +546,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           </div>
         </div>
       </div>
-    </div><!-- /page-sidebar-main -->
 
     <!-- RIGHT COLUMN: messaggi ricevuti -->
     <aside class="page-sidebar-right" id="messaggi-sidebar" aria-label="Messaggi di cordoglio ricevuti">
@@ -803,9 +802,8 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     </div>
   </section>
 
+    </div><!-- /page-sidebar-main -->
 
-    </div>
-  </div>
 
   <!-- Manifesto Modal -->
   {annuncio.epigrafe_url && (
@@ -2508,6 +2506,13 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       
       // Clear inputs
       cordoglioForm.reset();
+
+      // Add message live to sidebar if public
+      if (isPublic && window._sidebarAddMessage) {
+        const nome = payload.nome || 'Anonimo';
+        const testo = (typeof textVal === 'string' ? textVal : String(textVal)) || '';
+        window._sidebarAddMessage(nome, testo);
+      }
     } catch (err) {
       cordoglioStatus.className = 'form-status status-error';
       cordoglioStatus.textContent = err.message || 'Si è verificato un errore durante l\'invio. Verifica i dati o riprova più tardi.';
@@ -2933,6 +2938,120 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       });
     });
   }
+
+  // ============================================
+  // SIDEBAR: messaggi & foto ricevuti
+  // ============================================
+  (async () => {
+    const msgLoading = document.getElementById('msg-loading');
+    const msgList    = document.getElementById('msg-list');
+    const msgEmpty   = document.getElementById('msg-empty');
+    const msgCount   = document.getElementById('msg-count');
+    const fotoSection= document.getElementById('foto-section');
+    const fotoGrid   = document.getElementById('foto-grid');
+    const fotoCount  = document.getElementById('foto-count');
+
+    function initials(nome) {
+      if (!nome) return '?';
+      const parts = nome.trim().split(/\s+/);
+      return parts.length >= 2
+        ? (parts[0][0] + parts[1][0]).toUpperCase()
+        : parts[0].slice(0, 2).toUpperCase();
+    }
+
+    function formatDate(str) {
+      if (!str) return '';
+      try {
+        const d = new Date(str);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch { return ''; }
+    }
+
+    function renderMessages(items) {
+      if (msgLoading) msgLoading.style.display = 'none';
+      if (!items || items.length === 0) {
+        if (msgEmpty) msgEmpty.style.display = 'flex';
+        return;
+      }
+      if (msgCount) msgCount.textContent = items.length;
+      const html = items.map((m, i) => `
+        <div class="msg-card" style="animation-delay:${i * 0.06}s">
+          <div class="msg-avatar">${initials(m.nome || m.mittente)}</div>
+          <div class="msg-body">
+            <div class="msg-name">${m.nome || m.mittente || 'Anonimo'}</div>
+            <div class="msg-text">${(m.testo || '').replace(/\n/g, '<br>')}</div>
+            ${m.created_at || m.data ? `<div class="msg-date">${formatDate(m.created_at || m.data)}</div>` : ''}
+          </div>
+        </div>
+        ${i < items.length - 1 ? '<hr class="msg-divider">' : ''}
+      `).join('');
+      if (msgList) { msgList.innerHTML = html; msgList.style.display = 'flex'; }
+    }
+
+    function renderFotos(items) {
+      if (!items || items.length === 0) return;
+      if (fotoCount) fotoCount.textContent = items.length;
+      const html = items.map(f => {
+        const url = f.foto_url || f.url || '';
+        const nome = f.nome || f.mittente || '';
+        return `<div class="foto-thumb" title="${nome}">
+          <img src="${url}" alt="Foto da ${nome}" loading="lazy" onerror="this.closest('.foto-thumb').remove()">
+        </div>`;
+      }).join('');
+      if (fotoGrid) { fotoGrid.innerHTML = html; }
+      if (fotoSection) fotoSection.style.display = 'block';
+    }
+
+    // Expose function so the submit handler can add new messages live
+    window._sidebarAddMessage = function(nome, testo) {
+      if (!msgList) return;
+      if (msgEmpty) msgEmpty.style.display = 'none';
+      const count = parseInt(msgCount?.textContent || '0') + 1;
+      if (msgCount) msgCount.textContent = count;
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <div class="msg-card">
+          <div class="msg-avatar">${initials(nome)}</div>
+          <div class="msg-body">
+            <div class="msg-name">${nome}</div>
+            <div class="msg-text">${testo.replace(/\n/g, '<br>')}</div>
+            <div class="msg-date">Adesso</div>
+          </div>
+        </div>
+        <hr class="msg-divider">
+      `;
+      msgList.prepend(card);
+      msgList.style.display = 'flex';
+    };
+
+    try {
+      // Fetch public condolences
+      const res = await fetch(`https://api.cas-per.it/api/public/v1/cordogli?slug=${slug}`, {
+        headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+      });
+      if (!res.ok) throw new Error('API error');
+      const json = await res.json();
+      const items = (json.data || json.items || json || []).filter(m => m.visibile !== false);
+      renderMessages(items);
+
+      // Fetch public photos
+      try {
+        const resF = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli?slug=${slug}`, {
+          headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+        });
+        if (resF.ok) {
+          const jsonF = await resF.json();
+          const fotos = jsonF.data || jsonF.items || jsonF || [];
+          renderFotos(fotos);
+        }
+      } catch { /* foto non disponibili */ }
+
+    } catch {
+      if (msgLoading) msgLoading.style.display = 'none';
+      if (msgEmpty) msgEmpty.style.display = 'flex';
+    }
+  })();
 
   // ============================================
   // FIORI / FLOWER ORDER — INLINE FORM
