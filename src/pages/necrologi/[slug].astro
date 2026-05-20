@@ -375,16 +375,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 
 
   <!-- Interactive Forms Section -->
-  <!-- Interactive Forms Section -->
-
-  <!-- =========================================
-       TWO-COLUMN LAYOUT: form/fiori + sidebar
-       ========================================= -->
-  <div class="page-sidebar-layout">
-
-    <!-- LEFT COLUMN: form + fiori -->
-    <div class="page-sidebar-main">
-
   <section class="section interactive-memorial-section" id="interactive-area">
 
     <div class="container interactive-grid">
@@ -546,46 +536,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           </div>
         </div>
       </div>
-
-    <!-- RIGHT COLUMN: messaggi ricevuti -->
-    <aside class="page-sidebar-right" id="messaggi-sidebar" aria-label="Messaggi di cordoglio ricevuti">
-      <div class="sidebar-inner">
-        <div class="sidebar-header">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <h3 class="sidebar-title">Messaggi ricevuti</h3>
-          <span class="sidebar-count" id="msg-count"></span>
-        </div>
-
-        <!-- Loading state -->
-        <div id="msg-loading" class="sidebar-loading">
-          <div class="sidebar-skeleton"></div>
-          <div class="sidebar-skeleton"></div>
-          <div class="sidebar-skeleton"></div>
-        </div>
-
-        <!-- Messages list -->
-        <div id="msg-list" class="msg-list" style="display:none;"></div>
-
-        <!-- Empty state -->
-        <div id="msg-empty" class="sidebar-empty" style="display:none;">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <p>I messaggi di cordoglio pubblici appariranno qui.</p>
-        </div>
-
-        <!-- Photos section -->
-        <div id="foto-section" class="foto-section" style="display:none;">
-          <div class="sidebar-header" style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            <h3 class="sidebar-title">Foto ricevute</h3>
-            <span class="sidebar-count" id="foto-count"></span>
-          </div>
-          <div id="foto-grid" class="foto-grid"></div>
-        </div>
-
-      </div><!-- /sidebar-inner -->
-    </aside><!-- /page-sidebar-right -->
-
-  </div><!-- /page-sidebar-layout -->
+  </section>
 
 
   <section class="section fiori-section" id="invia-fiori">
@@ -802,8 +753,48 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     </div>
   </section>
 
-    </div><!-- /page-sidebar-main -->
+  <!-- =========================================
+       MESSAGGI & FOTO RICEVUTI
+       ========================================= -->
+  <section class="section messaggi-ricevuti-section" id="messaggi-ricevuti">
+    <div class="container">
+      <div class="text-center section-header">
+        <span class="section-label">In memoria</span>
+        <h2 class="section-title">Messaggi ricevuti</h2>
+        <div class="divider mx-auto"></div>
+        <p class="section-text" style="margin: 0 auto;">
+          I pensieri di affetto e le parole di cordoglio lasciati dalla comunità.
+        </p>
+      </div>
 
+      <!-- Loading state -->
+      <div id="msg-loading" class="msg-loading-wrap">
+        <div class="msg-skeleton"></div>
+        <div class="msg-skeleton"></div>
+        <div class="msg-skeleton"></div>
+      </div>
+
+      <!-- Messages grid -->
+      <div id="msg-list" class="msg-cards-grid" style="display:none;"></div>
+
+      <!-- Empty state -->
+      <div id="msg-empty" class="msg-empty-state" style="display:none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <p>I messaggi di cordoglio pubblici appariranno qui dopo l'invio.</p>
+      </div>
+
+      <!-- Foto ricevute -->
+      <div id="foto-section" class="foto-section-wrap" style="display:none;">
+        <div class="text-center" style="margin: 3rem 0 1.5rem;">
+          <span class="section-label">Ricordi fotografici</span>
+          <h3 class="section-title" style="font-size:1.5rem;">Foto ricevute</h3>
+          <div class="divider mx-auto"></div>
+        </div>
+        <div id="foto-grid" class="foto-grid-full"></div>
+      </div>
+
+    </div>
+  </section>
 
   <!-- Manifesto Modal -->
   {annuncio.epigrafe_url && (
@@ -2087,90 +2078,81 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   /* ============================================
-     TWO-COLUMN SIDEBAR LAYOUT
+     MESSAGGI RICEVUTI — full-width section
      ============================================ */
-  .page-sidebar-layout {
+  .messaggi-ricevuti-section {
+    background: var(--bg-soft);
+  }
+
+  /* Loading skeletons */
+  .msg-loading-wrap {
     display: grid;
-    grid-template-columns: 1fr 360px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .msg-skeleton {
+    height: 140px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Cards grid */
+  .msg-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 2.5rem;
     align-items: start;
-    gap: 0;
-    max-width: 1460px;
-    margin: 0 auto;
   }
 
-  .page-sidebar-main {
-    min-width: 0;
-  }
-
-  .page-sidebar-right {
-    position: sticky;
-    top: 2rem;
-    max-height: calc(100vh - 4rem);
-    overflow-y: auto;
-    padding: 0 1.5rem 1.5rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-
-  .page-sidebar-right::-webkit-scrollbar { width: 4px; }
-  .page-sidebar-right::-webkit-scrollbar-track { background: transparent; }
-  .page-sidebar-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-  .sidebar-inner {
+  /* Individual message card */
+  .msg-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg, 12px);
-    padding: 1.5rem;
-    min-height: 200px;
-  }
-
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .sidebar-title {
-    font-family: var(--font-serif);
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0;
-    flex: 1;
-  }
-
-  .sidebar-count {
-    font-size: 0.75rem;
-    font-weight: 700;
-    background: var(--gold-dim);
-    color: var(--gold);
-    border-radius: 20px;
-    padding: 0.15rem 0.6rem;
-    letter-spacing: 0.02em;
-  }
-
-  /* Message cards */
-  .msg-list {
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
+    animation: fadeInUp 0.4s ease both;
+    position: relative;
   }
 
-  .msg-card {
-    display: flex;
-    gap: 0.75rem;
-    animation: fadeInUp 0.35s ease both;
+  .msg-card::before {
+    content: '\201C';
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    color: var(--border);
+    line-height: 1;
+    pointer-events: none;
   }
 
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  .msg-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
   .msg-avatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: var(--gold-dim);
     color: var(--gold);
@@ -2178,55 +2160,52 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     align-items: center;
     justify-content: center;
     font-family: var(--font-serif);
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 700;
     flex-shrink: 0;
     border: 1px solid var(--border);
   }
 
-  .msg-body {
-    flex: 1;
-    min-width: 0;
-  }
-
   .msg-name {
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: var(--text);
-    margin-bottom: 0.2rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .msg-text {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    line-height: 1.55;
-    word-break: break-word;
+    line-height: 1.3;
   }
 
   .msg-date {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
-    opacity: 0.6;
-    margin-top: 0.3rem;
+    opacity: 0.65;
   }
 
-  .msg-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 0;
+  .msg-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    word-break: break-word;
+    flex: 1;
   }
 
-  /* Foto grid */
-  .foto-section {}
+  /* Empty state */
+  .msg-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3.5rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    margin-top: 2rem;
+  }
 
-  .foto-grid {
+  /* Foto full grid */
+  .foto-grid-full {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
   }
 
   .foto-thumb {
@@ -2250,48 +2229,17 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     display: block;
   }
 
-  /* Loading skeleton */
-  .sidebar-loading {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .sidebar-skeleton {
-    height: 64px;
-    border-radius: 8px;
-    background: linear-gradient(90deg, var(--bg-soft) 25%, var(--border) 50%, var(--bg-soft) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
-
-  @keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  /* Empty state */
-  .sidebar-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 2rem 1rem;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    line-height: 1.6;
-  }
-
-  /* Responsive: sidebar drops below on mobile */
-  @media (max-width: 960px) {
-    .page-sidebar-layout {
-      grid-template-columns: 1fr;
+  @media (max-width: 900px) {
+    .msg-loading-wrap,
+    .msg-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
-    .page-sidebar-right {
-      position: static;
-      max-height: none;
-      padding: 0 1.5rem 2rem;
+  }
+
+  @media (max-width: 560px) {
+    .msg-loading-wrap,
+    .msg-cards-grid {
+      grid-template-columns: 1fr;
     }
   }
 
@@ -2940,16 +2888,14 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   // ============================================
-  // SIDEBAR: messaggi & foto ricevuti
+  // MESSAGGI & FOTO RICEVUTI
   // ============================================
   (async () => {
     const msgLoading = document.getElementById('msg-loading');
     const msgList    = document.getElementById('msg-list');
     const msgEmpty   = document.getElementById('msg-empty');
-    const msgCount   = document.getElementById('msg-count');
     const fotoSection= document.getElementById('foto-section');
     const fotoGrid   = document.getElementById('foto-grid');
-    const fotoCount  = document.getElementById('foto-count');
 
     function initials(nome) {
       if (!nome) return '?';
@@ -2968,82 +2914,72 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       } catch { return ''; }
     }
 
+    function makeCard(nome, testo, data, delay = 0) {
+      return `
+        <div class="msg-card" style="animation-delay:${delay}s">
+          <div class="msg-card-top">
+            <div class="msg-avatar">${initials(nome)}</div>
+            <div>
+              <div class="msg-name">${nome || 'Anonimo'}</div>
+              ${data ? `<div class="msg-date">${formatDate(data)}</div>` : ''}
+            </div>
+          </div>
+          <div class="msg-text">${(testo || '').replace(/\n/g, '<br>')}</div>
+        </div>`;
+    }
+
     function renderMessages(items) {
       if (msgLoading) msgLoading.style.display = 'none';
       if (!items || items.length === 0) {
         if (msgEmpty) msgEmpty.style.display = 'flex';
         return;
       }
-      if (msgCount) msgCount.textContent = items.length;
-      const html = items.map((m, i) => `
-        <div class="msg-card" style="animation-delay:${i * 0.06}s">
-          <div class="msg-avatar">${initials(m.nome || m.mittente)}</div>
-          <div class="msg-body">
-            <div class="msg-name">${m.nome || m.mittente || 'Anonimo'}</div>
-            <div class="msg-text">${(m.testo || '').replace(/\n/g, '<br>')}</div>
-            ${m.created_at || m.data ? `<div class="msg-date">${formatDate(m.created_at || m.data)}</div>` : ''}
-          </div>
-        </div>
-        ${i < items.length - 1 ? '<hr class="msg-divider">' : ''}
-      `).join('');
-      if (msgList) { msgList.innerHTML = html; msgList.style.display = 'flex'; }
+      const html = items.map((m, i) =>
+        makeCard(m.nome || m.mittente, m.testo, m.created_at || m.data, i * 0.07)
+      ).join('');
+      if (msgList) { msgList.innerHTML = html; msgList.style.display = 'grid'; }
     }
 
     function renderFotos(items) {
       if (!items || items.length === 0) return;
-      if (fotoCount) fotoCount.textContent = items.length;
       const html = items.map(f => {
-        const url = f.foto_url || f.url || '';
+        const url  = f.foto_url || f.url || '';
         const nome = f.nome || f.mittente || '';
         return `<div class="foto-thumb" title="${nome}">
           <img src="${url}" alt="Foto da ${nome}" loading="lazy" onerror="this.closest('.foto-thumb').remove()">
         </div>`;
       }).join('');
-      if (fotoGrid) { fotoGrid.innerHTML = html; }
+      if (fotoGrid) fotoGrid.innerHTML = html;
       if (fotoSection) fotoSection.style.display = 'block';
     }
 
-    // Expose function so the submit handler can add new messages live
+    // Add a new message live after successful submit
     window._sidebarAddMessage = function(nome, testo) {
       if (!msgList) return;
       if (msgEmpty) msgEmpty.style.display = 'none';
-      const count = parseInt(msgCount?.textContent || '0') + 1;
-      if (msgCount) msgCount.textContent = count;
-      const card = document.createElement('div');
-      card.innerHTML = `
-        <div class="msg-card">
-          <div class="msg-avatar">${initials(nome)}</div>
-          <div class="msg-body">
-            <div class="msg-name">${nome}</div>
-            <div class="msg-text">${testo.replace(/\n/g, '<br>')}</div>
-            <div class="msg-date">Adesso</div>
-          </div>
-        </div>
-        <hr class="msg-divider">
-      `;
-      msgList.prepend(card);
-      msgList.style.display = 'flex';
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = makeCard(nome, testo, null, 0);
+      msgList.prepend(wrapper.firstElementChild);
+      msgList.style.display = 'grid';
     };
 
     try {
-      // Fetch public condolences
       const res = await fetch(`https://api.cas-per.it/api/public/v1/cordogli?slug=${slug}`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
       if (!res.ok) throw new Error('API error');
-      const json = await res.json();
-      const items = (json.data || json.items || json || []).filter(m => m.visibile !== false);
+      const json  = await res.json();
+      const items = (json.data || json.items || (Array.isArray(json) ? json : [])).filter(m => m.visibile !== false);
       renderMessages(items);
 
-      // Fetch public photos
+      // Photos (silent fail)
       try {
         const resF = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli?slug=${slug}`, {
           headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
         });
         if (resF.ok) {
           const jsonF = await resF.json();
-          const fotos = jsonF.data || jsonF.items || jsonF || [];
-          renderFotos(fotos);
+          renderFotos(jsonF.data || jsonF.items || (Array.isArray(jsonF) ? jsonF : []));
         }
       } catch { /* foto non disponibili */ }
 
