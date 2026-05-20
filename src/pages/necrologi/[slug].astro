@@ -2073,7 +2073,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   /* Loading skeletons */
   .msg-loading-wrap {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
     margin-top: 2.5rem;
   }
@@ -2094,7 +2094,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   /* Cards grid */
   .msg-cards-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
     margin-top: 2.5rem;
     align-items: start;
@@ -2153,16 +2153,18 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   .msg-name {
-    font-size: 0.88rem;
-    font-weight: 700;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 600;
     color: var(--text);
     line-height: 1.3;
   }
 
   .msg-date {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
-    opacity: 0.65;
+    opacity: 0.6;
+    margin-top: 0.15rem;
   }
 
   .msg-text {
@@ -2284,12 +2286,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     display: block;
   }
 
-  @media (max-width: 900px) {
-    .msg-loading-wrap,
-    .msg-cards-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
 
   @media (max-width: 560px) {
     .msg-loading-wrap,
@@ -2970,13 +2966,11 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     }
 
     function makeCard(nome, testo, data, delay = 0) {
-      const av   = initials(nome);
       const dt   = formatDate(data);
       const text = (testo || '').replace(/\r?\n/g, '<br>');
       return `
         <div class="msg-card" style="animation-delay:${delay}s">
           <div class="msg-card-top">
-            <div class="msg-avatar">${av}</div>
             <div>
               <div class="msg-name">${nome || 'Anonimo'}</div>
               ${dt ? `<div class="msg-date">${dt}</div>` : ''}
@@ -3042,9 +3036,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         // API non ancora disponibile: usa mock
         cordogli = MOCK_CORDOGLI.data.cordogli;
         albums   = MOCK_FOTOS.data.albums;
-        // badge demo
-        const secTitle = document.querySelector('.messaggi-ricevuti-section .section-title');
-        if (secTitle) secTitle.insertAdjacentHTML('afterend', '<span class="demo-badge">anteprima</span>');
       }
 
       renderMessages(Array.isArray(cordogli) ? cordogli : []);
@@ -3069,8 +3060,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       // Fallback totale al mock
       renderMessages(MOCK_CORDOGLI.data.cordogli);
       renderFotos(MOCK_FOTOS.data.albums);
-      const secTitle = document.querySelector('.messaggi-ricevuti-section .section-title');
-      if (secTitle) secTitle.insertAdjacentHTML('afterend', '<span class="demo-badge">anteprima</span>');
     }
   })();
 
