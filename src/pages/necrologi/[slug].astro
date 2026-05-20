@@ -367,6 +367,13 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
                 <textarea id="c-testo" name="testo" rows="5" placeholder="Scrivi qui le tue condoglianze..." required></textarea>
               </div>
 
+              <div class="form-group checkbox-group" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.85rem; font-weight: normal; color: var(--text-muted); user-select: none;">
+                  <input type="checkbox" id="c-visibile" name="visibile" checked style="accent-color: var(--gold); cursor: pointer; width: 18px; height: 18px; margin: 0;" />
+                  <span>Rendi il messaggio pubblico (visibile online su AnnunciFunebri.it)</span>
+                </label>
+              </div>
+
               <div class="form-status" id="cordoglio-status"></div>
 
               <button type="submit" class="btn btn-gold btn-block" id="cordoglio-submit-btn">
@@ -410,6 +417,13 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
                   </div>
                 </div>
                 <div class="photo-preview-grid" id="photo-preview-grid" style="display: none;"></div>
+              </div>
+
+              <div class="form-group checkbox-group" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.85rem; font-weight: normal; color: var(--text-muted); user-select: none;">
+                  <input type="checkbox" id="p-visibile" name="visibile" checked style="accent-color: var(--gold); cursor: pointer; width: 18px; height: 18px; margin: 0;" />
+                  <span>Rendi il messaggio pubblico (visibile online su AnnunciFunebri.it)</span>
+                </label>
               </div>
 
               <div class="form-status" id="fotocordoglio-status"></div>
@@ -1445,13 +1459,14 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     cordoglioStatus.textContent = 'Invio del messaggio alla famiglia in corso...';
 
     const formData = new FormData(cordoglioForm);
+    const isPublic = document.getElementById('c-visibile')?.checked ?? true;
     const payload = {
       slug: slug,
       nome: formData.get('nome'),
       telefono: formData.get('telefono'),
       mail: formData.get('mail') || null,
       testo: formData.get('testo'),
-      visibile: false, // Private cordoglio by default
+      visibile: isPublic,
       provenienza: 1   // 1 indicates from website
     };
 
@@ -1473,7 +1488,11 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       }
 
       cordoglioStatus.className = 'form-status status-success';
-      cordoglioStatus.textContent = 'Il tuo messaggio di cordoglio è stato inviato privatamente alla famiglia con successo.';
+      if (isPublic) {
+        cordoglioStatus.textContent = 'Il tuo messaggio di cordoglio è stato inviato con successo e sarà visibile online su AnnunciFunebri.it.';
+      } else {
+        cordoglioStatus.textContent = 'Il tuo messaggio di cordoglio è stato inviato privatamente alla famiglia con successo.';
+      }
       
       // Clear inputs
       cordoglioForm.reset();
@@ -1700,6 +1719,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     const mail = formData.get('mail') || null;
     const testo = formData.get('testo') || '';
 
+    const isPublic = document.getElementById('p-visibile')?.checked ?? true;
     const payload = {
       slug: slug,
       nome: nome,
@@ -1708,6 +1728,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       mail: mail,
       email: mail,
       testo: testo,
+      visibile: isPublic,
       provenienza: 1
     };
 
@@ -1842,8 +1863,13 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         throw new Error(verifyJson.message || 'Il codice inserito non è corretto o è scaduto.');
       }
 
+      const isPublic = document.getElementById('p-visibile')?.checked ?? true;
       otpStatus.className = 'form-status status-success';
-      otpStatus.textContent = 'Il tuo foto-cordoglio è stato inviato e confermato con successo! Grazie per la vicinanza.';
+      if (isPublic) {
+        otpStatus.textContent = 'Il tuo foto-cordoglio è stato inviato, confermato con successo e sarà visibile online! Grazie per la vicinanza.';
+      } else {
+        otpStatus.textContent = 'Il tuo foto-cordoglio è stato inviato privatamente alla famiglia e confermato con successo! Grazie per la vicinanza.';
+      }
       
       // Reset entire view
       selectedFiles = [];
