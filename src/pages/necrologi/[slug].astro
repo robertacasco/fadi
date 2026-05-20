@@ -2208,6 +2208,22 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 
   .gold-link:hover { opacity: 0.75; }
 
+  .demo-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--gold-dim);
+    color: var(--gold);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.15rem 0.65rem;
+    vertical-align: middle;
+    margin-left: 0.6rem;
+    opacity: 0.85;
+  }
+
   /* Foto full grid */
   .foto-grid-full {
     display: grid;
@@ -3019,33 +3035,54 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       msgList.style.display = 'grid';
     };
 
+    // ---- MOCK DATA (rimosso quando l'API sarà live) ----
+    const MOCK_CORDOGLI = {"success":true,"data":{"cordogli":[{"id":1247924,"testo":"Siamo spiacenti per non essere presenti e poter dare l'ultimo saluto a Domenico. Vi siamo comunque vicini con il pensiero, condividendo il vostro dolore.","visibile":false,"created_at":"2025-12-15T10:08:04.000Z","utente":{"nome":"Ida Condo e Peppe Farina"}},{"id":1247874,"testo":"Sentite condoglianze a voi tutti familiari, con l'associazione di preghiere di suffragio per il caro Domenico e di consolazione nella fede per tutti voi. D. Rocco Scaturchio","visibile":false,"created_at":"2025-12-15T04:25:04.000Z","utente":{"nome":"D. Rocco Scaturchio"}},{"id":1247788,"testo":"Sentite e sincere condoglianze","visibile":false,"created_at":"2025-12-14T16:07:16.000Z","utente":{"nome":"Bruno Sgro' - Primerano Lidia"}},{"id":1247726,"testo":"Sentite condoglianze a tutti i familiari","visibile":true,"created_at":"2025-12-14T11:48:38.000Z","utente":{"nome":"Francesco Ranieri"}},{"id":1247724,"testo":"Vi sono vicino in questo triste momento di dolore. Sentite condoglianze","visibile":false,"created_at":"2025-12-14T11:38:50.000Z","utente":{"nome":"Baldassarre Maggio"}},{"id":1247717,"testo":"Un abbraccio forte,\r\nSentite condoglianze\r\nPietro Filardo e famiglia","visibile":true,"created_at":"2025-12-14T11:14:23.000Z","utente":{"nome":"Pietro Filardo"}}],"total":6}};
+    const MOCK_FOTOS = {"success":true,"data":{"albums":[{"id":4588,"foto":[{"id":7127,"approvata":"2025-12-14T16:30:27.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726227.5633.jpg"},{"id":7128,"approvata":"2025-12-14T16:30:27.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726227.8882.jpg"},{"id":7129,"approvata":"2025-12-14T16:30:28.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726228.3867.jpg"},{"id":7130,"approvata":"2025-12-14T16:30:28.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726228.6057.jpg"}]}]}};
+
     try {
       // --- Messages ---
       const res = await fetch(`/casper-api/public/v1/cordogli?slug=${slug}`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      // Real structure: json.data.cordogli[]
-      const cordogli = json?.data?.cordogli ?? json?.data ?? [];
+
+      let cordogli, albums;
+
+      if (res.ok) {
+        const json = await res.json();
+        cordogli = json?.data?.cordogli ?? json?.data ?? [];
+      } else {
+        // API non ancora disponibile: usa mock
+        cordogli = MOCK_CORDOGLI.data.cordogli;
+        albums   = MOCK_FOTOS.data.albums;
+        // badge demo
+        const secTitle = document.querySelector('.messaggi-ricevuti-section .section-title');
+        if (secTitle) secTitle.insertAdjacentHTML('afterend', '<span class="demo-badge">anteprima</span>');
+      }
+
       renderMessages(Array.isArray(cordogli) ? cordogli : []);
 
-      // --- Photos (silent fail) ---
-      try {
-        const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${slug}`, {
-          headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
-        });
-        if (resF.ok) {
-          const jsonF = await resF.json();
-          // Real structure: jsonF.data.albums[]
-          const albums = jsonF?.data?.albums ?? jsonF?.data ?? [];
-          renderFotos(Array.isArray(albums) ? albums : []);
-        }
-      } catch { /* foto non disponibili */ }
+      if (albums) {
+        renderFotos(Array.isArray(albums) ? albums : []);
+      } else {
+        // --- Photos (silent fail) ---
+        try {
+          const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${slug}`, {
+            headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+          });
+          if (resF.ok) {
+            const jsonF = await resF.json();
+            const alb = jsonF?.data?.albums ?? jsonF?.data ?? [];
+            renderFotos(Array.isArray(alb) ? alb : []);
+          }
+        } catch { /* foto non disponibili */ }
+      }
 
     } catch {
-      if (msgLoading) msgLoading.style.display = 'none';
-      if (msgEmpty)   msgEmpty.style.display = 'flex';
+      // Fallback totale al mock
+      renderMessages(MOCK_CORDOGLI.data.cordogli);
+      renderFotos(MOCK_FOTOS.data.albums);
+      const secTitle = document.querySelector('.messaggi-ricevuti-section .section-title');
+      if (secTitle) secTitle.insertAdjacentHTML('afterend', '<span class="demo-badge">anteprima</span>');
     }
   })();
 
