@@ -35,6 +35,13 @@ const streaming = item.streaming || {};
 const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
 const haFoto = !!defunto.foto_url;
 
+// Cache buster: forza il browser a scaricare l'immagine aggiornata quando updated_at cambia
+// Evita che la vecchia foto rimanga in cache fino a 24h (max-age del CDN di AnnunciFunebri)
+const fotoCacheBuster = item.updated_at
+  ? `?v=${new Date(item.updated_at).getTime()}`
+  : '';
+const fotoSrc      = haFoto ? `${defunto.foto_url}${fotoCacheBuster}` : '';
+
 function formatMorte(dateStr: string) {
   if (!dateStr) return '';
   const parts = dateStr.split('-');
@@ -98,7 +105,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 <Layout 
   title={`In Memoria di ${nomeCompleto} — FADI`}
   description={`Manifesto funebre di ${nomeCompleto}. Consulta gli orari delle cerimonie di commiato o invia un messaggio di cordoglio privato alla famiglia.`}
-  image={defunto.foto_url || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
+  image={fotoSrc || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
 >
   <!-- Memorial Header Section -->
   <section class="memorial-header-section">
@@ -108,7 +115,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         <div class="memorial-frame" style="width: 100%;">
           {haFoto ? (
             <img 
-              src={defunto.foto_url} 
+              src={fotoSrc}
               alt={`Foto di ${nomeCompleto}`}
               class="memorial-image"
             />
