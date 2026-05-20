@@ -1133,42 +1133,47 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   /* Tabs for condolence types */
-  .memorial-tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    background-color: var(--bg-soft);
-    padding: 0.35rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    border: 1px solid var(--border);
+  :global(.memorial-tabs) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    background-color: var(--bg-soft, #f8f6f2) !important;
+    padding: 0.35rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 2rem !important;
+    border: 1px solid var(--border, #e5e0d8) !important;
   }
 
-  .tab-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    font-family: var(--font-sans);
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all var(--transition);
+  :global(.tab-btn) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1.25rem !important;
+    font-family: var(--font-sans), sans-serif !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: var(--text-muted, #70665C) !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
   }
 
-  .tab-btn:hover {
-    color: var(--text);
+  :global(.tab-btn:hover) {
+    color: var(--text, #2C2620) !important;
+    background-color: rgba(184, 150, 110, 0.04) !important;
   }
 
-  .tab-btn.active {
-    background-color: #ffffff;
-    color: var(--gold);
-    box-shadow: 0 4px 12px rgba(44, 38, 32, 0.05);
+  :global(.tab-btn.active) {
+    background-color: #ffffff !important;
+    color: var(--gold, #b8966e) !important;
+    box-shadow: 0 4px 12px rgba(44, 38, 32, 0.08) !important;
   }
 
   /* Photo upload dropzone */
@@ -1268,7 +1273,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     if (!listContainer) return;
 
     try {
-      const res = await fetch(`https://api.cas-per.it/api/public/v1/firme/${slug}`, {
+      const res = await fetch(`/casper-api/public/v1/firme/${slug}`, {
         headers: {
           'X-API-Key': apiKey,
           'Accept': 'application/json'
@@ -1451,7 +1456,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const response = await fetch('https://api.cas-per.it/api/public/v1/cordogli', {
+      const response = await fetch('/casper-api/public/v1/cordogli', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1518,7 +1523,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const response = await fetch('https://api.cas-per.it/api/public/v1/firme', {
+      const response = await fetch('/casper-api/public/v1/firme', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1708,7 +1713,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 
     try {
       // Step A: Create empty album
-      const createRes = await fetch('https://api.cas-per.it/api/public/v1/fotocordogli/albums/create', {
+      const createRes = await fetch('/casper-api/public/v1/fotocordogli/albums/create', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1740,7 +1745,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         fileData.append('image', file);
         fileData.append('file', file);
 
-        const uploadRes = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli/albums/${albumId}/add-photo`, {
+        const uploadRes = await fetch(`/casper-api/public/v1/fotocordogli/albums/${albumId}/add-photo`, {
           method: 'POST',
           headers: {
             'X-API-Key': apiKey,
@@ -1759,7 +1764,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       fotocordoglioStatus.textContent = 'Finalizzazione e invio codice di verifica...';
       fotocordoglioBtn.innerHTML = '<span class="spinner-inline"></span> Finalizzazione...';
 
-      const finalizeRes = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli/albums/${albumId}/finalize`, {
+      const finalizeRes = await fetch(`/casper-api/public/v1/fotocordogli/albums/${albumId}/finalize`, {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1822,7 +1827,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const verifyRes = await fetch('https://api.cas-per.it/api/public/v1/fotocordogli/verify', {
+      const verifyRes = await fetch('/casper-api/public/v1/fotocordogli/verify', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
