@@ -115,7 +115,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   <section class="memorial-header-section">
     <div class="container header-grid">
       <!-- Left side: elegant photo representation -->
-      <div class="memorial-photo-wrapper" style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
+      <div class="memorial-photo-wrapper">
         <div class="memorial-frame">
           {haFoto ? (
             <img 
@@ -130,18 +130,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           )}
           <div class="frame-gold-border"></div>
         </div>
-
-        {annuncio.epigrafe_url && (
-          <div class="manifesto-preview-wrapper" style="cursor: pointer; width: 100%; max-width: 160px; text-align: center;">
-            <div class="manifesto-thumbnail-card" id="open-manifesto-btn" style="position: relative; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all var(--transition); aspect-ratio: 1 / 1.41;">
-              <img src={annuncio.epigrafe_url} alt={`Manifesto di ${nomeCompleto}`} style="width: 100%; height: 100%; object-fit: cover;" />
-              <div class="manifesto-overlay" style="position: absolute; inset: 0; background: rgba(44, 38, 32, 0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition);">
-                <span style="color: #ffffff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #ffffff; padding: 0.4rem 0.8rem; border-radius: 4px; background: rgba(0,0,0,0.2);">Ingrandisci</span>
-              </div>
-            </div>
-            <span style="display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold);">Manifesto Funebre 🔍</span>
-          </div>
-        )}
       </div>
 
       <!-- Right side: details and text -->
@@ -175,6 +163,18 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           <blockquote class="deceased-quote">
             <p>“{annuncio.citazione}”</p>
           </blockquote>
+        )}
+
+        {annuncio.epigrafe_url && (
+          <div class="manifesto-preview-wrapper" style="cursor: pointer; width: 100%; max-width: 160px; margin-bottom: 2rem;">
+            <div class="manifesto-thumbnail-card" id="open-manifesto-btn" style="position: relative; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all var(--transition);">
+              <img src={annuncio.epigrafe_url} alt={`Manifesto di ${nomeCompleto}`} style="width: 100%; height: auto; display: block;" />
+              <div class="manifesto-overlay" style="position: absolute; inset: 0; background: rgba(44, 38, 32, 0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition);">
+                <span style="color: #ffffff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #ffffff; padding: 0.4rem 0.8rem; border-radius: 4px; background: rgba(0,0,0,0.2);">Ingrandisci</span>
+              </div>
+            </div>
+            <span style="display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); text-align: center;">Manifesto Funebre 🔍</span>
+          </div>
         )}
 
         <div class="action-buttons-group">
