@@ -1485,7 +1485,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 </style>
 
 <!-- Client Side Forms and Actions -->
-<script define:vars={{ slug }}>
+<script define:vars={{ slug, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '' }}>
   const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
   
   // 1. SUBMIT CONDOLENCE ACTION
@@ -1725,6 +1725,8 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       mail: mail,
       email: mail,
       testo: testo,
+      nome_defunto: defuntoNome,
+      cognome_defunto: defuntoCognome,
       visibile: isPublic,
       provenienza: 1
     };
