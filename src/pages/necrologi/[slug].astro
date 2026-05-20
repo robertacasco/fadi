@@ -362,6 +362,44 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   </section>
 
 
+  <!-- =========================================
+       MESSAGGI & FOTO RICEVUTI
+       ========================================= -->
+  <section class="section messaggi-ricevuti-section" id="messaggi-ricevuti">
+    <div class="container">
+      <div class="text-center section-header">
+        <span class="section-label">In memoria</span>
+        <h2 class="section-title">Messaggi e foto</h2>
+        <div class="divider mx-auto"></div>
+        <p class="section-text" style="margin: 0 auto;">
+          I pensieri di affetto e le parole di cordoglio lasciati dalla comunità.
+        </p>
+      </div>
+
+      <!-- Foto carousel (shown if photos exist) -->
+      <div id="foto-section" class="foto-carousel-wrap" style="display:none;">
+        <div class="foto-carousel-track" id="foto-grid"></div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="msg-loading" class="msg-loading-wrap">
+        <div class="msg-skeleton"></div>
+        <div class="msg-skeleton"></div>
+        <div class="msg-skeleton"></div>
+      </div>
+
+      <!-- Messages grid -->
+      <div id="msg-list" class="msg-cards-grid" style="display:none;"></div>
+
+      <!-- Empty state -->
+      <div id="msg-empty" class="msg-empty-state" style="display:none;">
+        <p>Se desideri inviare un messaggio o una foto in ricordo di <strong>{nomeCompleto}</strong> <a href="#cordoglio" class="gold-link">clicca qui</a>.</p>
+      </div>
+
+    </div>
+  </section>
+
+
   <!-- Interactive Forms Section -->
   <section class="section interactive-memorial-section" id="interactive-area">
 
@@ -524,44 +562,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           </div>
         </div>
       </div>
-  </section>
-
-
-  <!-- =========================================
-       MESSAGGI & FOTO RICEVUTI
-       ========================================= -->
-  <section class="section messaggi-ricevuti-section" id="messaggi-ricevuti">
-    <div class="container">
-      <div class="text-center section-header">
-        <span class="section-label">In memoria</span>
-        <h2 class="section-title">Messaggi e foto</h2>
-        <div class="divider mx-auto"></div>
-        <p class="section-text" style="margin: 0 auto;">
-          I pensieri di affetto e le parole di cordoglio lasciati dalla comunità.
-        </p>
-      </div>
-
-      <!-- Foto carousel (shown if photos exist) -->
-      <div id="foto-section" class="foto-carousel-wrap" style="display:none;">
-        <div class="foto-carousel-track" id="foto-grid"></div>
-      </div>
-
-      <!-- Loading state -->
-      <div id="msg-loading" class="msg-loading-wrap">
-        <div class="msg-skeleton"></div>
-        <div class="msg-skeleton"></div>
-        <div class="msg-skeleton"></div>
-      </div>
-
-      <!-- Messages grid -->
-      <div id="msg-list" class="msg-cards-grid" style="display:none;"></div>
-
-      <!-- Empty state -->
-      <div id="msg-empty" class="msg-empty-state" style="display:none;">
-        <p>Se desideri inviare un messaggio o una foto in ricordo di <strong>{nomeCompleto}</strong> <a href="#cordoglio" class="gold-link">clicca qui</a>.</p>
-      </div>
-
-    </div>
   </section>
 
   <!-- =========================================
