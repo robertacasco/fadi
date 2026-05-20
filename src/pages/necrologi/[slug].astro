@@ -330,37 +330,113 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         <div class="interactive-card card">
           <div class="card-title-header">
             <h3>Esprimi il tuo Cordoglio</h3>
-            <p>Invia un pensiero di affetto. Il messaggio sarà recapitato privatamente alla famiglia.</p>
+            <p>Invia un pensiero di affetto o un ricordo fotografico alla famiglia.</p>
+          </div>
+
+          <!-- Tab Selection Buttons -->
+          <div class="memorial-tabs">
+            <button type="button" class="tab-btn active" id="tab-btn-message">
+              <span>✍️</span> Solo Messaggio
+            </button>
+            <button type="button" class="tab-btn" id="tab-btn-photo">
+              <span>📸</span> Messaggio con Foto
+            </button>
           </div>
           
-          <form id="cordoglio-form" class="memorial-form">
-            <div class="form-group">
-              <label for="c-nome">Nome e Cognome *</label>
-              <input type="text" id="c-nome" name="nome" placeholder="Esempio: Famiglia Rossi" required />
-            </div>
-
-            <div class="form-row">
+          <!-- Content 1: Solo Messaggio Form -->
+          <div id="form-container-message" class="tab-content">
+            <form id="cordoglio-form" class="memorial-form">
               <div class="form-group">
-                <label for="c-telefono">Telefono *</label>
-                <input type="tel" id="c-telefono" name="telefono" placeholder="Esempio: 3331234567" required />
+                <label for="c-nome">Nome e Cognome *</label>
+                <input type="text" id="c-nome" name="nome" placeholder="Esempio: Famiglia Rossi" required />
               </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="c-telefono">Telefono *</label>
+                  <input type="tel" id="c-telefono" name="telefono" placeholder="Esempio: 3331234567" required />
+                </div>
+                <div class="form-group">
+                  <label for="c-mail">Email (Opzionale)</label>
+                  <input type="email" id="c-mail" name="mail" placeholder="Esempio: nome@email.it" />
+                </div>
+              </div>
+
               <div class="form-group">
-                <label for="c-mail">Email (Opzionale)</label>
-                <input type="email" id="c-mail" name="mail" placeholder="Esempio: nome@email.it" />
+                <label for="c-testo">Il tuo Messaggio *</label>
+                <textarea id="c-testo" name="testo" rows="5" placeholder="Scrivi qui le tue condoglianze..." required></textarea>
               </div>
+
+              <div class="form-status" id="cordoglio-status"></div>
+
+              <button type="submit" class="btn btn-gold btn-block" id="cordoglio-submit-btn">
+                Invia Messaggio
+              </button>
+            </form>
+          </div>
+
+          <!-- Content 2: Messaggio con Foto Form -->
+          <div id="form-container-photo" class="tab-content" style="display: none;">
+            <form id="fotocordoglio-form" class="memorial-form">
+              <div class="form-group">
+                <label for="p-nome">Nome e Cognome *</label>
+                <input type="text" id="p-nome" name="nome" placeholder="Esempio: Famiglia Rossi" required />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="p-telefono">Telefono *</label>
+                  <input type="tel" id="p-telefono" name="telefono" placeholder="Esempio: 3331234567" required />
+                </div>
+                <div class="form-group">
+                  <label for="p-mail">Email (Opzionale)</label>
+                  <input type="email" id="p-mail" name="mail" placeholder="Esempio: nome@email.it" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="p-testo">Il tuo Messaggio (Opzionale)</label>
+                <textarea id="p-testo" name="testo" rows="4" placeholder="Scrivi qui le tue condoglianze..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Seleziona le foto da allegare * (Max 3 foto)</label>
+                <div class="photo-upload-zone" id="photo-dropzone">
+                  <input type="file" id="photo-input" name="photos" accept="image/*" multiple style="display: none;" />
+                  <div class="upload-zone-content">
+                    <span class="upload-icon">📤</span>
+                    <p class="upload-title">Trascina qui le tue foto o <strong>clicca per sfogliare</strong></p>
+                    <p class="upload-subtitle">Formati supportati: JPG, PNG (max 10MB per foto)</p>
+                  </div>
+                </div>
+                <div class="photo-preview-grid" id="photo-preview-grid" style="display: none;"></div>
+              </div>
+
+              <div class="form-status" id="fotocordoglio-status"></div>
+
+              <button type="submit" class="btn btn-gold btn-block" id="fotocordoglio-submit-btn">
+                Procedi al caricamento
+              </button>
+            </form>
+
+            <!-- OTP Section -->
+            <div id="otp-verification-section" style="display: none; border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-top: 1.5rem;">
+              <div class="card-title-header text-center">
+                <h4>Verifica il tuo Foto-Cordoglio</h4>
+                <p>Inserisci il codice OTP inviato tramite SMS al numero fornito.</p>
+              </div>
+              <form id="otp-form" class="memorial-form" style="max-width: 320px; margin: 0 auto;">
+                <div class="form-group text-center">
+                  <label for="otp-code">Codice OTP di verifica *</label>
+                  <input type="text" id="otp-code" name="code" placeholder="Inserisci il codice" required style="text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; max-width: 220px; margin: 0 auto;" />
+                </div>
+                <div class="form-status" id="otp-status"></div>
+                <button type="submit" class="btn btn-gold btn-block" id="otp-submit-btn">
+                  Conferma e Invia
+                </button>
+              </form>
             </div>
-
-            <div class="form-group">
-              <label for="c-testo">Il tuo Messaggio *</label>
-              <textarea id="c-testo" name="testo" rows="5" placeholder="Scrivi qui le tue condoglianze..." required></textarea>
-            </div>
-
-            <div class="form-status" id="cordoglio-status"></div>
-
-            <button type="submit" class="btn btn-gold btn-block" id="cordoglio-submit-btn">
-              Invia Messaggio
-            </button>
-          </form>
+          </div>
         </div>
       </div>
 
@@ -1055,6 +1131,131 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       gap: 1.25rem;
     }
   }
+
+  /* Tabs for condolence types */
+  .memorial-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    background-color: var(--bg-soft);
+    padding: 0.35rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+  }
+
+  .tab-btn.active {
+    background-color: #ffffff;
+    color: var(--gold);
+    box-shadow: 0 4px 12px rgba(44, 38, 32, 0.05);
+  }
+
+  /* Photo upload dropzone */
+  .photo-upload-zone {
+    border: 2px dashed rgba(184, 150, 110, 0.4);
+    background-color: var(--bg);
+    border-radius: 8px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .photo-upload-zone:hover, .photo-upload-zone.dragover {
+    border-color: var(--gold);
+    background-color: rgba(184, 150, 110, 0.04);
+  }
+
+  .upload-zone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .upload-icon {
+    font-size: 2.2rem;
+  }
+
+  .upload-title {
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .upload-title strong {
+    color: var(--gold);
+  }
+
+  .upload-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Photo preview grid */
+  .photo-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .photo-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .photo-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(231, 76, 60, 0.9);
+    color: #ffffff;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color var(--transition);
+    padding: 0;
+  }
+
+  .photo-remove-btn:hover {
+    background: #c0392b;
+  }
 </style>
 
 <!-- Client Side Forms and Canvas Actions -->
@@ -1067,7 +1268,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     if (!listContainer) return;
 
     try {
-      const res = await fetch(`/casper-api/public/v1/firme/${slug}`, {
+      const res = await fetch(`https://api.cas-per.it/api/public/v1/firme/${slug}`, {
         headers: {
           'X-API-Key': apiKey,
           'Accept': 'application/json'
@@ -1250,7 +1451,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const response = await fetch('/casper-api/public/v1/cordogli', {
+      const response = await fetch('https://api.cas-per.it/api/public/v1/cordogli', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1317,7 +1518,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const response = await fetch('/casper-api/public/v1/firme', {
+      const response = await fetch('https://api.cas-per.it/api/public/v1/firme', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey,
@@ -1349,6 +1550,321 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     } finally {
       signatureBtn.disabled = false;
       signatureBtn.innerHTML = originalText;
+    }
+  });
+
+  // 5. TABS SWITCHING LOGIC
+  const tabBtnMessage = document.getElementById('tab-btn-message');
+  const tabBtnPhoto = document.getElementById('tab-btn-photo');
+  const containerMessage = document.getElementById('form-container-message');
+  const containerPhoto = document.getElementById('form-container-photo');
+
+  tabBtnMessage?.addEventListener('click', () => {
+    tabBtnMessage.classList.add('active');
+    tabBtnPhoto.classList.remove('active');
+    if (containerMessage) containerMessage.style.display = 'block';
+    if (containerPhoto) containerPhoto.style.display = 'none';
+  });
+
+  tabBtnPhoto?.addEventListener('click', () => {
+    tabBtnPhoto.classList.add('active');
+    tabBtnMessage.classList.remove('active');
+    if (containerPhoto) containerPhoto.style.display = 'block';
+    if (containerMessage) containerMessage.style.display = 'none';
+  });
+
+  // 6. PHOTO SELECTION AND PREVIEW
+  const photoDropzone = document.getElementById('photo-dropzone');
+  const photoInput = document.getElementById('photo-input');
+  const photoPreviewGrid = document.getElementById('photo-preview-grid');
+  let selectedFiles = [];
+
+  photoDropzone?.addEventListener('click', () => {
+    photoInput?.click();
+  });
+
+  photoDropzone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    photoDropzone.classList.add('dragover');
+  });
+
+  photoDropzone?.addEventListener('dragleave', () => {
+    photoDropzone.classList.remove('dragover');
+  });
+
+  photoDropzone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    photoDropzone.classList.remove('dragover');
+    if (e.dataTransfer.files) {
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
+  photoInput?.addEventListener('change', (e) => {
+    if (e.target.files) {
+      handleFiles(e.target.files);
+    }
+  });
+
+  function handleFiles(files) {
+    const filesArr = Array.from(files);
+    if (selectedFiles.length + filesArr.length > 3) {
+      alert('Puoi selezionare al massimo 3 foto.');
+      return;
+    }
+
+    filesArr.forEach(file => {
+      if (!file.type.startsWith('image/')) {
+        alert('Solo file immagine sono supportati.');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Ogni immagine deve essere inferiore a 10MB.');
+        return;
+      }
+      selectedFiles.push(file);
+    });
+
+    updatePreviews();
+  }
+
+  function updatePreviews() {
+    if (!photoPreviewGrid) return;
+
+    if (selectedFiles.length === 0) {
+      photoPreviewGrid.style.display = 'none';
+      photoPreviewGrid.innerHTML = '';
+      return;
+    }
+
+    photoPreviewGrid.style.display = 'grid';
+    photoPreviewGrid.innerHTML = '';
+
+    selectedFiles.forEach((file, index) => {
+      const previewItem = document.createElement('div');
+      previewItem.className = 'photo-preview-item';
+
+      const img = document.createElement('img');
+      img.className = 'photo-preview-img';
+      img.src = URL.createObjectURL(file);
+      previewItem.appendChild(img);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'photo-remove-btn';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.addEventListener('click', () => {
+        selectedFiles.splice(index, 1);
+        updatePreviews();
+      });
+      previewItem.appendChild(removeBtn);
+
+      photoPreviewGrid.appendChild(previewItem);
+    });
+  }
+
+  // 7. SUBMIT PHOTO CONDOLENCE (ALBUM CREATE & UPLOAD)
+  const fotocordoglioForm = document.getElementById('fotocordoglio-form');
+  const fotocordoglioStatus = document.getElementById('fotocordoglio-status');
+  const fotocordoglioBtn = document.getElementById('fotocordoglio-submit-btn');
+  const otpSection = document.getElementById('otp-verification-section');
+  let activeAlbumId = null;
+
+  fotocordoglioForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!fotocordoglioBtn || !fotocordoglioStatus) return;
+
+    if (selectedFiles.length === 0) {
+      fotocordoglioStatus.className = 'form-status status-error';
+      fotocordoglioStatus.style.display = 'block';
+      fotocordoglioStatus.textContent = 'Errore: Per favore, seleziona almeno una foto da allegare.';
+      return;
+    }
+
+    // Show loading
+    fotocordoglioBtn.disabled = true;
+    const originalText = fotocordoglioBtn.innerHTML;
+    fotocordoglioBtn.innerHTML = '<span class="spinner-inline"></span> Creazione album...';
+    fotocordoglioStatus.className = 'form-status status-info';
+    fotocordoglioStatus.style.display = 'block';
+    fotocordoglioStatus.textContent = 'Creazione album di foto-cordoglio...';
+
+    const formData = new FormData(fotocordoglioForm);
+    const nome = formData.get('nome');
+    const telefono = formData.get('telefono');
+    const mail = formData.get('mail') || null;
+    const testo = formData.get('testo') || '';
+
+    const payload = {
+      slug: slug,
+      nome: nome,
+      nominativo: nome,
+      telefono: telefono,
+      mail: mail,
+      email: mail,
+      testo: testo,
+      provenienza: 1
+    };
+
+    try {
+      // Step A: Create empty album
+      const createRes = await fetch('https://api.cas-per.it/api/public/v1/fotocordogli/albums/create', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const createJson = await createRes.json();
+      if (!createRes.ok || (!createJson.success && !createJson.id)) {
+        throw new Error(createJson.message || 'Errore nella creazione dell\'album.');
+      }
+
+      const albumId = createJson.id || createJson.data?.id;
+      if (!albumId) {
+        throw new Error('ID dell\'album non restituito dal server.');
+      }
+      activeAlbumId = albumId;
+
+      // Step B: Upload each photo
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        fotocordoglioStatus.textContent = `Caricamento foto ${i + 1} di ${selectedFiles.length}...`;
+        fotocordoglioBtn.innerHTML = `<span class="spinner-inline"></span> Foto ${i + 1}/${selectedFiles.length}...`;
+
+        const fileData = new FormData();
+        fileData.append('photo', file);
+        fileData.append('image', file);
+        fileData.append('file', file);
+
+        const uploadRes = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli/albums/${albumId}/add-photo`, {
+          method: 'POST',
+          headers: {
+            'X-API-Key': apiKey,
+            'Accept': 'application/json'
+          },
+          body: fileData
+        });
+
+        const uploadJson = await uploadRes.json();
+        if (!uploadRes.ok) {
+          throw new Error(uploadJson.message || `Errore nel caricamento della foto ${i + 1}.`);
+        }
+      }
+
+      // Step C: Finalize album
+      fotocordoglioStatus.textContent = 'Finalizzazione e invio codice di verifica...';
+      fotocordoglioBtn.innerHTML = '<span class="spinner-inline"></span> Finalizzazione...';
+
+      const finalizeRes = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli/albums/${albumId}/finalize`, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+
+      const finalizeJson = await finalizeRes.json();
+      if (!finalizeRes.ok) {
+        throw new Error(finalizeJson.message || 'Errore nella finalizzazione dell\'album.');
+      }
+
+      fotocordoglioStatus.className = 'form-status status-success';
+      fotocordoglioStatus.textContent = 'Album caricato con successo. Per completare l\'invio, inserisci il codice OTP ricevuto tramite SMS.';
+      
+      // Hide upload button & show OTP form
+      fotocordoglioBtn.style.display = 'none';
+      if (otpSection) {
+        otpSection.style.display = 'block';
+        otpSection.scrollIntoView({ behavior: 'smooth' });
+      }
+
+    } catch (err) {
+      fotocordoglioStatus.className = 'form-status status-error';
+      fotocordoglioStatus.textContent = err.message || 'Si è verificato un errore durante l\'invio delle foto. Riprova più tardi.';
+      fotocordoglioBtn.disabled = false;
+      fotocordoglioBtn.innerHTML = originalText;
+    }
+  });
+
+  // 8. VERIFY OTP CODE
+  const otpForm = document.getElementById('otp-form');
+  const otpStatus = document.getElementById('otp-status');
+  const otpBtn = document.getElementById('otp-submit-btn');
+
+  otpForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!otpBtn || !otpStatus || !activeAlbumId) return;
+
+    // Show loading
+    otpBtn.disabled = true;
+    const originalText = otpBtn.innerHTML;
+    otpBtn.innerHTML = '<span class="spinner-inline"></span> Verifica...';
+    otpStatus.className = 'form-status status-info';
+    otpStatus.style.display = 'block';
+    otpStatus.textContent = 'Verifica del codice OTP...';
+
+    const formData = new FormData(otpForm);
+    const otpCode = formData.get('code');
+
+    const payload = {
+      id: activeAlbumId,
+      album_id: activeAlbumId,
+      code: otpCode,
+      otp: otpCode,
+      verification_code: otpCode,
+      token: otpCode
+    };
+
+    try {
+      const verifyRes = await fetch('https://api.cas-per.it/api/public/v1/fotocordogli/verify', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const verifyJson = await verifyRes.json();
+      if (!verifyRes.ok || (!verifyJson.success && verifyJson.error)) {
+        throw new Error(verifyJson.message || 'Il codice inserito non è corretto o è scaduto.');
+      }
+
+      otpStatus.className = 'form-status status-success';
+      otpStatus.textContent = 'Il tuo foto-cordoglio è stato inviato e confermato con successo! Grazie per la vicinanza.';
+      
+      // Reset entire view
+      selectedFiles = [];
+      updatePreviews();
+      if (fotocordoglioForm) fotocordoglioForm.reset();
+      otpForm.reset();
+      
+      setTimeout(() => {
+        if (otpSection) otpSection.style.display = 'none';
+        if (fotocordoglioBtn) {
+          fotocordoglioBtn.style.display = 'block';
+          fotocordoglioBtn.disabled = false;
+          fotocordoglioBtn.innerHTML = 'Procedi al caricamento';
+        }
+        if (fotocordoglioStatus) fotocordoglioStatus.style.display = 'none';
+        otpStatus.style.display = 'none';
+        
+        // Switch back to message tab
+        tabBtnMessage?.click();
+      }, 4000);
+
+    } catch (err) {
+      otpStatus.className = 'form-status status-error';
+      otpStatus.textContent = err.message || 'Errore nella convalida. Verifica il codice e riprova.';
+      otpBtn.disabled = false;
+      otpBtn.innerHTML = originalText;
     }
   });
 </script>
