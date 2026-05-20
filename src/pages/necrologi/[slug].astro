@@ -2942,11 +2942,11 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   // MESSAGGI & FOTO RICEVUTI
   // ============================================
   (async () => {
-    const msgLoading = document.getElementById('msg-loading');
-    const msgList    = document.getElementById('msg-list');
-    const msgEmpty   = document.getElementById('msg-empty');
-    const fotoSection= document.getElementById('foto-section');
-    const fotoGrid   = document.getElementById('foto-grid');
+    const msgLoading  = document.getElementById('msg-loading');
+    const msgList     = document.getElementById('msg-list');
+    const msgEmpty    = document.getElementById('msg-empty');
+    const fotoSection = document.getElementById('foto-section');
+    const fotoGrid    = document.getElementById('foto-grid');
 
     function initials(nome) {
       if (!nome) return '?';
@@ -2966,77 +2966,86 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     }
 
     function makeCard(nome, testo, data, delay = 0) {
+      const av   = initials(nome);
+      const dt   = formatDate(data);
+      const text = (testo || '').replace(/\r?\n/g, '<br>');
       return `
         <div class="msg-card" style="animation-delay:${delay}s">
           <div class="msg-card-top">
-            <div class="msg-avatar">${initials(nome)}</div>
+            <div class="msg-avatar">${av}</div>
             <div>
               <div class="msg-name">${nome || 'Anonimo'}</div>
-              ${data ? `<div class="msg-date">${formatDate(data)}</div>` : ''}
+              ${dt ? `<div class="msg-date">${dt}</div>` : ''}
             </div>
           </div>
-          <div class="msg-text">${(testo || '').replace(/\n/g, '<br>')}</div>
+          <div class="msg-text">${text}</div>
         </div>`;
     }
 
-    function renderMessages(items) {
+    function renderMessages(cordogli) {
       if (msgLoading) msgLoading.style.display = 'none';
-      if (!items || items.length === 0) {
+      // Show only visibile:true messages publicly
+      const visible = cordogli.filter(m => m.visibile === true);
+      if (visible.length === 0) {
         if (msgEmpty) msgEmpty.style.display = 'flex';
         return;
       }
-      const html = items.map((m, i) =>
-        makeCard(m.nome || m.mittente, m.testo, m.created_at || m.data, i * 0.07)
+      const html = visible.map((m, i) =>
+        makeCard(m.utente?.nome || 'Anonimo', m.testo, m.created_at, i * 0.07)
       ).join('');
       if (msgList) { msgList.innerHTML = html; msgList.style.display = 'grid'; }
     }
 
-    function renderFotos(items) {
-      if (!items || items.length === 0) return;
-      const html = items.map(f => {
-        const url  = f.foto_url || f.url || '';
-        const nome = f.nome || f.mittente || '';
-        return `<div class="foto-thumb" title="${nome}">
-          <img src="${url}" alt="Foto da ${nome}" loading="lazy" onerror="this.closest('.foto-thumb').remove()">
-        </div>`;
-      }).join('');
-      if (fotoGrid) fotoGrid.innerHTML = html;
+    function renderFotos(albums) {
+      // Flatten all photos from all albums
+      const fotos = albums.flatMap(a => a.foto || []).filter(f => f.url && f.approvata);
+      if (fotos.length === 0) return;
+      const html = fotos.map(f => `
+        <div class="foto-thumb" title="${f.didascalia || ''}">
+          <img src="${f.url}" alt="${f.didascalia || 'Foto ricordo'}" loading="lazy"
+               onerror="this.closest('.foto-thumb').remove()">
+        </div>`).join('');
+      if (fotoGrid)    fotoGrid.innerHTML = html;
       if (fotoSection) fotoSection.style.display = 'block';
     }
 
-    // Add a new message live after successful submit
+    // Live-add a new public message after submit
     window._sidebarAddMessage = function(nome, testo) {
       if (!msgList) return;
       if (msgEmpty) msgEmpty.style.display = 'none';
       const wrapper = document.createElement('div');
-      wrapper.innerHTML = makeCard(nome, testo, null, 0);
+      wrapper.innerHTML = makeCard(nome, testo, new Date().toISOString(), 0);
       msgList.prepend(wrapper.firstElementChild);
       msgList.style.display = 'grid';
     };
 
     try {
+      // --- Messages ---
       const res = await fetch(`/casper-api/public/v1/cordogli?slug=${slug}`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
-      if (!res.ok) throw new Error('API error');
-      const json  = await res.json();
-      const items = (json.data || json.items || (Array.isArray(json) ? json : [])).filter(m => m.visibile !== false);
-      renderMessages(items);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      // Real structure: json.data.cordogli[]
+      const cordogli = json?.data?.cordogli ?? json?.data ?? [];
+      renderMessages(Array.isArray(cordogli) ? cordogli : []);
 
-      // Photos (silent fail)
+      // --- Photos (silent fail) ---
       try {
         const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${slug}`, {
           headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
         });
         if (resF.ok) {
           const jsonF = await resF.json();
-          renderFotos(jsonF.data || jsonF.items || (Array.isArray(jsonF) ? jsonF : []));
+          // Real structure: jsonF.data.albums[]
+          const albums = jsonF?.data?.albums ?? jsonF?.data ?? [];
+          renderFotos(Array.isArray(albums) ? albums : []);
         }
       } catch { /* foto non disponibili */ }
 
     } catch {
       if (msgLoading) msgLoading.style.display = 'none';
-      if (msgEmpty) msgEmpty.style.display = 'flex';
+      if (msgEmpty)   msgEmpty.style.display = 'flex';
     }
   })();
 
