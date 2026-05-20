@@ -539,6 +539,46 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   </section>
 
 
+  <!-- =========================================
+       MESSAGGI & FOTO RICEVUTI
+       ========================================= -->
+  <section class="section messaggi-ricevuti-section" id="messaggi-ricevuti">
+    <div class="container">
+      <div class="text-center section-header">
+        <span class="section-label">In memoria</span>
+        <h2 class="section-title">Messaggi e foto</h2>
+        <div class="divider mx-auto"></div>
+        <p class="section-text" style="margin: 0 auto;">
+          I pensieri di affetto e le parole di cordoglio lasciati dalla comunità.
+        </p>
+      </div>
+
+      <!-- Foto carousel (shown if photos exist) -->
+      <div id="foto-section" class="foto-carousel-wrap" style="display:none;">
+        <div class="foto-carousel-track" id="foto-grid"></div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="msg-loading" class="msg-loading-wrap">
+        <div class="msg-skeleton"></div>
+        <div class="msg-skeleton"></div>
+        <div class="msg-skeleton"></div>
+      </div>
+
+      <!-- Messages grid -->
+      <div id="msg-list" class="msg-cards-grid" style="display:none;"></div>
+
+      <!-- Empty state -->
+      <div id="msg-empty" class="msg-empty-state" style="display:none;">
+        <p>Se desideri inviare un messaggio o una foto in ricordo di <strong>{nomeCompleto}</strong> <a href="#cordoglio" class="gold-link">clicca qui</a>.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================
+       FIORI / FLOWER E-COMMERCE
+       ========================================= -->
   <section class="section fiori-section" id="invia-fiori">
     <div class="container">
       <div class="text-center section-header">
@@ -753,48 +793,6 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     </div>
   </section>
 
-  <!-- =========================================
-       MESSAGGI & FOTO RICEVUTI
-       ========================================= -->
-  <section class="section messaggi-ricevuti-section" id="messaggi-ricevuti">
-    <div class="container">
-      <div class="text-center section-header">
-        <span class="section-label">In memoria</span>
-        <h2 class="section-title">Messaggi ricevuti</h2>
-        <div class="divider mx-auto"></div>
-        <p class="section-text" style="margin: 0 auto;">
-          I pensieri di affetto e le parole di cordoglio lasciati dalla comunità.
-        </p>
-      </div>
-
-      <!-- Loading state -->
-      <div id="msg-loading" class="msg-loading-wrap">
-        <div class="msg-skeleton"></div>
-        <div class="msg-skeleton"></div>
-        <div class="msg-skeleton"></div>
-      </div>
-
-      <!-- Messages grid -->
-      <div id="msg-list" class="msg-cards-grid" style="display:none;"></div>
-
-      <!-- Empty state -->
-      <div id="msg-empty" class="msg-empty-state" style="display:none;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <p>I messaggi di cordoglio pubblici appariranno qui dopo l'invio.</p>
-      </div>
-
-      <!-- Foto ricevute -->
-      <div id="foto-section" class="foto-section-wrap" style="display:none;">
-        <div class="text-center" style="margin: 3rem 0 1.5rem;">
-          <span class="section-label">Ricordi fotografici</span>
-          <h3 class="section-title" style="font-size:1.5rem;">Foto ricevute</h3>
-          <div class="divider mx-auto"></div>
-        </div>
-        <div id="foto-grid" class="foto-grid-full"></div>
-      </div>
-
-    </div>
-  </section>
 
   <!-- Manifesto Modal -->
   {annuncio.epigrafe_url && (
@@ -2190,16 +2188,25 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   /* Empty state */
   .msg-empty-state {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    padding: 3.5rem 1rem;
+    justify-content: center;
+    padding: 3rem 1rem;
     text-align: center;
     color: var(--text-muted);
     font-size: 0.92rem;
     line-height: 1.7;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
+
+  .gold-link {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    transition: opacity var(--transition);
+  }
+
+  .gold-link:hover { opacity: 0.75; }
 
   /* Foto full grid */
   .foto-grid-full {
@@ -2208,9 +2215,53 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     gap: 0.75rem;
   }
 
+  /* Foto carousel */
+  .foto-carousel-wrap {
+    margin: 2.5rem 0 0;
+    position: relative;
+  }
+
+  .foto-carousel-wrap::before,
+  .foto-carousel-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .foto-carousel-wrap::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-soft), transparent);
+  }
+
+  .foto-carousel-wrap::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-soft), transparent);
+  }
+
+  .foto-carousel-track {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0.25rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .foto-carousel-track::-webkit-scrollbar { height: 4px; }
+  .foto-carousel-track::-webkit-scrollbar-track { background: transparent; }
+  .foto-carousel-track::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
   .foto-thumb {
-    aspect-ratio: 1;
-    border-radius: 8px;
+    flex: 0 0 200px;
+    height: 200px;
+    scroll-snap-align: start;
+    border-radius: 10px;
     overflow: hidden;
     cursor: pointer;
     border: 1px solid var(--border);
@@ -2964,7 +3015,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     };
 
     try {
-      const res = await fetch(`https://api.cas-per.it/api/public/v1/cordogli?slug=${slug}`, {
+      const res = await fetch(`/casper-api/public/v1/cordogli?slug=${slug}`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
       if (!res.ok) throw new Error('API error');
@@ -2974,7 +3025,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
 
       // Photos (silent fail)
       try {
-        const resF = await fetch(`https://api.cas-per.it/api/public/v1/fotocordogli?slug=${slug}`, {
+        const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${slug}`, {
           headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
         });
         if (resF.ok) {
