@@ -1,37 +1,25 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 
-export async function getStaticPaths() {
-  const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
-  const apiUrl = 'https://api.cas-per.it/api/public/v1/annunci?limit=100';
-  
-  try {
-    const res = await fetch(apiUrl, {
-      headers: {
-        'X-API-Key': apiKey,
-        'Accept': 'application/json'
-      }
-    });
-
-    if (!res.ok) {
-      throw new Error(`getStaticPaths failed: ${res.status}`);
-    }
-
-    const json = await res.json();
-    const items = json.data || [];
-    
-    return items.map((item: any) => ({
-      params: { slug: item.slug },
-      props: { item }
-    }));
-  } catch (err) {
-    console.error('Error generating static paths for necrologi:', err);
-    return [];
-  }
-}
+// SSR: ogni richiesta legge dati freschi dall'API
+export const prerender = false;
 
 const { slug } = Astro.params;
-const { item } = Astro.props;
+const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
+
+// Recupera la lista e trova l'annuncio per slug
+let item: any = null;
+try {
+  const res = await fetch(`https://api.cas-per.it/api/public/v1/annunci?limit=200`, {
+    headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+  });
+  if (res.ok) {
+    const json = await res.json();
+    item = (json.data || []).find((i: any) => i.slug === slug) || null;
+  }
+} catch (err) {
+  console.error('Errore fetch annuncio:', err);
+}
 
 if (!item) {
   return Astro.redirect('/404');
@@ -217,7 +205,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     <div class="container">
       <div class="text-center section-header">
         <span class="section-label">Cerimonie</span>
-        <h2 class="section-title">Orari & Luoghi del Commiato</h2>
+        <h2 class="section-title">Orari e luoghi del commiato</h2>
         <div class="divider mx-auto"></div>
       </div>
 
@@ -232,7 +220,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
                   <path d="M12 15v6M9 18h6" />
                 </svg>
               </span>
-              <h3>Santo Rosario</h3>
+              <h3>Santo rosario</h3>
             </div>
             <div class="ceremony-body">
               {rosario.data_ora && (
@@ -267,7 +255,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
                   <path d="M12 2v20M8 8h8" />
                 </svg>
               </span>
-              <h3>Cerimonia Funebre</h3>
+              <h3>Cerimonia funebre</h3>
             </div>
             <div class="ceremony-body">
               {funerale.data_ora && (
@@ -305,7 +293,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
                   <path d="M12 3c-0.8 1.5-0.8 2.5 0 4 0.8-1.5 0.8-2.5 0-4z" fill="currentColor" stroke="none" />
                 </svg>
               </span>
-              <h3>Camera Ardente</h3>
+              <h3>Camera ardente</h3>
             </div>
             <div class="ceremony-body">
               <div class="address-block" style="margin-top: 1rem;">
@@ -362,7 +350,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         <div class="streaming-block text-center">
           <div class="streaming-inner card">
             <span class="live-dot-pulse"></span>
-            <h3>Diretta Streaming della Cerimonia</h3>
+            <h3>Diretta streaming della cerimonia</h3>
             <p>Per coloro che non possono partecipare fisicamente, è possibile seguire la cerimonia funebre in diretta streaming online.</p>
             <a href={streaming.url_video} target="_blank" rel="noopener noreferrer" class="btn btn-gold streaming-btn">
               ▶ Segui la diretta streaming
@@ -382,7 +370,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       <div class="condolence-column" id="cordoglio" style="width: 100%;">
         <div class="interactive-card card">
           <div class="card-title-header">
-            <h3>Esprimi il tuo Cordoglio</h3>
+            <h3>Esprimi il tuo cordoglio</h3>
             <p>Invia un pensiero di affetto o un ricordo fotografico alla famiglia.</p>
           </div>
 
@@ -519,7 +507,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
             <!-- OTP Section -->
             <div id="otp-verification-section" style="display: none; border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-top: 1.5rem;">
               <div class="card-title-header text-center">
-                <h4>Verifica il tuo Foto-Cordoglio</h4>
+                <h4>Verifica il tuo foto-cordoglio</h4>
                 <p>Inserisci il codice OTP inviato tramite SMS al numero fornito.</p>
               </div>
               <form id="otp-form" class="memorial-form" style="max-width: 320px; margin: 0 auto;">
@@ -583,7 +571,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     <div class="container">
       <div class="text-center section-header">
         <span class="section-label">Fioreria FADI</span>
-        <h2 class="section-title">Ordina una Composizione Floreale</h2>
+        <h2 class="section-title">Ordina una composizione floreale</h2>
         <div class="divider mx-auto"></div>
         <p class="fiori-intro-text">
           Scegli la tua composizione floreale da inviare alla famiglia in segno di vicinanza.<br/>
