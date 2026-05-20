@@ -115,7 +115,7 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   <section class="memorial-header-section">
     <div class="container header-grid">
       <!-- Left side: elegant photo representation -->
-      <div class="memorial-photo-wrapper">
+      <div class="memorial-photo-wrapper" style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
         <div class="memorial-frame">
           {haFoto ? (
             <img 
@@ -130,6 +130,18 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
           )}
           <div class="frame-gold-border"></div>
         </div>
+
+        {annuncio.epigrafe_url && (
+          <div class="manifesto-preview-wrapper" style="cursor: pointer; width: 100%; max-width: 160px; text-align: center;">
+            <div class="manifesto-thumbnail-card" id="open-manifesto-btn" style="position: relative; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all var(--transition); aspect-ratio: 1 / 1.41;">
+              <img src={annuncio.epigrafe_url} alt={`Manifesto di ${nomeCompleto}`} style="width: 100%; height: 100%; object-fit: cover;" />
+              <div class="manifesto-overlay" style="position: absolute; inset: 0; background: rgba(44, 38, 32, 0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition);">
+                <span style="color: #ffffff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #ffffff; padding: 0.4rem 0.8rem; border-radius: 4px; background: rgba(0,0,0,0.2);">Ingrandisci</span>
+              </div>
+            </div>
+            <span style="display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold);">Manifesto Funebre 🔍</span>
+          </div>
+        )}
       </div>
 
       <!-- Right side: details and text -->
@@ -494,6 +506,21 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       </div>
     </div>
   </section>
+
+  <!-- Manifesto Modal -->
+  {annuncio.epigrafe_url && (
+    <div id="manifesto-modal" class="manifesto-modal-overlay">
+      <div class="manifesto-modal-content">
+        <button id="close-manifesto-btn" class="close-manifesto-btn" type="button">
+          &times;
+        </button>
+        <img src={annuncio.epigrafe_url} alt={`Manifesto Funebre di ${nomeCompleto}`} />
+        <div class="manifesto-modal-caption">
+          Manifesto Funebre di {nomeCompleto}
+        </div>
+      </div>
+    </div>
+  )}
 </Layout>
 
 <style>
@@ -1275,6 +1302,89 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   .photo-remove-btn:hover {
     background: #c0392b;
   }
+
+  /* Manifesto Thumbnail Hover & Interaction */
+  .manifesto-thumbnail-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold) !important;
+    box-shadow: 0 8px 24px rgba(184, 150, 110, 0.15) !important;
+  }
+  .manifesto-thumbnail-card:hover .manifesto-overlay {
+    opacity: 1 !important;
+  }
+
+  /* Manifesto Modal Styles */
+  .manifesto-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(26, 31, 46, 0.85);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .manifesto-modal-overlay.active {
+    display: flex !important;
+    opacity: 1 !important;
+  }
+  .manifesto-modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    background: #ffffff;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--gold);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .manifesto-modal-overlay.active .manifesto-modal-content {
+    transform: scale(1) !important;
+  }
+  .manifesto-modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: calc(var(--radius) - 4px);
+  }
+  .manifesto-modal-caption {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .close-manifesto-btn {
+    position: absolute;
+    top: -1.75rem;
+    right: -1.75rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    color: #ffffff !important;
+    font-size: 1.5rem !important;
+    line-height: 2rem;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+  }
+  .close-manifesto-btn:hover {
+    background-color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    transform: rotate(90deg);
+  }
 </style>
 
 <!-- Client Side Forms and Canvas Actions -->
@@ -1898,4 +2008,38 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
       otpBtn.innerHTML = originalText;
     }
   });
+
+  // 9. MANIFESTO MODAL ACTIONS
+  const openManifesto = document.getElementById('open-manifesto-btn');
+  const closeManifesto = document.getElementById('close-manifesto-btn');
+  const modal = document.getElementById('manifesto-modal');
+  
+  if (openManifesto && modal && closeManifesto) {
+    openManifesto.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      modal.offsetHeight; // force reflow for opacity transition
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+    
+    const closeModal = () => {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    };
+    
+    closeManifesto.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  }
 </script>
