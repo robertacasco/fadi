@@ -209,7 +209,12 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         {rosario.luogo || rosario.data_ora ? (
           <div class="ceremony-detail-card card">
             <div class="ceremony-header">
-              <span class="ceremony-card-icon">📿</span>
+              <span class="ceremony-card-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="9" r="6" stroke-dasharray="0 4" />
+                  <path d="M12 15v6M9 18h6" />
+                </svg>
+              </span>
               <h3>Santo Rosario</h3>
             </div>
             <div class="ceremony-body">
@@ -240,7 +245,11 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         {funerale.luogo || funerale.data_ora ? (
           <div class="ceremony-detail-card card card-highlighted">
             <div class="ceremony-header">
-              <span class="ceremony-card-icon">✝</span>
+              <span class="ceremony-card-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v20M8 8h8" />
+                </svg>
+              </span>
               <h3>Cerimonia Funebre</h3>
             </div>
             <div class="ceremony-body">
@@ -271,7 +280,14 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         {luogoRiposo.luogo || luogoRiposo.indirizzo ? (
           <div class="ceremony-detail-card card">
             <div class="ceremony-header">
-              <span class="ceremony-card-icon">🏠</span>
+              <span class="ceremony-card-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 21h12M12 18v3" />
+                  <rect x="10" y="11" width="4" height="7" rx="0.5" />
+                  <path d="M12 11V8" />
+                  <path d="M12 3c-0.8 1.5-0.8 2.5 0 4 0.8-1.5 0.8-2.5 0-4z" fill="currentColor" stroke="none" />
+                </svg>
+              </span>
               <h3>Camera Ardente</h3>
             </div>
             <div class="ceremony-body">
@@ -296,7 +312,13 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
         {sepoltura.luogo || sepoltura.indirizzo ? (
           <div class="ceremony-detail-card card">
             <div class="ceremony-header">
-              <span class="ceremony-card-icon">🪦</span>
+              <span class="ceremony-card-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 20V10a6 6 0 0 1 12 0v10" />
+                  <path d="M3 20h18" />
+                  <path d="M12 8v6M10 10h4" />
+                </svg>
+              </span>
               <h3>Sepoltura</h3>
             </div>
             <div class="ceremony-body">
@@ -715,8 +737,10 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
   }
 
   .ceremony-card-icon {
-    font-size: 2rem;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
     color: var(--gold);
   }
 
