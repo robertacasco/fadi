@@ -1,0 +1,682 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
+const apiUrl = 'https://api.cas-per.it/api/public/v1/annunci?limit=100';
+
+let annunci = [];
+let error = null;
+
+try {
+  const res = await fetch(apiUrl, {
+    headers: {
+      'X-API-Key': apiKey,
+      'Accept': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error(`Errore API: ${res.status} ${res.statusText}`);
+  }
+
+  const json = await res.json();
+  annunci = json.data || [];
+} catch (err: any) {
+  console.error('Error fetching annunci at build time:', err);
+  error = err.message || 'Impossibile caricare gli annunci in questo momento.';
+}
+
+function formatMorte(dateStr: string) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    const months = [
+      'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    ];
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return `${day} ${months[monthIndex]} ${year}`;
+    }
+  }
+  return dateStr;
+}
+
+function formatCerimonia(dateTimeStr: string) {
+  if (!dateTimeStr) return '';
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return '';
+    const day = d.getDate();
+    const months = [
+      'Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu',
+      'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'
+    ];
+    const hour = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${day} ${months[d.getMonth()]} alle ore ${hour}:${min}`;
+  } catch {
+    return '';
+  }
+}
+---
+
+<Layout 
+  title="Necrologi e Annunci Funebri — FADI" 
+  description="Registro dei necrologi e annunci funebri dell'Agenzia Funebre FADI. Consulta i dettagli dei funerali, invia cordogli privati ed apponi la tua firma di presenza."
+>
+  <section class="section necrologi-hero">
+    <div class="container text-center">
+      <span class="section-label">Onoranze Funebri FADI</span>
+      <h1 class="section-title text-serif">Necrologi & Annunci Funebri</h1>
+      <div class="divider mx-auto"></div>
+      <p class="section-text mx-auto">
+        In questa sezione è possibile consultare i manifesti di lutto, conoscere gli orari e i luoghi delle cerimonie di commiato e dei rosari, inviare un messaggio di cordoglio privato alla famiglia o apporre una firma sul registro delle presenze digitale.
+      </p>
+    </div>
+  </section>
+
+  <section class="necrologi-list-section">
+    <div class="container">
+      <!-- Search and Filter Bar -->
+      <div class="search-bar-container">
+        <div class="search-box">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            id="necrologi-search" 
+            placeholder="Cerca per nome o cognome..." 
+            aria-label="Cerca necrologi"
+          />
+          <button id="search-clear-btn" class="search-clear-btn" aria-label="Cancella ricerca" style="display: none;">
+            &times;
+          </button>
+        </div>
+        <div class="search-results-info">
+          Trovati <span id="visible-count">{annunci.length}</span> annunci funebri
+        </div>
+      </div>
+
+      {error && (
+        <div class="error-container text-center">
+          <p class="error-message">{error}</p>
+          <button onclick="window.location.reload()" class="btn btn-outline">Riprova a caricare</button>
+        </div>
+      )}
+
+      {!error && annunci.length === 0 && (
+        <div class="empty-container text-center">
+          <p class="empty-message">Nessun annuncio funebre attivo trovato al momento.</p>
+        </div>
+      )}
+
+      {!error && annunci.length > 0 && (
+        <div class="necrologi-grid" id="necrologi-grid">
+          {annunci.map((item: any) => {
+            const defunto = item.defunto || {};
+            const annuncio = item.annuncio || {};
+            const funerale = item.funerale || {};
+            const rosario = item.rosario || {};
+            const paese = annuncio.paese || 'Dasà';
+            const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+            const haFoto = !!defunto.foto_url;
+            const dataMorteIta = formatMorte(defunto.data_morte);
+            
+            return (
+              <article 
+                class="necrologio-card card" 
+                data-nominativo={nomeCompleto.toLowerCase()}
+              >
+                {/* Image Container with Frame */}
+                <div class="card-img-wrapper">
+                  {haFoto ? (
+                    <img 
+                      src={defunto.foto_url} 
+                      alt={`Foto di ${nomeCompleto}`}
+                      class="card-img"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="card-img-placeholder">
+                      <div class="placeholder-cross">✝</div>
+                    </div>
+                  )}
+                  {/* Decorative Frame Overlay */}
+                  <div class="card-img-border"></div>
+                </div>
+
+                {/* Card Info Content */}
+                <div class="card-info">
+                  <span class="card-location">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    {paese}
+                  </span>
+
+                  <h2 class="card-name">{nomeCompleto}</h2>
+                  
+                  <div class="card-meta">
+                    {dataMorteIta && (
+                      <div class="meta-row">
+                        <span class="meta-label">Mancato il:</span>
+                        <span class="meta-value">{dataMorteIta}</span>
+                      </div>
+                    )}
+                    {defunto.eta_visibile && defunto.eta && (
+                      <div class="meta-row">
+                        <span class="meta-label">Età:</span>
+                        <span class="meta-value">{defunto.eta} anni</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="card-divider"></div>
+
+                  {/* Ceremonies Previews */}
+                  <div class="card-ceremonies">
+                    {funerale.data_ora ? (
+                      <div class="ceremony-preview">
+                        <span class="ceremony-icon" title="Funerale">✝</span>
+                        <div class="ceremony-text">
+                          <strong>Funerale:</strong> {formatCerimonia(funerale.data_ora)}
+                        </div>
+                      </div>
+                    ) : null}
+                    
+                    {rosario.data_ora ? (
+                      <div class="ceremony-preview">
+                        <span class="ceremony-icon ceremony-icon--rosario" title="Rosario">📿</span>
+                        <div class="ceremony-text">
+                          <strong>Rosario:</strong> {formatCerimonia(rosario.data_ora)}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {!funerale.data_ora && !rosario.data_ora && (
+                      <div class="ceremony-preview ceremony-preview--empty">
+                        <div class="ceremony-text italic text-muted">
+                          Contattare l'agenzia per orari e dettagli.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Action Buttons */}
+                <div class="card-actions">
+                  <a href={`/necrologi/${item.slug}/`} class="btn-card btn-card-primary">
+                    Visualizza Dettaglio
+                  </a>
+                  <a href={`/necrologi/${item.slug}/#cordoglio`} class="btn-card btn-card-outline">
+                    Invia Cordoglio
+                  </a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      <!-- No Results State -->
+      <div id="no-results" class="no-results-container text-center" style="display: none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <h3>Nessun necrologio trovato</h3>
+        <p>Non ci sono annunci corrispondenti ai criteri di ricerca inseriti.</p>
+        <button id="clear-search-btn-bottom" class="btn btn-outline btn-sm">Cancella filtro</button>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .necrologi-hero {
+    background-color: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 4.5rem 0 3.5rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .necrologi-list-section {
+    padding: 3.5rem 0 5rem;
+    background-color: var(--bg);
+  }
+
+  /* Search Bar */
+  .search-bar-container {
+    max-width: 760px;
+    margin: 0 auto 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .search-box {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.25rem;
+    color: var(--gold);
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 1.05rem 3rem 1.05rem 3.25rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 30px; /* Fully rounded search pill */
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+    transition: all var(--transition);
+    outline: none;
+  }
+
+  .search-box input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 4px 24px rgba(184, 150, 110, 0.15);
+  }
+
+  .search-clear-btn {
+    position: absolute;
+    right: 1.25rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: color var(--transition);
+  }
+
+  .search-clear-btn:hover {
+    color: var(--gold);
+  }
+
+  .search-results-info {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .search-results-info span {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* Grid Layout */
+  .necrologi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2.5rem;
+  }
+
+  /* Card Customizations */
+  .necrologio-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .card-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3.2 / 4; /* Portrait oriented frame */
+    background-color: var(--bg-soft);
+    overflow: hidden;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition);
+  }
+
+  .necrologio-card:hover .card-img {
+    transform: scale(1.03);
+  }
+
+  .card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-soft) 0%, rgba(184, 150, 110, 0.05) 100%);
+  }
+
+  .placeholder-cross {
+    font-size: 3.5rem;
+    color: var(--gold);
+    opacity: 0.35;
+    font-family: var(--font-serif);
+  }
+
+  /* Luxurious Gold Border Frame overlay */
+  .card-img-border {
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 150, 110, 0.25);
+    pointer-events: none;
+    transition: border-color var(--transition);
+  }
+
+  .necrologio-card:hover .card-img-border {
+    border-color: rgba(184, 150, 110, 0.6);
+  }
+
+  /* Info block */
+  .card-info {
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .card-location svg {
+    opacity: 0.8;
+  }
+
+  .card-name {
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+    transition: color var(--transition);
+  }
+
+  .necrologio-card:hover .card-name {
+    color: var(--gold);
+  }
+
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    border-bottom: 1px dashed rgba(184, 150, 110, 0.1);
+    padding-bottom: 2px;
+  }
+
+  .meta-label {
+    color: var(--text-muted);
+  }
+
+  .meta-value {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.25rem 0 1.25rem;
+  }
+
+  /* Ceremonies styling */
+  .card-ceremonies {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .ceremony-preview {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+  }
+
+  .ceremony-icon {
+    font-size: 0.95rem;
+    color: var(--gold);
+    font-family: var(--font-serif);
+    line-height: 1.2;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+  }
+
+  .ceremony-icon--rosario {
+    font-size: 0.85rem;
+  }
+
+  .ceremony-text {
+    line-height: 1.4;
+  }
+
+  .ceremony-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .ceremony-preview--empty {
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .italic {
+    font-style: italic;
+  }
+
+  /* Card Actions block */
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--border);
+    background-color: var(--bg-soft);
+  }
+
+  .btn-card {
+    padding: 1rem 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-decoration: none;
+    border: none;
+  }
+
+  .btn-card-primary {
+    background: transparent;
+    color: var(--text);
+    border-right: 1px solid var(--border);
+  }
+
+  .btn-card-primary:hover {
+    background: var(--gold);
+    color: #1a1f2e; /* Navy for premium contrast */
+  }
+
+  .btn-card-outline {
+    background: transparent;
+    color: var(--gold);
+  }
+
+  .btn-card-outline:hover {
+    background: var(--gold-dim);
+  }
+
+  /* Error and Empty States */
+  .error-container, .empty-container, .no-results-container {
+    padding: 4rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-width: 600px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+  }
+
+  .error-message {
+    color: #c0392b;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-message {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .no-results-container svg {
+    color: var(--gold);
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  .no-results-container h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .no-results-container p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 768px) {
+    .necrologi-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .search-bar-container {
+      margin-bottom: 2rem;
+    }
+
+    .search-box input {
+      padding: 0.85rem 2.5rem 0.85rem 2.75rem;
+      font-size: 0.95rem;
+    }
+
+    .search-icon {
+      left: 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Client-side search and filtering implementation
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('necrologi-search') as HTMLInputElement | null;
+    const clearBtn = document.getElementById('search-clear-btn') as HTMLButtonElement | null;
+    const clearBtnBottom = document.getElementById('clear-search-btn-bottom') as HTMLButtonElement | null;
+    const grid = document.getElementById('necrologi-grid');
+    const cards = document.querySelectorAll('.necrologio-card');
+    const visibleCountEl = document.getElementById('visible-count');
+    const noResults = document.getElementById('no-results');
+
+    if (!searchInput || !cards.length) return;
+
+    function filterCards() {
+      const query = searchInput!.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      // Toggle clear button visibility
+      if (clearBtn) {
+        clearBtn.style.display = query ? 'block' : 'none';
+      }
+
+      cards.forEach((cardEl) => {
+        const card = cardEl as HTMLElement;
+        const name = card.getAttribute('data-nominativo') || '';
+        
+        if (name.includes(query)) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Update count
+      if (visibleCountEl) {
+        visibleCountEl.textContent = String(visibleCount);
+      }
+
+      // Toggle no-results state
+      if (grid) {
+        if (visibleCount === 0) {
+          grid.style.display = 'none';
+          if (noResults) noResults.style.display = 'block';
+        } else {
+          grid.style.display = 'grid';
+          if (noResults) noResults.style.display = 'none';
+        }
+      }
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterCards);
+
+    function clearSearch() {
+      if (searchInput) {
+        searchInput.value = '';
+        filterCards();
+        searchInput.focus();
+      }
+    }
+
+    clearBtn?.addEventListener('click', clearSearch);
+    clearBtnBottom?.addEventListener('click', clearSearch);
+  });
+</script>

@@ -1,0 +1,1354 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
+  const apiUrl = 'https://api.cas-per.it/api/public/v1/annunci?limit=100';
+  
+  try {
+    const res = await fetch(apiUrl, {
+      headers: {
+        'X-API-Key': apiKey,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`getStaticPaths failed: ${res.status}`);
+    }
+
+    const json = await res.json();
+    const items = json.data || [];
+    
+    return items.map((item: any) => ({
+      params: { slug: item.slug },
+      props: { item }
+    }));
+  } catch (err) {
+    console.error('Error generating static paths for necrologi:', err);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+const { item } = Astro.props;
+
+if (!item) {
+  return Astro.redirect('/404');
+}
+
+const defunto = item.defunto || {};
+const annuncio = item.annuncio || {};
+const funerale = item.funerale || {};
+const rosario = item.rosario || {};
+const sepoltura = item.sepoltura || {};
+const luogoRiposo = item.luogo_riposo || {};
+const streaming = item.streaming || {};
+const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+const haFoto = !!defunto.foto_url;
+
+function formatMorte(dateStr: string) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    const months = [
+      'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    ];
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return `${day} ${months[monthIndex]} ${year}`;
+    }
+  }
+  return dateStr;
+}
+
+function formatNascita(dateStr: string) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+}
+
+function formatCerimoniaOra(dateTimeStr: string) {
+  if (!dateTimeStr) return '';
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return '';
+    const hour = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `ore ${hour}:${min}`;
+  } catch {
+    return '';
+  }
+}
+
+function formatCerimoniaData(dateTimeStr: string) {
+  if (!dateTimeStr) return '';
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return '';
+    const day = d.getDate();
+    const months = [
+      'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    ];
+    return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  } catch {
+    return '';
+  }
+}
+
+const dataMorteIta = formatMorte(defunto.data_morte);
+const dataNascitaIta = formatNascita(defunto.data_nascita);
+---
+
+<Layout 
+  title={`In Memoria di ${nomeCompleto} — FADI`}
+  description={`Manifesto funebre di ${nomeCompleto}. Consulta gli orari delle cerimonie di commiato, invia un messaggio di cordoglio privato o lascia una firma.`}
+>
+  <!-- Memorial Header Section -->
+  <section class="memorial-header-section">
+    <div class="container header-grid">
+      <!-- Left side: elegant photo representation -->
+      <div class="memorial-photo-wrapper">
+        <div class="memorial-frame">
+          {haFoto ? (
+            <img 
+              src={defunto.foto_url} 
+              alt={`Foto di ${nomeCompleto}`}
+              class="memorial-image"
+            />
+          ) : (
+            <div class="memorial-image-placeholder">
+              <div class="placeholder-cross-lg">✝</div>
+            </div>
+          )}
+          <div class="frame-gold-border"></div>
+        </div>
+      </div>
+
+      <!-- Right side: details and text -->
+      <div class="memorial-primary-info">
+        <div class="emblem" aria-hidden="true">✝</div>
+        <span class="annuncio-label">In Memoria di</span>
+        <h1 class="deceased-name">{nomeCompleto}</h1>
+        
+        <div class="dates-eta">
+          {dataMorteIta && (
+            <div class="info-tag">
+              <span class="tag-title">Deceduto il:</span>
+              <span class="tag-val">{dataMorteIta}</span>
+            </div>
+          )}
+          {dataNascitaIta && (
+            <div class="info-tag">
+              <span class="tag-title">Nato il:</span>
+              <span class="tag-val">{dataNascitaIta}</span>
+            </div>
+          )}
+          {defunto.eta_visibile && defunto.eta && (
+            <div class="info-tag">
+              <span class="tag-title">Età:</span>
+              <span class="tag-val">{defunto.eta} Anni</span>
+            </div>
+          )}
+        </div>
+
+        {annuncio.citazione && (
+          <blockquote class="deceased-quote">
+            <p>“{annuncio.citazione}”</p>
+          </blockquote>
+        )}
+
+        <div class="action-buttons-group">
+          <a href="#cordoglio" class="btn btn-gold">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            Invia Cordoglio
+          </a>
+          <a href="#firma-libro" class="btn btn-outline">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+            Firma Libro Presenze
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ceremony Details Grid -->
+  <section class="section ceremonies-section">
+    <div class="container">
+      <div class="text-center section-header">
+        <span class="section-label">Cerimonie</span>
+        <h2 class="section-title">Orari & Luoghi del Commiato</h2>
+        <div class="divider mx-auto"></div>
+      </div>
+
+      <div class="ceremonies-grid">
+        <!-- ROSARIO CARD -->
+        {rosario.luogo || rosario.data_ora ? (
+          <div class="ceremony-detail-card card">
+            <div class="ceremony-header">
+              <span class="ceremony-card-icon">📿</span>
+              <h3>Santo Rosario</h3>
+            </div>
+            <div class="ceremony-body">
+              {rosario.data_ora && (
+                <div class="time-block">
+                  <span class="time-date">{formatCerimoniaData(rosario.data_ora)}</span>
+                  <span class="time-hours">{formatCerimoniaOra(rosario.data_ora)}</span>
+                </div>
+              )}
+              <div class="address-block">
+                <span class="place-name">{rosario.luogo || 'Presso la Chiesa'}</span>
+                {rosario.indirizzo && <span class="place-address">{rosario.indirizzo}</span>}
+              </div>
+            </div>
+            {rosario.link_maps && (
+              <a href={rosario.link_maps} target="_blank" rel="noopener noreferrer" class="maps-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Indicazioni stradali
+              </a>
+            )}
+          </div>
+        ) : null}
+
+        <!-- FUNERALE CARD -->
+        {funerale.luogo || funerale.data_ora ? (
+          <div class="ceremony-detail-card card card-highlighted">
+            <div class="ceremony-header">
+              <span class="ceremony-card-icon">✝</span>
+              <h3>Cerimonia Funebre</h3>
+            </div>
+            <div class="ceremony-body">
+              {funerale.data_ora && (
+                <div class="time-block">
+                  <span class="time-date">{formatCerimoniaData(funerale.data_ora)}</span>
+                  <span class="time-hours">{formatCerimoniaOra(funerale.data_ora)}</span>
+                </div>
+              )}
+              <div class="address-block">
+                <span class="place-name">{funerale.luogo || 'Chiesa Parrocchiale'}</span>
+                {funerale.indirizzo && <span class="place-address">{funerale.indirizzo}</span>}
+              </div>
+            </div>
+            {funerale.link_maps && (
+              <a href={funerale.link_maps} target="_blank" rel="noopener noreferrer" class="maps-link highlighted-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Indicazioni stradali
+              </a>
+            )}
+          </div>
+        ) : null}
+
+        <!-- LUOGO DI RIPOSO CARD -->
+        {luogoRiposo.luogo || luogoRiposo.indirizzo ? (
+          <div class="ceremony-detail-card card">
+            <div class="ceremony-header">
+              <span class="ceremony-card-icon">🏠</span>
+              <h3>Camera Ardente</h3>
+            </div>
+            <div class="ceremony-body">
+              <div class="address-block" style="margin-top: 1rem;">
+                <span class="place-name">{luogoRiposo.luogo}</span>
+                {luogoRiposo.indirizzo && <span class="place-address">{luogoRiposo.indirizzo}</span>}
+              </div>
+            </div>
+            {luogoRiposo.link_maps && (
+              <a href={luogoRiposo.link_maps} target="_blank" rel="noopener noreferrer" class="maps-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Indicazioni stradali
+              </a>
+            )}
+          </div>
+        ) : null}
+
+        <!-- SEPOLTURA CARD -->
+        {sepoltura.luogo || sepoltura.indirizzo ? (
+          <div class="ceremony-detail-card card">
+            <div class="ceremony-header">
+              <span class="ceremony-card-icon">🪦</span>
+              <h3>Sepoltura</h3>
+            </div>
+            <div class="ceremony-body">
+              <div class="address-block" style="margin-top: 1rem;">
+                <span class="place-name">{sepoltura.luogo || 'Cimitero Comunale'}</span>
+                {sepoltura.indirizzo && <span class="place-address">{sepoltura.indirizzo}</span>}
+              </div>
+            </div>
+            {sepoltura.link_maps && (
+              <a href={sepoltura.link_maps} target="_blank" rel="noopener noreferrer" class="maps-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Indicazioni stradali
+              </a>
+            )}
+          </div>
+        ) : null}
+      </div>
+
+      <!-- Live Stream Streaming Option -->
+      {streaming.url_video && (
+        <div class="streaming-block text-center">
+          <div class="streaming-inner card">
+            <span class="live-dot-pulse"></span>
+            <h3>Diretta Streaming della Cerimonia</h3>
+            <p>Per coloro che non possono partecipare fisicamente, è possibile seguire la cerimonia funebre in diretta streaming online.</p>
+            <a href={streaming.url_video} target="_blank" rel="noopener noreferrer" class="btn btn-gold streaming-btn">
+              ▶ Segui la diretta streaming
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Interactive Forms Section -->
+  <section class="section interactive-memorial-section" id="interactive-area">
+    <div class="container interactive-grid">
+      <!-- CONDOLENCE FORM COLUMN -->
+      <div class="condolence-column" id="cordoglio">
+        <div class="interactive-card card">
+          <div class="card-title-header">
+            <h3>Esprimi il tuo Cordoglio</h3>
+            <p>Invia un pensiero di affetto. Il messaggio sarà recapitato privatamente alla famiglia.</p>
+          </div>
+          
+          <form id="cordoglio-form" class="memorial-form">
+            <div class="form-group">
+              <label for="c-nome">Nome e Cognome *</label>
+              <input type="text" id="c-nome" name="nome" placeholder="Esempio: Famiglia Rossi" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="c-telefono">Telefono *</label>
+                <input type="tel" id="c-telefono" name="telefono" placeholder="Esempio: 3331234567" required />
+              </div>
+              <div class="form-group">
+                <label for="c-mail">Email (Opzionale)</label>
+                <input type="email" id="c-mail" name="mail" placeholder="Esempio: nome@email.it" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="c-testo">Il tuo Messaggio *</label>
+              <textarea id="c-testo" name="testo" rows="5" placeholder="Scrivi qui le tue condoglianze..." required></textarea>
+            </div>
+
+            <div class="form-status" id="cordoglio-status"></div>
+
+            <button type="submit" class="btn btn-gold btn-block" id="cordoglio-submit-btn">
+              Invia Messaggio
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- SIGNATURE BOOK COLUMN -->
+      <div class="signatures-column" id="firma-libro">
+        <div class="interactive-card card">
+          <div class="card-title-header">
+            <h3>Libro delle Firme virtuale</h3>
+            <p>Lascia una firma per attestare la tua presenza ed essere vicino ai familiari.</p>
+          </div>
+
+          <div class="signatures-view-container">
+            <h4>Firme recenti</h4>
+            <div class="signatures-list" id="signatures-list-container">
+              <div class="loading-signatures">Caricamento in corso...</div>
+            </div>
+          </div>
+
+          <form id="signature-form" class="memorial-form" style="border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-top: 1.5rem;">
+            <h4>Lascia la tua firma</h4>
+            <div class="form-group">
+              <label for="s-nome">Nome e Cognome *</label>
+              <input type="text" id="s-nome" name="nominativo" placeholder="Esempio: Mario Rossi" required />
+            </div>
+
+            <div class="form-group">
+              <label>Firma Calligrafica (Disegna nel riquadro sottostante)</label>
+              <div class="canvas-wrapper">
+                <canvas id="signature-canvas" width="400" height="150"></canvas>
+                <button type="button" id="canvas-clear" class="canvas-clear-btn" title="Cancella disegno">&times; Cancella</button>
+              </div>
+            </div>
+
+            <div class="form-status" id="signature-status"></div>
+
+            <button type="submit" class="btn btn-outline btn-block" id="signature-submit-btn">
+              Apponi Firma
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Memorial layout details */
+  .memorial-header-section {
+    background-color: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 5rem 0;
+  }
+
+  .header-grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 3.5rem;
+    align-items: center;
+  }
+
+  .memorial-photo-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .memorial-frame {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 3.2 / 4;
+    border-radius: var(--radius);
+    background-color: #ffffff;
+    box-shadow: 0 10px 40px rgba(44, 38, 32, 0.08);
+    overflow: hidden;
+  }
+
+  .memorial-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .memorial-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-soft) 0%, rgba(184, 150, 110, 0.03) 100%);
+  }
+
+  .placeholder-cross-lg {
+    font-size: 5rem;
+    color: var(--gold);
+    opacity: 0.3;
+    font-family: var(--font-serif);
+  }
+
+  .frame-gold-border {
+    position: absolute;
+    inset: 16px;
+    border: 1px solid rgba(184, 150, 110, 0.28);
+    pointer-events: none;
+  }
+
+  /* Info on right */
+  .memorial-primary-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .emblem {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    opacity: 0.9;
+  }
+
+  .annuncio-label {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .deceased-name {
+    font-size: clamp(2.25rem, 5vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  .dates-eta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  .info-tag {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.6rem 1.25rem;
+    box-shadow: 0 4px 12px rgba(44, 38, 32, 0.01);
+  }
+
+  .tag-title {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+
+  .tag-val {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 0.15rem;
+  }
+
+  .deceased-quote {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    border-left: 2px solid var(--gold);
+    padding-left: 1.25rem;
+    margin: 0.5rem 0 2.25rem;
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  .action-buttons-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .action-buttons-group .btn {
+    padding: 0.9rem 2.2rem;
+  }
+
+  /* Ceremonies section */
+  .ceremonies-section {
+    background-color: var(--bg);
+  }
+
+  .section-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .ceremonies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .ceremony-detail-card {
+    display: flex;
+    flex-direction: column;
+    padding: 2.25rem 2rem;
+    height: 100%;
+    align-items: center;
+    text-align: center;
+    background-color: #ffffff;
+  }
+
+  .card-highlighted {
+    border-color: var(--gold);
+    background: linear-gradient(to bottom, #ffffff 0%, rgba(184, 150, 110, 0.02) 100%);
+    box-shadow: 0 10px 30px rgba(184, 150, 110, 0.06);
+  }
+
+  .ceremony-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .ceremony-card-icon {
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--gold);
+  }
+
+  .ceremony-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .ceremony-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .time-block {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-soft);
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .time-date {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .time-hours {
+    font-size: 0.85rem;
+    color: var(--gold);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.15rem;
+  }
+
+  .address-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .place-name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 1rem;
+  }
+
+  .place-address {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+
+  .maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    transition: all var(--transition);
+  }
+
+  .maps-link:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background-color: var(--bg-soft);
+  }
+
+  .highlighted-link {
+    background-color: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .highlighted-link:hover {
+    background-color: var(--gold);
+    color: #1a1f2e;
+  }
+
+  /* Streaming info */
+  .streaming-block {
+    margin-top: 4.5rem;
+  }
+
+  .streaming-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2.5rem;
+    position: relative;
+    border-color: #4ade80; /* Elegant soft green border for live streaming activity */
+    background: linear-gradient(to bottom, #ffffff 0%, rgba(74, 222, 128, 0.01) 100%);
+  }
+
+  .live-dot-pulse {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+    animation: livePulse 2s infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.5; }
+  }
+
+  .streaming-inner h3 {
+    font-size: 1.45rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .streaming-inner p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .streaming-btn {
+    border: none;
+    background-color: #4ade80;
+    color: #111827;
+  }
+
+  .streaming-btn:hover {
+    background-color: #2ecc71;
+    color: #111827;
+    box-shadow: 0 6px 24px rgba(46, 204, 113, 0.25);
+  }
+
+  /* Interactive section split */
+  .interactive-memorial-section {
+    background-color: var(--bg-soft);
+    border-top: 1px solid var(--border);
+  }
+
+  .interactive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .interactive-card {
+    padding: 3rem 2.5rem;
+    background-color: #ffffff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title-header {
+    margin-bottom: 2rem;
+  }
+
+  .card-title-header h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+
+  .card-title-header p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Forms general styling */
+  .memorial-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .memorial-form label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .memorial-form input, .memorial-form textarea {
+    padding: 0.85rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--text);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    outline: none;
+    transition: all var(--transition);
+  }
+
+  .memorial-form input:focus, .memorial-form textarea:focus {
+    border-color: var(--gold);
+    background-color: #ffffff;
+    box-shadow: 0 4px 16px rgba(184, 150, 110, 0.08);
+  }
+
+  .btn-block {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+
+  /* Signatures view list */
+  .signatures-view-container {
+    margin-bottom: 2rem;
+  }
+
+  .signatures-view-container h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.35rem;
+  }
+
+  .signatures-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  /* Custom scrollbar for signatures */
+  .signatures-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .signatures-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .signatures-list::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 2px;
+  }
+
+  .loading-signatures, .no-signatures {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 1rem 0;
+    text-align: center;
+  }
+
+  .signature-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-soft);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    border: 1px solid rgba(184, 150, 110, 0.1);
+  }
+
+  .signature-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .signature-img-wrapper {
+    height: 35px;
+    display: flex;
+    align-items: center;
+  }
+
+  .signature-img {
+    height: 100%;
+    max-width: 120px;
+    object-fit: contain;
+    filter: contrast(1.2) brightness(0.9);
+  }
+
+  .signature-date-only {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Canvas styling */
+  .canvas-wrapper {
+    position: relative;
+    width: 100%;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  #signature-canvas {
+    display: block;
+    width: 100%;
+    height: 150px;
+    cursor: crosshair;
+    background-color: #fafaf9; /* Extremely clean drawing surface */
+    touch-action: none; /* Crucial to disable default gestures when drawing on touch screens */
+  }
+
+  .canvas-clear-btn {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.75rem;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all var(--transition);
+  }
+
+  .canvas-clear-btn:hover {
+    border-color: #c0392b;
+    color: #c0392b;
+  }
+
+  /* Feedback status */
+  .form-status {
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    display: none;
+    font-weight: 500;
+  }
+
+  .status-success {
+    display: block;
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.2);
+  }
+
+  .status-error {
+    display: block;
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+  }
+
+  .status-info {
+    display: block;
+    background-color: var(--gold-dim);
+    color: var(--gold);
+    border: 1px solid var(--border);
+  }
+
+  /* Spinner */
+  .spinner-inline {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: rotateSpinner 0.8s linear infinite;
+    vertical-align: -2px;
+    margin-right: 0.5rem;
+  }
+
+  @keyframes rotateSpinner {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 900px) {
+    .header-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      text-align: center;
+    }
+
+    .memorial-photo-wrapper {
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    .memorial-primary-info {
+      align-items: center;
+    }
+
+    .deceased-quote {
+      text-align: center;
+      border-left: none;
+      border-top: 1px dashed var(--border);
+      border-bottom: 1px dashed var(--border);
+      padding: 1rem 0;
+      margin: 1.5rem 0;
+    }
+
+    .dates-eta {
+      justify-content: center;
+    }
+
+    .action-buttons-group {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .action-buttons-group .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .interactive-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .interactive-card {
+      padding: 2rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+</style>
+
+<!-- Client Side Forms and Canvas Actions -->
+<script define:vars={{ slug }}>
+  const apiKey = 'ak_live_eQDEkmlEmMg7LxNcuE6WYLAXeQDEkmlE';
+  
+  // 1. SIGNATURES LIST LOADER
+  async function loadSignatures() {
+    const listContainer = document.getElementById('signatures-list-container');
+    if (!listContainer) return;
+
+    try {
+      const res = await fetch(`https://api.cas-per.it/api/public/v1/firme/${slug}`, {
+        headers: {
+          'X-API-Key': apiKey,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      const json = await res.json();
+      const list = json.data || [];
+
+      if (list.length === 0) {
+        listContainer.innerHTML = '<div class="no-signatures">Nessuna firma apposta finora. Lascia la tua per primo.</div>';
+        return;
+      }
+
+      // Populate list
+      listContainer.innerHTML = '';
+      list.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'signature-item';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'signature-name';
+        nameEl.textContent = item.nominativo;
+
+        row.appendChild(nameEl);
+
+        if (item.firma_base64) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'signature-img-wrapper';
+          const img = document.createElement('img');
+          img.className = 'signature-img';
+          img.src = item.firma_base64;
+          img.alt = `Firma calligrafica di ${item.nominativo}`;
+          wrapper.appendChild(img);
+          row.appendChild(wrapper);
+        } else {
+          // If no image, show a placeholder or date
+          const dateEl = document.createElement('span');
+          dateEl.className = 'signature-date-only';
+          dateEl.textContent = 'Presenza registrata';
+          row.appendChild(dateEl);
+        }
+
+        listContainer.appendChild(row);
+      });
+    } catch (err) {
+      listContainer.innerHTML = '<div class="no-signatures">Impossibile caricare le firme. Riprova più tardi.</div>';
+    }
+  }
+
+  // Load signatures on mount
+  document.addEventListener('DOMContentLoaded', () => {
+    loadSignatures();
+  });
+
+  // 2. CANVAS DRAWING IMPLEMENTATION
+  const canvas = document.getElementById('signature-canvas');
+  const clearBtn = document.getElementById('canvas-clear');
+  
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    // Set line appearance
+    ctx.strokeStyle = '#1a1f2e'; // Elegant dark blue ink
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 2.5;
+
+    // Helper to get touch/mouse coordinates relative to canvas
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      // Account for canvas pixel scale versus layout size
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      let clientX, clientY;
+
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    function startDrawing(e) {
+      isDrawing = true;
+      const coords = getCoords(e);
+      lastX = coords.x;
+      lastY = coords.y;
+      
+      // Prevent default scrolling when drawing on touch screens
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const coords = getCoords(e);
+
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(coords.x, coords.y);
+      ctx.stroke();
+
+      lastX = coords.x;
+      lastY = coords.y;
+
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    // Mouse Listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    // Touch Listeners
+    canvas.addEventListener('touchstart', startDrawing, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    // Clear Canvas Action
+    clearBtn?.addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+  }
+
+  // Helper function to check if canvas is blank
+  function isCanvasBlank(canvasEl) {
+    const blank = document.createElement('canvas');
+    blank.width = canvasEl.width;
+    blank.height = canvasEl.height;
+    return canvasEl.toDataURL() === blank.toDataURL();
+  }
+
+  // 3. SUBMIT CONDOLENCE ACTION
+  const cordoglioForm = document.getElementById('cordoglio-form');
+  const cordoglioStatus = document.getElementById('cordoglio-status');
+  const cordoglioBtn = document.getElementById('cordoglio-submit-btn');
+
+  cordoglioForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!cordoglioBtn || !cordoglioStatus) return;
+
+    // Show loading state
+    cordoglioBtn.disabled = true;
+    const originalText = cordoglioBtn.innerHTML;
+    cordoglioBtn.innerHTML = '<span class="spinner-inline"></span> Invio in corso...';
+    
+    cordoglioStatus.className = 'form-status status-info';
+    cordoglioStatus.style.display = 'block';
+    cordoglioStatus.textContent = 'Invio del messaggio alla famiglia in corso...';
+
+    const formData = new FormData(cordoglioForm);
+    const payload = {
+      slug: slug,
+      nome: formData.get('nome'),
+      telefono: formData.get('telefono'),
+      mail: formData.get('mail') || null,
+      testo: formData.get('testo'),
+      visibile: false, // Private cordoglio by default
+      provenienza: 1   // 1 indicates from website
+    };
+
+    try {
+      const response = await fetch('https://api.cas-per.it/api/public/v1/cordogli', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Errore di connessione al server.');
+      }
+
+      cordoglioStatus.className = 'form-status status-success';
+      cordoglioStatus.textContent = 'Il tuo messaggio di cordoglio è stato inviato privatamente alla famiglia con successo.';
+      
+      // Clear inputs
+      cordoglioForm.reset();
+    } catch (err) {
+      cordoglioStatus.className = 'form-status status-error';
+      cordoglioStatus.textContent = err.message || 'Si è verificato un errore durante l\'invio. Verifica i dati o riprova più tardi.';
+    } finally {
+      cordoglioBtn.disabled = false;
+      cordoglioBtn.innerHTML = originalText;
+    }
+  });
+
+  // 4. SUBMIT SIGNATURE ACTION
+  const signatureForm = document.getElementById('signature-form');
+  const signatureStatus = document.getElementById('signature-status');
+  const signatureBtn = document.getElementById('signature-submit-btn');
+
+  signatureForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!signatureBtn || !signatureStatus || !canvas) return;
+
+    // Validate canvas is signed
+    const isSigned = !isCanvasBlank(canvas);
+    if (!isSigned) {
+      signatureStatus.className = 'form-status status-error';
+      signatureStatus.style.display = 'block';
+      signatureStatus.textContent = 'Errore: Per favore, apponi il tuo tratto di firma nel riquadro prima di inviare.';
+      return;
+    }
+
+    // Show loading
+    signatureBtn.disabled = true;
+    const originalText = signatureBtn.innerHTML;
+    signatureBtn.innerHTML = '<span class="spinner-inline"></span> Registrazione in corso...';
+    
+    signatureStatus.className = 'form-status status-info';
+    signatureStatus.style.display = 'block';
+    signatureStatus.textContent = 'Salvataggio della firma in corso...';
+
+    const formData = new FormData(signatureForm);
+    const signatureBase64 = canvas.toDataURL('image/png');
+
+    const payload = {
+      slug: slug,
+      nominativo: formData.get('nominativo'),
+      firma_base64: signatureBase64
+    };
+
+    try {
+      const response = await fetch('https://api.cas-per.it/api/public/v1/firme', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Errore nel salvataggio della firma.');
+      }
+
+      signatureStatus.className = 'form-status status-success';
+      signatureStatus.textContent = 'La tua firma è stata registrata con successo sul Libro delle Presenze.';
+
+      // Reset form and canvas
+      signatureForm.reset();
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Reload signatures list dynamically
+      loadSignatures();
+    } catch (err) {
+      signatureStatus.className = 'form-status status-error';
+      signatureStatus.textContent = err.message || 'Si è verificato un errore nella registrazione della firma. Riprova più tardi.';
+    } finally {
+      signatureBtn.disabled = false;
+      signatureBtn.innerHTML = originalText;
+    }
+  });
+</script>
