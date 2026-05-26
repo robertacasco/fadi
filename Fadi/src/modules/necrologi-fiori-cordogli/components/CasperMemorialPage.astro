@@ -915,9 +915,17 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
   .fiori-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 1.25rem;
     margin-top: 2.5rem;
+  }
+
+  .fiori-card {
+    grid-column: span 2;
+  }
+
+  .fiori-card:nth-child(5):nth-last-child(3) {
+    grid-column: 2 / span 2;
   }
 
   .fiori-empty-state {
@@ -1572,6 +1580,11 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
   @media (max-width: 900px) {
     .fiori-grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fiori-card,
+    .fiori-card:nth-child(5):nth-last-child(3) {
+      grid-column: auto;
     }
   }
 
