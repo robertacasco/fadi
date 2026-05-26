@@ -21,6 +21,15 @@ const currentPath = Astro.url.pathname;
       <Image src={logoImage} alt="Onoranze Funebri FADI" class="brand-logo" />
     </a>
 
+    <!-- Area Famiglia -->
+    <a
+      href="/area-famiglia/"
+      class={`header-family ${currentPath.startsWith('/area-famiglia') || currentPath.startsWith('/famiglia') ? 'active' : ''}`}
+      aria-label="Accedi all'Area Famiglia"
+    >
+      Area Famiglia
+    </a>
+
     <!-- Navigation Desktop -->
     <nav class="nav-desktop" aria-label="Navigazione principale">
       {navLinks.map(link => (
@@ -32,11 +41,6 @@ const currentPath = Astro.url.pathname;
         </a>
       ))}
     </nav>
-
-    <!-- Area Famiglia -->
-    <a href="/area-famiglia/" class="header-family" aria-label="Accedi all'Area Famiglia">
-      Area Famiglia
-    </a>
 
     <!-- CTA tel -->
     <a href="tel:+390963353321" class="header-tel" aria-label="Chiama FADI">
