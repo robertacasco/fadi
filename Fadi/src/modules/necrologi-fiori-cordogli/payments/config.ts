@@ -4,6 +4,8 @@ export interface PaymentRuntimeConfig {
   onlineEnabled: boolean;
   provider: string;
   webhookSecret: string;
+  stripeSecretKey: string;
+  stripeWebhookSecret: string;
   casperPaymentStatusEndpoint: string;
 }
 
@@ -16,6 +18,8 @@ export function getPaymentRuntimeConfig(): PaymentRuntimeConfig {
     onlineEnabled: readEnv('FIORI_ONLINE_PAYMENTS_ENABLED') === 'true',
     provider: readEnv('FIORI_PAYMENT_PROVIDER'),
     webhookSecret: readEnv('FIORI_PAYMENT_WEBHOOK_SECRET'),
+    stripeSecretKey: readEnv('STRIPE_SECRET_KEY'),
+    stripeWebhookSecret: readEnv('STRIPE_WEBHOOK_SECRET'),
     casperPaymentStatusEndpoint: readEnv('CASPER_PAYMENT_STATUS_ENDPOINT'),
   };
 }

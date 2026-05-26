@@ -33,12 +33,14 @@ Per abilitare il pagamento online quando il gateway e gli endpoint CasPer sarann
 ```env
 PUBLIC_FIORI_ONLINE_PAYMENTS_ENABLED=true
 FIORI_ONLINE_PAYMENTS_ENABLED=true
-FIORI_PAYMENT_PROVIDER=stripe|nexi|satispay
+FIORI_PAYMENT_PROVIDER=stripe
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 FIORI_PAYMENT_WEBHOOK_SECRET=...
 CASPER_PAYMENT_STATUS_ENDPOINT=https://api.cas-per.it/api/.../{orderId}
 ```
 
-Il flusso online e' predisposto ma resta disattivato finche' non viene implementato il provider reale. L'ordine fiori viene comunque validato lato server contro catalogo CasPer (`fiore_id` e `importo`) prima di essere registrato.
+Il provider Stripe crea una sessione Checkout ospitata da Stripe e verifica i webhook tramite `Stripe-Signature`. `FIORI_PAYMENT_WEBHOOK_SECRET` resta disponibile per provider generici futuri. L'ordine fiori viene sempre validato lato server contro catalogo CasPer (`fiore_id` e `importo`) prima di essere registrato.
 
 3. Crea le rotte `/necrologi/` e `/necrologi/[slug]/` importando client e componenti dal modulo.
 
