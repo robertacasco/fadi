@@ -79,11 +79,13 @@ export interface ApiResponse {
 export interface FioreData {
   id: number | string;
   nome?: string;
+  denominazione?: string;
   titolo?: string;
   name?: string;
   descrizione?: string;
   descrizione_breve?: string;
   description?: string;
+  importo?: number | string;
   prezzo?: number | string;
   prezzo_ivato?: number | string;
   price?: number | string;

@@ -2375,6 +2375,11 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     fioriOrderStatus.textContent = '';
   }
 
+  function parseAmount(value) {
+    const amount = Number(String(value || '').replace(',', '.'));
+    return Number.isFinite(amount) ? amount : 0;
+  }
+
   function showFioriForm(button) {
     selectedFlowerId = button.dataset.productId || '';
     selectedFlowerProduct = button.dataset.product || '';
@@ -2463,6 +2468,14 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
         return;
       }
 
+      const selectedFlowerNumericId = Number(selectedFlowerId);
+      const selectedFlowerAmount = parseAmount(selectedFlowerPrice);
+
+      if (!Number.isFinite(selectedFlowerNumericId) || selectedFlowerAmount <= 0) {
+        setFioriStatus('error', 'La composizione selezionata non e disponibile. Ricarica la pagina e riprova.');
+        return;
+      }
+
       if (!mittente || !telefono || !email) {
         setFioriStatus('error', 'Nome, telefono ed email sono obbligatori.');
         return;
@@ -2474,12 +2487,13 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       setFioriStatus('info', 'Stiamo inviando il tuo ordine alla fioreria.');
 
       const payload = {
-        fiore_id: selectedFlowerId,
-        id_fiore: selectedFlowerId,
-        prodotto_id: selectedFlowerId,
+        fiore_id: selectedFlowerNumericId,
+        id_fiore: selectedFlowerNumericId,
+        prodotto_id: selectedFlowerNumericId,
         fiore_nome: selectedFlowerProduct,
         prodotto: selectedFlowerProduct,
-        prezzo: selectedFlowerPrice,
+        importo: selectedFlowerAmount,
+        prezzo: selectedFlowerAmount,
         prezzo_label: selectedFlowerPriceLabel,
         quantita: 1,
         slug,
