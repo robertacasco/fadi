@@ -2206,14 +2206,6 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     const fotoSection = document.getElementById('foto-section');
     const fotoGrid    = document.getElementById('foto-grid');
 
-    function initials(nome) {
-      if (!nome) return '?';
-      const parts = nome.trim().split(/\s+/);
-      return parts.length >= 2
-        ? (parts[0][0] + parts[1][0]).toUpperCase()
-        : parts[0].slice(0, 2).toUpperCase();
-    }
-
     function formatDate(str) {
       if (!str) return '';
       try {
@@ -2223,44 +2215,71 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       } catch { return ''; }
     }
 
+    function getApiArray(json, keys) {
+      if (Array.isArray(json)) return json;
+      if (Array.isArray(json?.data)) return json.data;
+      for (const key of keys) {
+        if (Array.isArray(json?.data?.[key])) return json.data[key];
+        if (Array.isArray(json?.[key])) return json[key];
+      }
+      return [];
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function isPublicValue(value) {
+      return value !== false && value !== 0 && value !== '0' && value !== 'false';
+    }
+
     function makeCard(nome, testo, data, delay = 0) {
       const dt   = formatDate(data);
-      const text = (testo || '').replace(/\r?\n/g, '<br>');
+      const safeName = escapeHtml(nome || 'Anonimo');
+      const safeText = escapeHtml(testo).replace(/\r?\n/g, '<br>');
       return `
         <div class="msg-card" style="animation-delay:${delay}s">
           <div class="msg-card-top">
             <div>
-              <div class="msg-name">${nome || 'Anonimo'}</div>
+              <div class="msg-name">${safeName}</div>
               ${dt ? `<div class="msg-date">${dt}</div>` : ''}
             </div>
           </div>
-          <div class="msg-text">${text}</div>
+          <div class="msg-text">${safeText}</div>
         </div>`;
     }
 
     function renderMessages(cordogli) {
       if (msgLoading) msgLoading.style.display = 'none';
-      // Show only visibile:true messages publicly
-      const visible = cordogli.filter(m => m.visibile === true);
+      const visible = cordogli.filter(m => isPublicValue(m.visibile));
       if (visible.length === 0) {
         if (msgEmpty) msgEmpty.style.display = 'flex';
         return;
       }
       const html = visible.map((m, i) =>
-        makeCard(m.utente?.nome || 'Anonimo', m.testo, m.created_at, i * 0.07)
+        makeCard(m.utente?.nome || m.mittente || 'Anonimo', m.testo, m.created_at, i * 0.07)
       ).join('');
       if (msgList) { msgList.innerHTML = html; msgList.style.display = 'grid'; }
     }
 
     function renderFotos(albums) {
-      // Flatten all photos from all albums
-      const fotos = albums.flatMap(a => a.foto || []).filter(f => f.url && f.approvata);
+      // Flatten all public photos from all albums.
+      const fotos = albums.flatMap(a => a.foto || []).filter(f => f.url && isPublicValue(f.approvata));
       if (fotos.length === 0) return;
-      const html = fotos.map(f => `
-        <div class="foto-thumb" title="${f.didascalia || ''}">
-          <img src="${f.url}" alt="${f.didascalia || 'Foto ricordo'}" loading="lazy"
+      const html = fotos.map(f => {
+        const caption = escapeHtml(f.didascalia || 'Foto ricordo');
+        const url = escapeHtml(f.url);
+        return `
+        <div class="foto-thumb" title="${caption}">
+          <img src="${url}" alt="${caption}" loading="lazy"
                onerror="this.closest('.foto-thumb').remove()">
-        </div>`).join('');
+        </div>`;
+      }).join('');
       if (fotoGrid)    fotoGrid.innerHTML = html;
       if (fotoSection) fotoSection.style.display = 'block';
     }
@@ -2276,8 +2295,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     };
 
     try {
-      const encodedSlug = encodeURIComponent(slug);
-      const res = await fetch(`/casper-api/public/v1/cordogli?slug=${encodedSlug}`, {
+      const res = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/cordogli`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
 
@@ -2288,7 +2306,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
         renderMessages([]);
       }
 
-      const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${encodedSlug}`, {
+      const resF = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/fotocordogli`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
       if (resF.ok) {

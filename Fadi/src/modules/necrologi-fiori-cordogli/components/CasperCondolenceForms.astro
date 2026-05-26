@@ -15,7 +15,7 @@ const localFioriCatalog = [
   {
     id: 'bouquet',
     nome: 'Bouquet',
-    descrizione: 'Composizione colorata di rose rosse, gerbere rosa e gigli bianchi, legata con nastro bordeaux.',
+    descrizione: 'Composizione floreale raccolta e armoniosa, realizzata con fiori freschi disponibili in stagione.',
     prezzo: 30,
     immagine: '/fiori/bouquet.png',
     aliases: ['bouquet']
@@ -23,7 +23,7 @@ const localFioriCatalog = [
   {
     id: 'corona-di-fiori',
     nome: 'Corona di fiori',
-    descrizione: 'Corona circolare ricca e colorata con rose, gerbere, crisantemi e garofani multicolore.',
+    descrizione: 'Composizione circolare funebre, preparata con fiori freschi di stagione e finiture coordinate.',
     prezzo: 150,
     immagine: '/fiori/corona.png',
     aliases: ['corona', 'corona funebre', 'corona di fiori']
@@ -31,7 +31,7 @@ const localFioriCatalog = [
   {
     id: 'cuscino',
     nome: 'Cuscino',
-    descrizione: 'Cuscino compatto di rose rosa, garofani rossi e gerbere bianche su base di muschio verde.',
+    descrizione: 'Composizione compatta e raffinata, realizzata con fiori freschi di stagione su base verde.',
     prezzo: 80,
     immagine: '/fiori/cuscino.png',
     aliases: ['cuscino', 'cuscino floreale']
@@ -39,7 +39,7 @@ const localFioriCatalog = [
   {
     id: 'cuore',
     nome: 'Cuore',
-    descrizione: '',
+    descrizione: 'Composizione a forma di cuore, realizzata con fiori freschi disponibili in stagione e colori armoniosi.',
     prezzo: 150,
     immagine: '/fiori/cuore.png',
     aliases: ['cuore']
@@ -47,7 +47,7 @@ const localFioriCatalog = [
   {
     id: 'copri-bara',
     nome: 'Copri bara',
-    descrizione: 'Composizione allungata per bara con croce di rose rosse e cornice di fiori colorati misti.',
+    descrizione: 'Composizione floreale allungata per feretro, preparata con fiori freschi di stagione e verde decorativo.',
     prezzo: 400,
     immagine: '/fiori/copri-bara.png',
     aliases: ['copri bara', 'copribara']
@@ -63,6 +63,14 @@ function normalizeFioreName(value: string): string {
     .trim();
 }
 
+function getFioreName(fiore: FioreData): string {
+  return fiore.nome || fiore.titolo || fiore.name || `Composizione ${fiore.id}`;
+}
+
+function getFioreDescription(fiore: FioreData): string {
+  return fiore.descrizione || fiore.descrizione_breve || fiore.description || '';
+}
+
 function findSourceFiore(aliases: string[]): FioreData | undefined {
   const normalizedAliases = aliases.map(normalizeFioreName);
   return sourceFiori.find((fiore) => {
@@ -75,25 +83,15 @@ const matchedLocalFiori: FioreData[] = localFioriCatalog.flatMap(({ aliases, ...
   const sourceFiore = findSourceFiore(aliases);
   if (!sourceFiore) return [];
 
-  const sourceDescription = getFioreDescription(sourceFiore);
-
   return [{
     ...sourceFiore,
     nome: fiore.nome,
-    descrizione: sourceDescription || fiore.descrizione,
+    descrizione: fiore.descrizione,
     immagine: fiore.immagine,
   }];
 });
 
 const activeFiori = matchedLocalFiori.length > 0 ? matchedLocalFiori : sourceFiori;
-
-function getFioreName(fiore: FioreData): string {
-  return fiore.nome || fiore.titolo || fiore.name || `Composizione ${fiore.id}`;
-}
-
-function getFioreDescription(fiore: FioreData): string {
-  return fiore.descrizione || fiore.descrizione_breve || fiore.description || '';
-}
 
 function getFioreImage(fiore: FioreData): string {
   return fiore.immagine_url || fiore.immagine || fiore.foto_url || fiore.image_url || fiore.url_immagine || fallbackFioreImage;
