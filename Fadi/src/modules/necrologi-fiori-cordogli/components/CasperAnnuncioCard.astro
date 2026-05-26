@@ -1,0 +1,296 @@
+---
+import type { AnnuncioData } from '../types';
+import { getFotoUrl, formatMorte, formatCerimoniaOra, formatCerimoniaData } from '../utils/formatters';
+
+interface Props {
+  item: AnnuncioData;
+}
+
+const { item } = Astro.props;
+
+const defunto  = item.defunto  || {};
+const annuncio = item.annuncio || {};
+const funerale = item.funerale || {};
+const rosario  = item.rosario  || {};
+const paese    = annuncio.paese || 'Dasà';
+const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+const haFoto   = !!defunto.foto_url;
+const imgSrc   = getFotoUrl(defunto, item.updated_at);
+const dataMorteIta = formatMorte(defunto.data_morte);
+
+// Local function to format ceremonies for the card
+function formatCerimonia(dateTimeStr?: string) {
+  if (!dateTimeStr) return '';
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return '';
+    const day = d.getDate();
+    const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    const hour = String(d.getHours()).padStart(2, '0');
+    const min  = String(d.getMinutes()).padStart(2, '0');
+    return `${day} ${months[d.getMonth()]} alle ore ${hour}:${min}`;
+  } catch { return ''; }
+}
+---
+
+<article
+  class="necrologio-card card"
+  data-nominativo={nomeCompleto.toLowerCase()}
+  data-comune={(annuncio.paese || '').toLowerCase()}
+  data-morte={defunto.data_morte || ''}
+>
+  <a href={`/necrologi/${item.slug}/`} class="card-main-link">
+    <div class="card-img-wrapper">
+      {haFoto ? (
+        <img
+          src={imgSrc}
+          alt={`Foto di ${nomeCompleto}`}
+          class="card-img"
+          loading="lazy"
+        />
+      ) : (
+        <div class="card-img-placeholder">
+          <div class="placeholder-cross">✝</div>
+        </div>
+      )}
+      <div class="card-img-border"></div>
+    </div>
+
+    <div class="card-info">
+      <span class="card-location">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        {paese}
+      </span>
+
+      <h2 class="card-name">{nomeCompleto}</h2>
+
+      <div class="card-meta">
+        {dataMorteIta && (
+          <div class="meta-row">
+            <span class="meta-label">Mancato il:</span>
+            <span class="meta-value">{dataMorteIta}</span>
+          </div>
+        )}
+        {(defunto as any).eta_visibile && (defunto as any).eta && (
+          <div class="meta-row">
+            <span class="meta-label">Età:</span>
+            <span class="meta-value">{(defunto as any).eta} anni</span>
+          </div>
+        )}
+      </div>
+
+      <div class="card-divider"></div>
+
+      <div class="card-ceremonies">
+        {funerale.data_ora ? (
+          <div class="ceremony-preview">
+            <span class="ceremony-icon" title="Funerale">✝</span>
+            <div class="ceremony-text">
+              <strong>Funerale:</strong> {formatCerimonia(funerale.data_ora)}
+            </div>
+          </div>
+        ) : null}
+
+        {rosario.data_ora ? (
+          <div class="ceremony-preview">
+            <span class="ceremony-icon ceremony-icon--rosario" title="Rosario">📿</span>
+            <div class="ceremony-text">
+              <strong>Rosario:</strong> {formatCerimonia(rosario.data_ora)}
+            </div>
+          </div>
+        ) : null}
+
+        {!funerale.data_ora && !rosario.data_ora && (
+          <div class="ceremony-preview ceremony-preview--empty">
+            <div class="ceremony-text italic text-muted">
+              Contattare l'agenzia per orari e dettagli.
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </a>
+
+  <div class="card-actions">
+    <a href={`/necrologi/${item.slug}/`} class="btn-card btn-card-primary">Visualizza Dettaglio</a>
+    <a href={`/necrologi/${item.slug}/#cordoglio`} class="btn-card btn-card-outline">Invia Cordoglio</a>
+  </div>
+</article>
+
+<style>
+  /* Card Styles */
+  .necrologio-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: var(--card-bg, #fff);
+    border-radius: var(--radius, 16px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+
+  .card-main-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3.2 / 4;
+    background-color: var(--bg-soft, #f8f9fa);
+    overflow: hidden;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition, 0.3s ease);
+  }
+
+  .necrologio-card:hover .card-img { transform: scale(1.03); }
+
+  .card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-soft, #f8f9fa) 0%, rgba(184,150,110,0.05) 100%);
+  }
+
+  .placeholder-cross {
+    font-size: 3.5rem;
+    color: var(--gold, #b8966e);
+    opacity: 0.35;
+    font-family: var(--font-serif, serif);
+  }
+
+  .card-img-border {
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 150, 110, 0.25);
+    pointer-events: none;
+    transition: border-color var(--transition, 0.3s ease);
+  }
+
+  .necrologio-card:hover .card-img-border { border-color: rgba(184, 150, 110, 0.6); }
+
+  .card-info {
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold, #b8966e);
+    margin-bottom: 0.75rem;
+  }
+
+  .card-name {
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--text, #1a1f2e);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+    transition: color var(--transition, 0.3s ease);
+  }
+
+  .necrologio-card:hover .card-name { color: var(--gold, #b8966e); }
+
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    border-bottom: 1px dashed rgba(184, 150, 110, 0.1);
+    padding-bottom: 2px;
+  }
+
+  .meta-label { color: var(--text-muted, #64748b); }
+  .meta-value { font-weight: 600; color: var(--text, #1a1f2e); }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border, #e2e8f0);
+    margin: 0.25rem 0 1.25rem;
+  }
+
+  .card-ceremonies {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    color: var(--text-muted, #64748b);
+  }
+
+  .ceremony-preview { display: flex; gap: 0.65rem; align-items: flex-start; }
+
+  .ceremony-icon {
+    font-size: 0.95rem;
+    color: var(--gold, #b8966e);
+    font-family: var(--font-serif, serif);
+    line-height: 1.2;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+  }
+
+  .ceremony-icon--rosario { font-size: 0.85rem; }
+  .ceremony-text { line-height: 1.4; }
+  .ceremony-text strong { color: var(--text, #1a1f2e); font-weight: 600; }
+  .ceremony-preview--empty { justify-content: center; padding: 0.5rem 0; }
+  .italic { font-style: italic; }
+
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--border, #e2e8f0);
+    background-color: var(--bg-soft, #f8f9fa);
+  }
+
+  .btn-card {
+    padding: 1rem 0.5rem;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition, 0.3s ease);
+    text-decoration: none;
+    border: none;
+  }
+
+  .btn-card-primary {
+    background: transparent;
+    color: var(--text, #1a1f2e);
+    border-right: 1px solid var(--border, #e2e8f0);
+  }
+
+  .btn-card-primary:hover { background: var(--gold, #b8966e); color: #fff; }
+  .btn-card-outline { background: transparent; color: var(--gold, #b8966e); }
+  .btn-card-outline:hover { background: var(--gold-dim, rgba(184, 150, 110, 0.1)); }
+</style>

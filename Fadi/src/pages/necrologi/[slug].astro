@@ -1,0 +1,34 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { CasperClient } from '../../modules/necrologi-fiori-cordogli/api/casper-client';
+import { getCasperApiKey } from '../../modules/necrologi-fiori-cordogli/config';
+import { getFotoUrl } from '../../modules/necrologi-fiori-cordogli/utils/formatters';
+import CasperMemorialPage from '../../modules/necrologi-fiori-cordogli/components/CasperMemorialPage.astro';
+
+export const prerender = false;
+
+const slug = Astro.params.slug;
+if (!slug) {
+  return Astro.redirect('/404');
+}
+
+const apiKey = getCasperApiKey();
+const client = new CasperClient(apiKey);
+const item = await client.getAnnuncioBySlug(slug);
+
+if (!item) {
+  return Astro.redirect('/404');
+}
+
+const defunto = item.defunto || {};
+const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+const fotoSrc = getFotoUrl(defunto, item.updated_at);
+---
+
+<Layout
+  title={`In Memoria di ${nomeCompleto} — FADI`}
+  description={`Manifesto funebre di ${nomeCompleto}. Consulta gli orari delle cerimonie di commiato o invia un messaggio di cordoglio privato alla famiglia.`}
+  image={fotoSrc || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
+>
+  <CasperMemorialPage item={item} apiKey={apiKey} slug={slug} />
+</Layout>

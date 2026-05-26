@@ -5,8 +5,23 @@ import fioreriaLogo from '../img/fadi-fioreria.png';
 
 // Dynamically import all images from the gallery directory
 const imageGlob = import.meta.glob<{ default: ImageMetadata }>('../img/galleria fioreria/*.{jpeg,jpg,png,webp}');
+const hiddenGalleryFiles = new Set([
+  'Unknown-10.jpeg',
+  'Unknown-17.jpeg',
+  'Unknown-18.jpeg',
+  'Unknown-19.jpeg',
+  'Unknown-3.jpeg',
+  'Unknown-32.jpeg',
+  'Unknown-40-1.jpeg',
+  'Unknown-41.jpeg',
+  'Unknown-8.jpeg',
+  'Unknown-9.jpeg'
+]);
 const galleryImages = await Promise.all(
-  Object.keys(imageGlob).map(async (path) => {
+  Object.keys(imageGlob).filter((path) => {
+    const fileName = path.split('/').pop() ?? path;
+    return !hiddenGalleryFiles.has(fileName);
+  }).map(async (path) => {
     const module = await imageGlob[path]();
     return module.default;
   })
@@ -24,8 +39,7 @@ const galleryImages = await Promise.all(
         <h1 class="page-hero-title">Un fiore per onorare il ricordo del tuo caro</h1>
         <div class="divider"></div>
         <p class="page-hero-sub">
-          Nata nel 1991, la fioreria FADI opera da 30 anni nel mondo floreale,
-          migliorando e incrementando costantemente i propri servizi.
+          Nata nel 1991, la fioreria Fadi opera da 30 anni nel mondo floreale, migliorando e incrementando costantemente i propri servizi. Il nostro team di fioristi, specializzato e appassionato nel proprio lavoro, riuscirà a soddisfare le richieste dei clienti, persino quelle più esigenti.
         </p>
       </div>
       <div class="hero-image-wrap">

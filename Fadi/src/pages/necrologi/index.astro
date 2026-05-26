@@ -1,0 +1,60 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { CasperClient } from '../../modules/necrologi-fiori-cordogli/api/casper-client';
+import { getCasperApiKey } from '../../modules/necrologi-fiori-cordogli/config';
+import CasperNecrologiList from '../../modules/necrologi-fiori-cordogli/components/CasperNecrologiList.astro';
+
+// SSR: dati sempre freschi dall'API
+export const prerender = false;
+
+const apiKey = getCasperApiKey();
+const client = new CasperClient(apiKey);
+
+let annunci: any[] = [];
+let error: string | null = null;
+
+try {
+  annunci = await client.getAnnunci(200);
+} catch (err: any) {
+  console.error('Error fetching annunci:', err);
+  error = err.message || 'Impossibile caricare gli annunci in questo momento.';
+}
+---
+
+<Layout
+  title="Necrologi e annunci funebri — FADI"
+  description="Registro dei necrologi e annunci funebri dell'Agenzia Funebre FADI. Consulta i dettagli dei funerali, invia cordogli privati ed apponi la tua firma di presenza."
+>
+  <section class="section necrologi-hero">
+    <div class="container text-center">
+      <span class="section-label">Onoranze Funebri FADI</span>
+      <h1 class="section-title text-serif">Necrologi e annunci funebri</h1>
+      <div class="divider mx-auto"></div>
+      <p class="section-text mx-auto">
+        In questa sezione è possibile consultare i manifesti di lutto, conoscere gli orari e i luoghi delle cerimonie di commiato e dei rosari, inviare un messaggio di cordoglio privato alla famiglia o apporre una firma sul registro delle presenze digitale.
+      </p>
+    </div>
+  </section>
+
+  <section class="necrologi-list-section">
+    <div class="container">
+      <CasperNecrologiList annunci={annunci} error={error} />
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .necrologi-hero {
+    background-color: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 4.5rem 0 3.5rem;
+  }
+
+  .text-center { text-align: center; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+
+  .necrologi-list-section {
+    padding: 3.5rem 0 5rem;
+    background-color: var(--bg);
+  }
+</style>

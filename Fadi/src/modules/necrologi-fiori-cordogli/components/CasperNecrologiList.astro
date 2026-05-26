@@ -1,0 +1,603 @@
+---
+import type { AnnuncioData } from '../types';
+import CasperAnnuncioCard from './CasperAnnuncioCard.astro';
+
+interface Props {
+  annunci: AnnuncioData[];
+  error?: string | null;
+}
+
+const { annunci, error } = Astro.props;
+
+// Calcolo dinamico dei comuni
+const comuni = [...new Set(annunci.map(item => (item.annuncio?.paese || '').trim()))]
+  .filter(Boolean)
+  .sort((a, b) => a.localeCompare(b));
+---
+
+<div class="casper-necrologi-wrapper">
+  <!-- Search Bar -->
+  <div class="search-bar-container">
+    <div class="search-row">
+      <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="necrologi-search"
+          placeholder="Cerca per nome o cognome..."
+          aria-label="Cerca necrologi"
+        />
+        <button id="search-clear-btn" class="search-clear-btn" aria-label="Cancella ricerca" style="display:none;">&times;</button>
+      </div>
+      <button id="advanced-search-btn" class="advanced-search-toggle" aria-expanded="false" aria-controls="advanced-search-panel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Ricerca avanzata
+        <span id="adv-badge" class="adv-badge" style="display:none;"></span>
+      </button>
+    </div>
+
+    <!-- Advanced Search Panel -->
+    <div id="advanced-search-panel" class="advanced-panel" hidden>
+      <div class="advanced-fields">
+        <div class="adv-field">
+          <label for="filter-comune" class="adv-label">Comune</label>
+          <select id="filter-comune" class="adv-input">
+            <option value="">Tutti i comuni</option>
+            {comuni.map((comune) => (
+              <option value={comune.toLowerCase()}>{comune}</option>
+            ))}
+          </select>
+        </div>
+        <div class="adv-field">
+          <label for="filter-da" class="adv-label">Data morte — dal</label>
+          <input type="date" id="filter-da" class="adv-input" />
+        </div>
+        <div class="adv-field">
+          <label for="filter-al" class="adv-label">Al</label>
+          <input type="date" id="filter-al" class="adv-input" />
+        </div>
+        <button id="adv-reset-btn" class="adv-reset">Azzera filtri</button>
+      </div>
+    </div>
+  </div>
+
+  {error && (
+    <div class="error-container text-center">
+      <p class="error-message">{error}</p>
+      <button onclick="window.location.reload()" class="btn btn-outline">Riprova a caricare</button>
+    </div>
+  )}
+
+  {!error && annunci.length === 0 && (
+    <div class="empty-container text-center">
+      <p class="empty-message">Nessun annuncio funebre attivo trovato al momento.</p>
+    </div>
+  )}
+
+  {!error && annunci.length > 0 && (
+    <div class="necrologi-grid" id="necrologi-grid">
+      {annunci.map((item) => (
+        <CasperAnnuncioCard item={item} />
+      ))}
+    </div>
+  )}
+
+  <!-- No Results State -->
+  <div id="no-results" class="no-results-container text-center" style="display: none;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <h3>Nessun necrologio trovato</h3>
+    <p>Non ci sono annunci corrispondenti ai criteri di ricerca inseriti.</p>
+    <button id="clear-search-btn-bottom" class="btn btn-outline btn-sm">Cancella filtro</button>
+  </div>
+
+  <!-- Pagination -->
+  <nav class="pagination-nav" id="pagination-nav" aria-label="Paginazione annunci"></nav>
+
+  <!-- Powered by -->
+  <p class="powered-by">
+    <a href="https://www.annuncifunebri.it" target="_blank" rel="noopener noreferrer">powered by Annunci Funebri</a>
+  </p>
+</div>
+
+<style>
+  /* Search Bar */
+  .search-bar-container {
+    max-width: 780px;
+    margin: 0 auto 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.25rem;
+    color: var(--gold, #b8966e);
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 1rem 3rem 1rem 3.25rem;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 0.97rem;
+    color: var(--text, #1a1f2e);
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 30px;
+    box-shadow: 0 2px 12px rgba(44, 38, 32, 0.04);
+    transition: all var(--transition, 0.3s ease);
+    outline: none;
+  }
+
+  .search-box input:focus {
+    border-color: var(--gold, #b8966e);
+    box-shadow: 0 4px 24px rgba(184, 150, 110, 0.15);
+  }
+
+  .search-clear-btn {
+    position: absolute;
+    right: 1.25rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted, #64748b);
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: color var(--transition, 0.3s ease);
+  }
+
+  .search-clear-btn:hover { color: var(--gold, #b8966e); }
+
+  /* Advanced search toggle button */
+  .advanced-search-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.1rem;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-muted, #64748b);
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 30px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition, 0.3s ease);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .advanced-search-toggle:hover,
+  .advanced-search-toggle[aria-expanded="true"] {
+    border-color: var(--gold, #b8966e);
+    color: var(--gold, #b8966e);
+    background: var(--gold-dim, rgba(184, 150, 110, 0.1));
+  }
+
+  .adv-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 7px;
+    height: 7px;
+    background-color: var(--gold, #b8966e);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--card-bg, #fff);
+  }
+
+  /* Advanced panel */
+  .advanced-panel {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 14px;
+    padding: 1.5rem 1.75rem;
+    animation: fadeInDown 0.2s ease;
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .advanced-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: flex-end;
+  }
+
+  .adv-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .adv-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold, #b8966e);
+  }
+
+  .adv-input {
+    padding: 0.65rem 0.9rem;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 0.88rem;
+    color: var(--text, #1a1f2e);
+    background: var(--bg, #f4ede4);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color var(--transition, 0.3s ease);
+  }
+
+  .adv-input:focus { border-color: var(--gold, #b8966e); }
+
+  select.adv-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23b8966e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.1rem;
+    padding-right: 2.2rem;
+    cursor: pointer;
+  }
+
+  .adv-reset {
+    padding: 0.65rem 1.2rem;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted, #64748b);
+    background: transparent;
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition, 0.3s ease);
+    white-space: nowrap;
+    align-self: flex-end;
+  }
+
+  .adv-reset:hover { border-color: var(--gold, #b8966e); color: var(--gold, #b8966e); }
+
+  /* Grid Layout */
+  .necrologi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
+  }
+
+  /* States */
+  .error-container, .empty-container, .no-results-container {
+    padding: 4rem 1.5rem;
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: var(--radius, 16px);
+    max-width: 600px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 20px rgba(44, 38, 32, 0.02);
+  }
+
+  .error-message { color: #c0392b; font-weight: 600; margin-bottom: 1.5rem; }
+  .empty-message { color: var(--text-muted, #64748b); font-style: italic; }
+
+  .no-results-container svg { color: var(--gold, #b8966e); margin-bottom: 1rem; opacity: 0.6; }
+  .no-results-container h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .no-results-container p { color: var(--text-muted, #64748b); margin-bottom: 1.5rem; }
+  .btn-sm { padding: 0.5rem 1.25rem; font-size: 0.8rem; }
+  
+  .text-center { text-align: center; }
+
+  /* ── Pagination ── */
+  .pagination-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border, #e2e8f0);
+  }
+
+  .pagination-nav :global(button) {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 50%;
+    background: var(--bg-card, #fff);
+    color: var(--text-muted, #64748b);
+    font-family: var(--font-sans, sans-serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 6px rgba(44, 38, 32, 0.02);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pagination-nav :global(button:hover:not(:disabled)) {
+    color: var(--gold-light, #cfb38f);
+    border-color: var(--gold-light, #cfb38f);
+    background: var(--gold-dim, rgba(184, 150, 110, 0.1));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(184, 150, 110, 0.15);
+  }
+
+  .pagination-nav :global(button.active) {
+    background: var(--gold, #b8966e);
+    color: var(--text-active, #1a1f2e);
+    font-weight: 700;
+    border-color: var(--gold, #b8966e);
+    box-shadow: 0 6px 16px rgba(184, 150, 110, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .pagination-nav :global(button:disabled) {
+    opacity: 0.25;
+    cursor: not-allowed;
+    background: transparent;
+    border-color: var(--border, #e2e8f0);
+    color: var(--text-muted, #64748b);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .pagination-nav :global(.pagination-arrow-svg) {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: block;
+  }
+
+  .pagination-nav :global(button[aria-label="Pagina precedente"]:hover:not(:disabled) .pagination-arrow-svg) {
+    transform: translateX(-4px);
+  }
+
+  .pagination-nav :global(button[aria-label="Pagina successiva"]:hover:not(:disabled) .pagination-arrow-svg) {
+    transform: translateX(4px);
+  }
+
+  .pagination-nav :global(.pagination-ellipsis) {
+    color: var(--text-muted, #64748b);
+    font-size: 0.95rem;
+    padding: 0 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    font-family: var(--font-sans, sans-serif);
+    user-select: none;
+    font-weight: 600;
+  }
+
+  /* ── Powered by ── */
+  .powered-by {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+
+  .powered-by a {
+    color: var(--gold, #b8966e);
+    text-decoration: none;
+    opacity: 0.55;
+    transition: opacity var(--transition, 0.3s ease), color var(--transition, 0.3s ease);
+    font-family: var(--font-sans, sans-serif);
+  }
+
+  .powered-by a:hover {
+    opacity: 1;
+    color: var(--gold-light, #cfb38f);
+  }
+
+  @media (max-width: 768px) {
+    .necrologi-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .search-bar-container { margin-bottom: 2rem; }
+    .search-row { flex-wrap: wrap; }
+    .search-box input { padding: 0.85rem 2.5rem 0.85rem 2.75rem; font-size: 0.95rem; }
+    .search-icon { left: 1rem; }
+    .advanced-search-toggle { width: 100%; justify-content: center; }
+    .pagination-nav :global(button) { width: 38px; height: 38px; font-size: 0.9rem; }
+    .pagination-nav :global(.pagination-ellipsis) { height: 38px; font-size: 0.9rem; }
+    .adv-field { min-width: 100%; }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput    = document.getElementById('necrologi-search')     as HTMLInputElement | null;
+    const clearBtn       = document.getElementById('search-clear-btn')     as HTMLButtonElement | null;
+    const clearBtnBottom = document.getElementById('clear-search-btn-bottom') as HTMLButtonElement | null;
+    const grid           = document.getElementById('necrologi-grid');
+    const noResults      = document.getElementById('no-results');
+    const paginationNav  = document.getElementById('pagination-nav');
+
+    // Advanced search
+    const advBtn         = document.getElementById('advanced-search-btn')  as HTMLButtonElement | null;
+    const advPanel       = document.getElementById('advanced-search-panel');
+    const filterComune   = document.getElementById('filter-comune')        as HTMLSelectElement | null;
+    const filterDa       = document.getElementById('filter-da')            as HTMLInputElement | null;
+    const filterAl       = document.getElementById('filter-al')            as HTMLInputElement | null;
+    const advResetBtn    = document.getElementById('adv-reset-btn')        as HTMLButtonElement | null;
+
+    const PER_PAGE = 12;
+    let currentPage = 1;
+    let filteredCards: HTMLElement[] = [];
+
+    const allCards = Array.from(document.querySelectorAll('.necrologio-card')) as HTMLElement[];
+    if (!allCards.length) return;
+
+    // ── Advanced panel toggle ──────────────────────────────────
+    advBtn?.addEventListener('click', () => {
+      const isOpen = advPanel && !advPanel.hidden;
+      if (advPanel) advPanel.hidden = !!isOpen;
+      advBtn?.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+    });
+
+    // ── Paginate ──────────────────────────────────────────────
+    function paginate() {
+      const total      = filteredCards.length;
+      const totalPages = Math.ceil(total / PER_PAGE);
+
+      allCards.forEach(c => (c.style.display = 'none'));
+      const start = (currentPage - 1) * PER_PAGE;
+      filteredCards.slice(start, start + PER_PAGE).forEach(c => (c.style.display = 'flex'));
+
+      if (grid)      grid.style.display      = total > 0 ? 'grid'  : 'none';
+      if (noResults) noResults.style.display = total === 0 ? 'block' : 'none';
+
+      renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages: number) {
+      if (!paginationNav) return;
+      paginationNav.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const addBtn = (label: string | number, page: number, isActive = false, disabled = false) => {
+        const btn = document.createElement('button');
+        
+        let ariaLabel = '';
+        if (label === '←') {
+          btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pagination-arrow-svg"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+          ariaLabel = 'Pagina precedente';
+        } else if (label === '→') {
+          btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pagination-arrow-svg"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+          ariaLabel = 'Pagina successiva';
+        } else {
+          btn.textContent = String(label);
+          ariaLabel = `Pagina ${label}`;
+        }
+        
+        if (isActive) btn.classList.add('active');
+        btn.disabled = disabled;
+        btn.setAttribute('aria-label', ariaLabel);
+        if (!disabled && !isActive) {
+          btn.addEventListener('click', () => {
+            currentPage = page;
+            paginate();
+            grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+        paginationNav!.appendChild(btn);
+      };
+
+      const addEllipsis = () => {
+        const span = document.createElement('span');
+        span.className = 'pagination-ellipsis';
+        span.textContent = '…';
+        paginationNav!.appendChild(span);
+      };
+
+      addBtn('←', currentPage - 1, false, currentPage === 1);
+
+      const range: (number | '...')[] = [];
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          range.push(i);
+        } else if (range[range.length - 1] !== '...') {
+          range.push('...');
+        }
+      }
+      range.forEach(r => {
+        if (r === '...') addEllipsis();
+        else addBtn(r, r, r === currentPage);
+      });
+
+      addBtn('→', currentPage + 1, false, currentPage === totalPages);
+    }
+
+    // ── Filter ────────────────────────────────────────────────
+    function filterCards() {
+      const nameQ   = searchInput?.value.trim().toLowerCase()   || '';
+      const comuneQ = filterComune?.value.trim().toLowerCase()  || '';
+      const daVal   = filterDa?.value   || '';   // YYYY-MM-DD
+      const alVal   = filterAl?.value   || '';
+
+      if (clearBtn) clearBtn.style.display = nameQ ? 'block' : 'none';
+
+      // Advanced filters active indicator badge
+      const advBadge = document.getElementById('adv-badge');
+      if (advBadge) {
+        advBadge.style.display = (comuneQ || daVal || alVal) ? 'block' : 'none';
+      }
+
+      filteredCards = allCards.filter(card => {
+        // name match
+        if (nameQ && !(card.getAttribute('data-nominativo') || '').includes(nameQ)) return false;
+        // comune match
+        if (comuneQ && !(card.getAttribute('data-comune') || '').includes(comuneQ)) return false;
+        // date range
+        const morte = card.getAttribute('data-morte') || '';  // YYYY-MM-DD
+        if (daVal && morte && morte < daVal) return false;
+        if (alVal && morte && morte > alVal) return false;
+        return true;
+      });
+
+      currentPage = 1;
+      paginate();
+    }
+
+    // ── Init ──────────────────────────────────────────────────
+    filteredCards = allCards;
+    paginate();
+
+    // ── Events ────────────────────────────────────────────────
+    searchInput?.addEventListener('input', filterCards);
+    filterComune?.addEventListener('change', filterCards);
+    filterDa?.addEventListener('input', filterCards);
+    filterAl?.addEventListener('input', filterCards);
+
+    function clearSearch() {
+      if (searchInput) { searchInput.value = ''; }
+      filterCards();
+      searchInput?.focus();
+    }
+
+    clearBtn?.addEventListener('click', clearSearch);
+    clearBtnBottom?.addEventListener('click', clearSearch);
+
+    advResetBtn?.addEventListener('click', () => {
+      if (searchInput)  searchInput.value  = '';
+      if (filterComune) filterComune.value = '';
+      if (filterDa)     filterDa.value     = '';
+      if (filterAl)     filterAl.value     = '';
+      if (clearBtn)     clearBtn.style.display = 'none';
+      filterCards();
+    });
+  });
+</script>

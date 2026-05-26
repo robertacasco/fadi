@@ -1,0 +1,299 @@
+---
+import type { AnnuncioData } from '../types';
+import { getFotoUrl, formatMorte, formatNascita, formatCerimoniaOra, formatCerimoniaData } from '../utils/formatters';
+
+interface Props {
+  item: AnnuncioData;
+}
+
+const { item } = Astro.props;
+
+const defunto  = item.defunto  || {};
+const annuncio = item.annuncio || {};
+const funerale = item.funerale || {};
+const rosario  = item.rosario  || {};
+const sepoltura = item.sepoltura || {};
+const luogoRiposo = item.luogo_riposo || {};
+const streaming = item.streaming || {};
+const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+const haFoto   = !!defunto.foto_url;
+
+const fotoSrc = getFotoUrl(defunto, item.updated_at);
+const dataMorteIta = formatMorte(defunto.data_morte);
+const dataNascitaIta = formatNascita(defunto.data_nascita);
+---
+
+<!-- Memorial Header Section -->
+<section class="memorial-header-section">
+  <div class="container header-grid">
+    <!-- Left side: elegant photo representation -->
+    <div class="memorial-photo-wrapper" style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center; width: 100%; max-width: 320px; margin: 0 auto;">
+      <div class="memorial-frame" style="width: 100%;">
+        {haFoto ? (
+          <img 
+            src={fotoSrc}
+            alt={`Foto di ${nomeCompleto}`}
+            class="memorial-image"
+          />
+        ) : (
+          <div class="memorial-image-placeholder">
+            <div class="placeholder-cross-lg">✝</div>
+          </div>
+        )}
+        <div class="frame-gold-border"></div>
+      </div>
+
+      <div class="action-buttons-group-vertical" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+        <a href="#cordoglio" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.9rem 0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 0.35rem;">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Invia Cordoglio
+        </a>
+        <a href="#cordoglio" id="hero-btn-photo" class="btn btn-outline-gold" style="width: 100%; justify-content: center; padding: 0.9rem 0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 0.35rem;">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          Invia una Foto
+        </a>
+        <a href="#invia-fiori" class="btn btn-outline-gold" style="width: 100%; justify-content: center; padding: 0.9rem 0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 0.35rem;">
+            <circle cx="12" cy="12" r="2.5"/>
+            <path d="M12 2a2.5 2.5 0 0 1 2.5 2.5c0 1.5-2.5 4-2.5 4s-2.5-2.5-2.5-4A2.5 2.5 0 0 1 12 2z"/>
+            <path d="M22 12a2.5 2.5 0 0 1-2.5 2.5c-1.5 0-4-2.5-4-2.5s2.5-2.5 4-2.5A2.5 2.5 0 0 1 22 12z"/>
+            <path d="M12 22a2.5 2.5 0 0 1-2.5-2.5c0-1.5 2.5-4 2.5-4s2.5 2.5 2.5 4A2.5 2.5 0 0 1 12 22z"/>
+            <path d="M2 12a2.5 2.5 0 0 1 2.5-2.5c1.5 0 4 2.5 4 2.5s-2.5 2.5-4 2.5A2.5 2.5 0 0 1 2 12z"/>
+            <path d="M19.07 4.93a2.5 2.5 0 0 1 0 3.54c-1.06 1.06-4.24.7-4.24.7s-.36-3.18.7-4.24a2.5 2.5 0 0 1 3.54 0z"/>
+            <path d="M4.93 4.93a2.5 2.5 0 0 1 3.54 0c1.06 1.06.7 4.24.7 4.24s-3.18.36-4.24-.7a2.5 2.5 0 0 1 0-3.54z"/>
+            <path d="M4.93 19.07a2.5 2.5 0 0 1 0-3.54c1.06-1.06 4.24-.7 4.24-.7s.36 3.18-.7 4.24a2.5 2.5 0 0 1-3.54 0z"/>
+            <path d="M19.07 19.07a2.5 2.5 0 0 1-3.54 0c-1.06-1.06-.7-4.24-.7-4.24s3.18-.36 4.24.7a2.5 2.5 0 0 1 0 3.54z"/>
+          </svg>
+          Invia dei Fiori
+        </a>
+      </div>
+    </div>
+
+    <!-- Right side: details and text -->
+    <div class="memorial-primary-info">
+      <div class="emblem" aria-hidden="true">✝</div>
+      <span class="annuncio-label">In Memoria di</span>
+      <h1 class="deceased-name">{nomeCompleto}</h1>
+      
+      <div class="dates-eta">
+        {dataMorteIta && (
+          <div class="info-tag">
+            <span class="tag-title">Deceduto il:</span>
+            <span class="tag-val">{dataMorteIta}</span>
+          </div>
+        )}
+        {dataNascitaIta && (
+          <div class="info-tag">
+            <span class="tag-title">Nato il:</span>
+            <span class="tag-val">{dataNascitaIta}</span>
+          </div>
+        )}
+        {(defunto as any).eta_visibile && (defunto as any).eta && (
+          <div class="info-tag">
+            <span class="tag-title">Età:</span>
+            <span class="tag-val">{(defunto as any).eta} Anni</span>
+          </div>
+        )}
+      </div>
+
+      {annuncio.citazione && (
+        <blockquote class="deceased-quote">
+          <p>“{annuncio.citazione}”</p>
+        </blockquote>
+      )}
+
+      {annuncio.epigrafe_url && (
+        <div class="manifesto-preview-wrapper" style="cursor: pointer; width: 100%; max-width: 270px; margin-bottom: 2rem;">
+          <div class="manifesto-thumbnail-card" id="open-manifesto-btn" style="position: relative; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all var(--transition);">
+            <img src={annuncio.epigrafe_url} alt={`Manifesto di ${nomeCompleto}`} style="width: 100%; height: auto; display: block;" />
+            <div class="manifesto-overlay" style="position: absolute; inset: 0; background: rgba(44, 38, 32, 0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition);">
+              <span style="color: #ffffff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #ffffff; padding: 0.4rem 0.8rem; border-radius: 4px; background: rgba(0,0,0,0.2);">Ingrandisci</span>
+            </div>
+          </div>
+          <span style="display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); text-align: center;">Manifesto Funebre</span>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<!-- Ceremony Details Grid -->
+<section class="section ceremonies-section">
+  <div class="container">
+    <div class="text-center section-header">
+      <span class="section-label">Cerimonie</span>
+      <h2 class="section-title">Orari e luoghi del commiato</h2>
+      <div class="divider mx-auto"></div>
+    </div>
+
+    <div class="ceremonies-grid">
+      <!-- ROSARIO CARD -->
+      {rosario.luogo || rosario.data_ora ? (
+        <div class="ceremony-detail-card card">
+          <div class="ceremony-header">
+            <span class="ceremony-card-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="9" r="6" stroke-dasharray="0 4" />
+                <path d="M12 15v6M9 18h6" />
+              </svg>
+            </span>
+            <h3>Santo rosario</h3>
+          </div>
+          <div class="ceremony-body">
+            {rosario.data_ora && (
+              <div class="time-block">
+                <span class="time-date">{formatCerimoniaData(rosario.data_ora)}</span>
+                <span class="time-hours">{formatCerimoniaOra(rosario.data_ora)}</span>
+              </div>
+            )}
+            <div class="address-block">
+              <span class="place-name">{rosario.luogo || 'Presso la Chiesa'}</span>
+              {rosario.indirizzo && <span class="place-address">{rosario.indirizzo}</span>}
+            </div>
+          </div>
+          {rosario.link_maps && (
+            <a href={(rosario as any).link_maps} target="_blank" rel="noopener noreferrer" class="maps-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Indicazioni stradali
+            </a>
+          )}
+        </div>
+      ) : null}
+
+      <!-- FUNERALE CARD -->
+      {funerale.luogo || funerale.data_ora ? (
+        <div class="ceremony-detail-card card card-highlighted">
+          <div class="ceremony-header">
+            <span class="ceremony-card-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M8 8h8" />
+              </svg>
+            </span>
+            <h3>Cerimonia funebre</h3>
+          </div>
+          <div class="ceremony-body">
+            {funerale.data_ora && (
+              <div class="time-block">
+                <span class="time-date">{formatCerimoniaData(funerale.data_ora)}</span>
+                <span class="time-hours">{formatCerimoniaOra(funerale.data_ora)}</span>
+              </div>
+            )}
+            <div class="address-block">
+              <span class="place-name">{funerale.luogo || 'Chiesa Parrocchiale'}</span>
+              {funerale.indirizzo && <span class="place-address">{funerale.indirizzo}</span>}
+            </div>
+          </div>
+          {funerale.link_maps && (
+            <a href={(funerale as any).link_maps} target="_blank" rel="noopener noreferrer" class="maps-link highlighted-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Indicazioni stradali
+            </a>
+          )}
+        </div>
+      ) : null}
+
+      <!-- LUOGO DI RIPOSO CARD -->
+      {luogoRiposo.luogo || luogoRiposo.indirizzo ? (
+        <div class="ceremony-detail-card card">
+          <div class="ceremony-header">
+            <span class="ceremony-card-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 21h12M12 18v3" />
+                <rect x="10" y="11" width="4" height="7" rx="0.5" />
+                <path d="M12 11V8" />
+                <path d="M12 3c-0.8 1.5-0.8 2.5 0 4 0.8-1.5 0.8-2.5 0-4z" fill="currentColor" stroke="none" />
+              </svg>
+            </span>
+            <h3>Camera ardente</h3>
+          </div>
+          <div class="ceremony-body">
+            <div class="address-block" style="margin-top: 1rem;">
+              <span class="place-name">{luogoRiposo.luogo}</span>
+              {luogoRiposo.indirizzo && <span class="place-address">{luogoRiposo.indirizzo}</span>}
+            </div>
+          </div>
+          {luogoRiposo.link_maps && (
+            <a href={(luogoRiposo as any).link_maps} target="_blank" rel="noopener noreferrer" class="maps-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Indicazioni stradali
+            </a>
+          )}
+        </div>
+      ) : null}
+
+      <!-- SEPOLTURA CARD -->
+      {sepoltura.luogo || sepoltura.indirizzo ? (
+        <div class="ceremony-detail-card card">
+          <div class="ceremony-header">
+            <span class="ceremony-card-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 20V10a6 6 0 0 1 12 0v10" />
+                <path d="M3 20h18" />
+                <path d="M12 8v6M10 10h4" />
+              </svg>
+            </span>
+            <h3>Sepoltura</h3>
+          </div>
+          <div class="ceremony-body">
+            <div class="address-block" style="margin-top: 1rem;">
+              <span class="place-name">{sepoltura.luogo || 'Cimitero Comunale'}</span>
+              {sepoltura.indirizzo && <span class="place-address">{sepoltura.indirizzo}</span>}
+            </div>
+          </div>
+          {sepoltura.link_maps && (
+            <a href={(sepoltura as any).link_maps} target="_blank" rel="noopener noreferrer" class="maps-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Indicazioni stradali
+            </a>
+          )}
+        </div>
+      ) : null}
+    </div>
+
+    <!-- Live Stream Streaming Option -->
+    {streaming.url_video && (
+      <div class="streaming-block text-center">
+        <div class="streaming-inner card">
+          <span class="live-dot-pulse"></span>
+          <h3>Diretta streaming della cerimonia</h3>
+          <p>Per coloro che non possono partecipare fisicamente, è possibile seguire la cerimonia funebre in diretta streaming online.</p>
+          <a href={streaming.url_video} target="_blank" rel="noopener noreferrer" class="btn btn-gold streaming-btn">
+            ▶ Segui la diretta streaming
+          </a>
+        </div>
+      </div>
+    )}
+  </div>
+</section>
+
+{annuncio.epigrafe_url && (
+  <div id="manifesto-modal" class="manifesto-modal-overlay">
+    <div class="manifesto-modal-content">
+      <button id="close-manifesto-btn" class="close-manifesto-btn" type="button">
+        &times;
+      </button>
+      <img src={annuncio.epigrafe_url} alt={`Manifesto Funebre di ${nomeCompleto}`} />
+      <div class="manifesto-modal-caption">
+        Manifesto Funebre di {nomeCompleto}
+      </div>
+    </div>
+  </div>
+)}
