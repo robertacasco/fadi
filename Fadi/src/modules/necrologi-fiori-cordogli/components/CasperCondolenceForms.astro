@@ -1,126 +1,91 @@
 ---
-import type { AnnuncioData, FioreData } from '../types';
+import type { AnnuncioData } from '../types';
+import { isPublicOnlinePaymentEnabled } from '../payments/config';
 
 interface Props {
   item: AnnuncioData;
-  fiori?: FioreData[];
+  fiori?: unknown[];
 }
 
-const { item, fiori = [] } = Astro.props;
+const { item } = Astro.props;
+const onlinePaymentEnabled = isPublicOnlinePaymentEnabled();
 
-const fallbackFioreImage = '/fiori/composizione.png';
-const sourceFiori = fiori.filter((fiore) => fiore.attivo !== false);
-
-const localFioriCatalog = [
+const activeFiori = [
+  {
+    id: 'ciotola-fiori-stagione',
+    nome: 'Ciotola di fiori di stagione',
+    descrizione: 'Ideale per un funerale. Un gesto più sentito.',
+    prezzo: 25,
+    prezzoPrefix: 'A partire da ',
+    immagine: '/fiori/ciotola-fiori-stagione.png'
+  },
+  {
+    id: 'mazzo-di-fiori',
+    nome: 'Mazzo di fiori',
+    descrizione: 'Classico, ideale per funerali. Un semplice ma gradito pensiero.',
+    prezzo: 10,
+    immagine: '/fiori/mazzo-di-fiori.png'
+  },
   {
     id: 'bouquet',
     nome: 'Bouquet',
-    descrizione: 'Composizione floreale raccolta e armoniosa, realizzata con fiori freschi disponibili in stagione.',
+    descrizione: 'Composizione colorata di rose rosse, gerbere rosa e gigli bianchi, legata con nastro bordeaux.',
     prezzo: 30,
-    immagine: '/fiori/bouquet.png',
-    aliases: ['mazzo di fiori', 'bouquet']
+    immagine: '/fiori/bouquet.png'
   },
   {
     id: 'corona-di-fiori',
     nome: 'Corona di fiori',
-    descrizione: 'Composizione circolare funebre, preparata con fiori freschi di stagione e finiture coordinate.',
+    descrizione: 'Corona circolare ricca e colorata con rose, gerbere, crisantemi e garofani multicolore.',
     prezzo: 150,
-    immagine: '/fiori/corona.png',
-    aliases: ['corona', 'corona funebre', 'corona di fiori']
+    immagine: '/fiori/corona.png'
   },
   {
     id: 'cuscino',
     nome: 'Cuscino',
-    descrizione: 'Composizione compatta e raffinata, realizzata con fiori freschi di stagione su base verde.',
+    descrizione: 'Cuscino compatto di rose rosa, garofani rossi e gerbere bianche su base di muschio verde.',
     prezzo: 80,
-    immagine: '/fiori/cuscino.png',
-    aliases: ['cuscino', 'cuscino floreale']
+    immagine: '/fiori/cuscino.png'
   },
   {
     id: 'cuore',
     nome: 'Cuore',
-    descrizione: 'Composizione a forma di cuore, realizzata con fiori freschi disponibili in stagione e colori armoniosi.',
-    prezzo: 70,
-    immagine: '/fiori/cuore.png',
-    aliases: ['cuore', 'cuscino a forma di cuore']
+    descrizione: '',
+    prezzo: 150,
+    immagine: '/fiori/cuore.png'
   },
   {
     id: 'copri-bara',
     nome: 'Copri bara',
-    descrizione: 'Composizione floreale allungata per feretro, preparata con fiori freschi di stagione e verde decorativo.',
+    descrizione: 'Composizione allungata per bara con croce di rose rosse e cornice di fiori colorati misti.',
     prezzo: 400,
-    immagine: '/fiori/copri-bara.png',
-    aliases: ['copri bara', 'copribara']
+    immagine: '/fiori/copri-bara.png'
   }
 ];
 
-function normalizeFioreName(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
+function getFioreName(fiore: (typeof activeFiori)[number]): string {
+  return fiore.nome;
 }
 
-function getFioreName(fiore: FioreData): string {
-  return fiore.nome || fiore.denominazione || fiore.titolo || fiore.name || `Composizione ${fiore.id}`;
+function getFioreDescription(fiore: (typeof activeFiori)[number]): string {
+  return fiore.descrizione;
 }
 
-function getFioreDescription(fiore: FioreData): string {
-  return fiore.descrizione || fiore.descrizione_breve || fiore.description || '';
+function getFioreImage(fiore: (typeof activeFiori)[number]): string {
+  return fiore.immagine;
 }
 
-function getFioreAmount(fiore: FioreData): number | null {
-  const raw = fiore.importo ?? fiore.prezzo_ivato ?? fiore.prezzo ?? fiore.price ?? fiore.amount;
-  if (raw === undefined || raw === null || raw === '') return null;
-  const value = Number(String(raw).replace(',', '.'));
-  return Number.isFinite(value) ? value : null;
+function getFiorePriceValue(fiore: (typeof activeFiori)[number]): string {
+  return String(fiore.prezzo);
 }
 
-function findSourceFiore(aliases: string[], prezzo: number): FioreData | undefined {
-  const normalizedAliases = aliases.map(normalizeFioreName);
-  return sourceFiori.find((fiore) => {
-    const name = normalizeFioreName(getFioreName(fiore));
-    const amount = getFioreAmount(fiore);
-    const nameMatches = normalizedAliases.some((alias) => name === alias || name.includes(alias));
-    return nameMatches && amount === prezzo;
-  });
-}
-
-const matchedLocalFiori: FioreData[] = localFioriCatalog.flatMap(({ aliases, ...fiore }) => {
-  const sourceFiore = findSourceFiore(aliases, fiore.prezzo);
-  if (!sourceFiore) return [];
-
-  return [{
-    ...sourceFiore,
-    nome: fiore.nome,
-    descrizione: fiore.descrizione,
-    immagine: fiore.immagine,
-  }];
-});
-
-const activeFiori: FioreData[] = matchedLocalFiori.length > 0 ? matchedLocalFiori : sourceFiori;
-
-function getFioreImage(fiore: FioreData): string {
-  return fiore.immagine_url || fiore.immagine || fiore.foto_url || fiore.image_url || fiore.url_immagine || fallbackFioreImage;
-}
-
-function getFiorePriceValue(fiore: FioreData): string {
-  const raw = fiore.importo ?? fiore.prezzo_ivato ?? fiore.prezzo ?? fiore.price ?? fiore.amount ?? '';
-  return String(raw);
-}
-
-function formatFiorePrice(fiore: FioreData): string {
-  const raw = getFiorePriceValue(fiore);
-  const value = Number(raw.replace(',', '.'));
-
-  if (!Number.isFinite(value)) return raw;
-
-  return new Intl.NumberFormat('it-IT', {
+function formatFiorePrice(fiore: (typeof activeFiori)[number]): string {
+  const price = new Intl.NumberFormat('it-IT', {
     style: 'currency',
     currency: 'EUR'
-  }).format(value);
+  }).format(fiore.prezzo);
+
+  return `${fiore.prezzoPrefix || ''}${price}`;
 }
 ---
 
@@ -442,20 +407,44 @@ function formatFiorePrice(fiore: FioreData): string {
             </label>
           </div>
 
-          <!-- Metodo di pagamento description -->
-          <div class="fiori-payment-info fiori-form-full">
-            <div class="fiori-payment-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="5" width="18" height="14" rx="2" />
-                <path d="M3 10h18" />
-                <path d="M7 15h3" />
-              </svg>
+          <!-- Metodo di pagamento -->
+          <div class="form-group fiori-form-full">
+            <label class="form-label">Metodo di pagamento</label>
+            <div class="fiori-payment-options">
+              <label class="fiori-payment-option">
+                <input type="radio" name="metodo_pagamento" value="consegna" checked />
+                <span class="fiori-payment-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="M3 10h18" />
+                    <path d="M7 15h3" />
+                  </svg>
+                </span>
+                <span>
+                  <strong>Pagamento alla consegna</strong>
+                  <small>Contanti, POS o Satispay alla consegna</small>
+                </span>
+              </label>
+
+              <label class={`fiori-payment-option ${onlinePaymentEnabled ? '' : 'fiori-payment-option-disabled'}`}>
+                <input type="radio" name="metodo_pagamento" value="online" disabled={!onlinePaymentEnabled} />
+                <span class="fiori-payment-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <path d="M2 10h20" />
+                    <path d="M16 15h2" />
+                    <path d="M12 15h1" />
+                  </svg>
+                </span>
+                <span>
+                  <strong>Pagamento online sicuro</strong>
+                  <small>{onlinePaymentEnabled ? 'Carta o wallet sul checkout protetto' : 'In attivazione con Cas-Per'}</small>
+                </span>
+              </label>
             </div>
-            <div class="payment-text">
-              <strong>Pagamento alla consegna</strong><br/>
-              Il pagamento avverrà al momento della consegna, potrai pagare in contanti, POS o satispay.<br/>
-              Sarai contattato dal nostro staff per confermare l'ordine.
-            </div>
+            <p class="fiori-payment-note">
+              L'ordine viene validato sul server e comunicato al backoffice Cas-Per.
+            </p>
           </div>
 
           <div class="form-status fiori-form-full" id="fiori-status"></div>

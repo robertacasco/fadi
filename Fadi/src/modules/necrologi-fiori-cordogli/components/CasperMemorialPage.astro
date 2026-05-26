@@ -1262,10 +1262,31 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     min-width: 160px;
   }
 
+  .fiori-payment-option span:last-child {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .fiori-payment-option small {
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+  }
+
   .fiori-payment-option:has(input:checked) {
     border-color: var(--gold);
     background: rgba(184,150,110,0.07);
     color: var(--gold);
+  }
+
+  .fiori-payment-option-disabled {
+    opacity: 0.62;
+    cursor: not-allowed;
+  }
+
+  .fiori-payment-option-disabled * {
+    cursor: not-allowed;
   }
 
   .fiori-payment-option input[type="radio"] {
@@ -1297,6 +1318,13 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
   .fiori-payment-info strong {
     color: var(--text);
+  }
+
+  .fiori-payment-note {
+    margin: 0.65rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   .fiori-submit-row {
@@ -2472,6 +2500,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       const telefono = document.getElementById('fiori-telefono')?.value.trim() || '';
       const email = document.getElementById('fiori-email')?.value.trim() || '';
       const note = document.getElementById('fiori-note')?.value.trim() || '';
+      const metodoPagamento = document.querySelector('input[name="metodo_pagamento"]:checked')?.value || 'consegna';
 
       if (!selectedFlowerId) {
         setFioriStatus('error', 'Seleziona una composizione floreale.');
@@ -2494,7 +2523,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       const originalText = fioriSubmitBtn.innerHTML;
       fioriSubmitBtn.disabled = true;
       fioriSubmitBtn.innerHTML = '<span class="spinner-inline"></span> Invio ordine...';
-      setFioriStatus('info', 'Stiamo inviando il tuo ordine alla fioreria.');
+      setFioriStatus('info', metodoPagamento === 'online'
+        ? 'Stiamo preparando il checkout sicuro.'
+        : 'Stiamo inviando il tuo ordine alla fioreria.');
 
       const payload = {
         fiore_id: selectedFlowerNumericId,
@@ -2529,18 +2560,17 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
         note,
         messaggio: note,
         luogo_consegna: 'Presso il luogo delle esequie',
-        metodo_pagamento: 'consegna',
-        pagamento: 'consegna',
+        metodo_pagamento: metodoPagamento,
+        pagamento: metodoPagamento,
         privacy: true,
         accetta_privacy: true,
         provenienza: 1
       };
 
       try {
-        const response = await fetch('/casper-api/public/v1/fiori-ordini', {
+        const response = await fetch('/api/fiori/ordine', {
           method: 'POST',
           headers: {
-            'X-API-Key': apiKey,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
@@ -2552,16 +2582,18 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
           throw new Error(getFioriApiError(json));
         }
 
-        const checkoutUrl = json.data?.checkout_url || json.data?.payment_url || json.checkout_url || json.payment_url;
+        const checkoutUrl = json.checkout_url || json.data?.checkout_url || json.data?.payment_url || json.payment_url;
 
-        setFioriStatus('success', 'Ordine ricevuto. Il nostro staff ti contatterà per confermare consegna e pagamento.');
+        if (checkoutUrl) {
+          setFioriStatus('info', 'Ti stiamo portando al checkout sicuro.');
+          window.location.href = checkoutUrl;
+          return;
+        }
+
+        setFioriStatus('success', json.message || 'Ordine ricevuto. Il nostro staff ti contatterà per confermare consegna e pagamento.');
         fioriOrderForm.reset();
         const defuntoInput = document.getElementById('fiori-defunto');
         if (defuntoInput) defuntoInput.value = nomeDefuntoCompleto || '';
-
-        if (checkoutUrl) {
-          window.location.href = checkoutUrl;
-        }
       } catch (err) {
         setFioriStatus('error', err.message || 'Si è verificato un errore durante l\'invio dell\'ordine. Riprova più tardi.');
       } finally {

@@ -14,6 +14,9 @@ Modulo Astro copiabile per integrare CasPer in un sito di onoranze funebri.
 - `components/CasperMemorialDetails.astro`: dettaglio manifesto/cerimonie.
 - `components/CasperMessagesList.astro`: area messaggi e foto ricevuti.
 - `components/CasperCondolenceForms.astro`: form cordoglio, foto-cordoglio e ordine fiori.
+- `payments/`: validazione server-side ordine fiori, configurazione gateway e webhook pagamento.
+- `pages/api/fiori/ordine.ts`: endpoint server Astro per creare l'ordine fiori senza esporre la chiave CasPer nel browser.
+- `pages/api/pagamenti/webhook.ts`: endpoint webhook pronto per il provider di pagamento.
 
 ## Come riusarlo
 
@@ -24,6 +27,18 @@ Modulo Astro copiabile per integrare CasPer in un sito di onoranze funebri.
 CASPER_API_KEY=...
 PUBLIC_CASPER_API_KEY=...
 ```
+
+Per abilitare il pagamento online quando il gateway e gli endpoint CasPer saranno disponibili:
+
+```env
+PUBLIC_FIORI_ONLINE_PAYMENTS_ENABLED=true
+FIORI_ONLINE_PAYMENTS_ENABLED=true
+FIORI_PAYMENT_PROVIDER=stripe|nexi|satispay
+FIORI_PAYMENT_WEBHOOK_SECRET=...
+CASPER_PAYMENT_STATUS_ENDPOINT=https://api.cas-per.it/api/.../{orderId}
+```
+
+Il flusso online e' predisposto ma resta disattivato finche' non viene implementato il provider reale. L'ordine fiori viene comunque validato lato server contro catalogo CasPer (`fiore_id` e `importo`) prima di essere registrato.
 
 3. Crea le rotte `/necrologi/` e `/necrologi/[slug]/` importando client e componenti dal modulo.
 
@@ -67,4 +82,4 @@ if (!item || !slug) return Astro.redirect('/404');
 
 ## Nota sicurezza
 
-Le chiamate SSR usano `CASPER_API_KEY`. Alcuni form browser-side usano ancora `PUBLIC_CASPER_API_KEY`, quindi la chiave è visibile nel bundle. Per una versione più riservata, crea endpoint server Astro per cordogli, foto-cordogli e verifica OTP e rimuovi la chiave dal client.
+Le chiamate SSR usano `CASPER_API_KEY`. L'ordine fiori passa da `/api/fiori/ordine`, quindi `fiore_id` e `importo` vengono ricalcolati sul server e poi inviati a CasPer. Alcuni form browser-side usano ancora `PUBLIC_CASPER_API_KEY`, quindi la chiave e' visibile nel bundle. Per una versione piu' riservata, porta anche cordogli, foto-cordogli e verifica OTP dietro endpoint server Astro.
