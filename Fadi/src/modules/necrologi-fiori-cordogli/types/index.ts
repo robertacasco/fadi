@@ -75,3 +75,28 @@ export interface AnnuncioData {
 export interface ApiResponse {
   data: AnnuncioData[];
 }
+
+export interface FioreData {
+  id: number | string;
+  nome?: string;
+  titolo?: string;
+  name?: string;
+  descrizione?: string;
+  descrizione_breve?: string;
+  description?: string;
+  prezzo?: number | string;
+  prezzo_ivato?: number | string;
+  price?: number | string;
+  amount?: number | string;
+  immagine_url?: string;
+  immagine?: string;
+  foto_url?: string;
+  image_url?: string;
+  url_immagine?: string;
+  attivo?: boolean;
+}
+
+export interface FioriApiResponse {
+  data?: FioreData[] | { fiori?: FioreData[] };
+  fiori?: FioreData[];
+}

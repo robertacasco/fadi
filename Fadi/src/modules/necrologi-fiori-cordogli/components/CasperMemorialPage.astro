@@ -1,5 +1,5 @@
 ---
-import type { AnnuncioData } from '../types';
+import type { AnnuncioData, FioreData } from '../types';
 import CasperMemorialDetails from './CasperMemorialDetails.astro';
 import CasperMessagesList from './CasperMessagesList.astro';
 import CasperCondolenceForms from './CasperCondolenceForms.astro';
@@ -8,16 +8,17 @@ interface Props {
   item: AnnuncioData;
   apiKey: string;
   slug: string;
+  fiori?: FioreData[];
 }
 
-const { item, apiKey, slug } = Astro.props;
+const { item, apiKey, slug, fiori = [] } = Astro.props;
 const defunto = item.defunto || {};
 const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
 ---
 
 <CasperMemorialDetails item={item} />
 <CasperMessagesList item={item} />
-<CasperCondolenceForms item={item} />
+<CasperCondolenceForms item={item} fiori={fiori} />
 <style is:global>
   /* Memorial layout details */
   .memorial-header-section {
@@ -917,6 +918,24 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     margin-top: 2.5rem;
   }
 
+  .fiori-empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2.25rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  .fiori-empty-state p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
   .fiori-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -1259,6 +1278,23 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     display: flex;
     align-items: center;
     color: var(--gold);
+  }
+
+  .fiori-payment-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
+  }
+
+  .fiori-payment-info strong {
+    color: var(--text);
   }
 
   .fiori-submit-row {
@@ -1653,7 +1689,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 </style>
 
 <!-- Client Side Forms and Actions -->
-<script define:vars={{ slug, apiKey, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '', nomeDefuntoCompleto: nomeCompleto || '' }}>
+<script define:vars={{ slug, apiKey, annuncioId: item.id, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '', nomeDefuntoCompleto: nomeCompleto || '' }}>
 // 1. SUBMIT CONDOLENCE ACTION
   const cordoglioForm = document.getElementById('cordoglio-form');
   const cordoglioStatus = document.getElementById('cordoglio-status');
@@ -2290,51 +2326,63 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
   // ============================================
   const fioriFormWrap    = document.getElementById('fiori-inline-form-wrap');
   const fioriOrderForm   = document.getElementById('fiori-order-form');
-  const fioriOrderStatus = document.getElementById('fiori-order-status');
+  const fioriOrderStatus = document.getElementById('fiori-status') || document.getElementById('fiori-order-status');
   const fioriCancelBtn   = document.getElementById('fiori-cancel-btn');
+  const fioriSubmitBtn   = document.getElementById('fiori-submit-btn');
 
+  let selectedFlowerId = '';
   let selectedFlowerProduct = '';
   let selectedFlowerPrice   = '';
+  let selectedFlowerPriceLabel = '';
 
-  function showFioriForm(productName, productPrice) {
-    selectedFlowerProduct = productName;
-    selectedFlowerPrice   = productPrice;
+  function setFioriStatus(type, message) {
+    if (!fioriOrderStatus) return;
+    fioriOrderStatus.className = `form-status status-${type}`;
+    fioriOrderStatus.style.display = 'block';
+    fioriOrderStatus.textContent = message;
+  }
+
+  function hideFioriStatus() {
+    if (!fioriOrderStatus) return;
+    fioriOrderStatus.style.display = 'none';
+    fioriOrderStatus.textContent = '';
+  }
+
+  function showFioriForm(button) {
+    selectedFlowerId = button.dataset.productId || '';
+    selectedFlowerProduct = button.dataset.product || '';
+    selectedFlowerPrice = button.dataset.price || '';
+    selectedFlowerPriceLabel = button.dataset.priceLabel || selectedFlowerPrice;
 
     // Product header
     const nameEl  = document.getElementById('fiori-inline-product-name');
     const priceEl = document.getElementById('fiori-inline-product-price');
-    if (nameEl)  nameEl.textContent  = productName;
-    if (priceEl) priceEl.textContent = `€ ${productPrice} IVA inclusa`;
+    if (nameEl)  nameEl.textContent  = selectedFlowerProduct;
+    if (priceEl) priceEl.textContent = `${selectedFlowerPriceLabel} IVA inclusa`;
+
+    const fioreIdInput = document.getElementById('fiori-fiore-id');
+    const fioreNameInput = document.getElementById('fiori-fiore-name');
+    if (fioreIdInput) fioreIdInput.value = selectedFlowerId;
+    if (fioreNameInput) fioreNameInput.value = selectedFlowerProduct;
 
     // Auto-fill defunto field
     const defuntoInput = document.getElementById('fiori-defunto');
     if (defuntoInput) defuntoInput.value = nomeDefuntoCompleto || '';
 
-    // Price summary
-    const summaryLabel = document.getElementById('fiori-summary-label');
-    const summaryPrice = document.getElementById('fiori-summary-price');
-    const summaryTotal = document.getElementById('fiori-summary-total');
-    if (summaryLabel) summaryLabel.textContent = `Prezzo del prodotto €${productPrice} x 1`;
-    if (summaryPrice) summaryPrice.textContent = `€${productPrice}`;
-    if (summaryTotal) summaryTotal.textContent = `€${productPrice}`;
-
     // Reset form fields (except defunto)
     const mittente = document.getElementById('fiori-mittente');
     const nastro   = document.getElementById('fiori-nastro');
-    const biglietto= document.getElementById('fiori-biglietto');
-    const luogo    = document.getElementById('fiori-luogo');
+    const telefono = document.getElementById('fiori-telefono');
+    const email    = document.getElementById('fiori-email');
     const note     = document.getElementById('fiori-note');
     const privacy  = document.getElementById('fiori-privacy');
     if (mittente)  mittente.value  = '';
     if (nastro)    nastro.value    = '';
-    if (biglietto) biglietto.value = '';
-    if (luogo)     luogo.value     = '';
+    if (telefono)  telefono.value  = '';
+    if (email)     email.value     = '';
     if (note)      note.value      = '';
     if (privacy)   privacy.checked = false;
-    document.querySelectorAll('input[name="pagamento"]').forEach(r => r.checked = false);
-    document.getElementById('nastro-count') && (document.getElementById('nastro-count').textContent = '0');
-    document.getElementById('biglietto-count') && (document.getElementById('biglietto-count').textContent = '0');
-    if (fioriOrderStatus) { fioriOrderStatus.style.display = 'none'; fioriOrderStatus.textContent = ''; }
+    hideFioriStatus();
 
     // Show form and scroll to it
     if (fioriFormWrap) {
@@ -2344,91 +2392,119 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
     // Highlight selected card
     document.querySelectorAll('.fiori-card').forEach(card => {
-      card.classList.toggle('fiori-card-selected', card.dataset.product === productName);
+      card.classList.toggle('fiori-card-selected', card.dataset.productId === selectedFlowerId);
     });
   }
 
   function hideFioriForm() {
     if (fioriFormWrap) fioriFormWrap.style.display = 'none';
     document.querySelectorAll('.fiori-card').forEach(c => c.classList.remove('fiori-card-selected'));
+    hideFioriStatus();
   }
 
   // "Scegli" buttons
   document.querySelectorAll('.fiori-order-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      showFioriForm(btn.dataset.product || '', btn.dataset.price || '');
+      showFioriForm(btn);
     });
   });
 
   // Cancel button
   fioriCancelBtn?.addEventListener('click', hideFioriForm);
 
-  // Char counters
-  document.getElementById('fiori-nastro')?.addEventListener('input', function() {
-    const el = document.getElementById('nastro-count');
-    if (el) el.textContent = this.value.length;
-  });
-  document.getElementById('fiori-biglietto')?.addEventListener('input', function() {
-    const el = document.getElementById('biglietto-count');
-    if (el) el.textContent = this.value.length;
-  });
-
-  // Form submit → WhatsApp
-  fioriOrderForm?.addEventListener('submit', (e) => {
+  // Form submit to Cas-Per
+  fioriOrderForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!fioriSubmitBtn) return;
 
-    const privacyOk = document.getElementById('fiori-privacy')?.checked ?? false;
-    if (!privacyOk) {
-      if (fioriOrderStatus) {
-        fioriOrderStatus.className = 'form-status status-error';
-        fioriOrderStatus.style.display = 'block';
-        fioriOrderStatus.textContent = 'È necessario accettare l\'informativa sulla privacy.';
+    {
+      const privacyOk = document.getElementById('fiori-privacy')?.checked ?? false;
+      if (!privacyOk) {
+        setFioriStatus('error', 'È necessario accettare l\'informativa sulla privacy.');
+        return;
       }
+
+      const mittente = document.getElementById('fiori-mittente')?.value.trim() || '';
+      const defunto = document.getElementById('fiori-defunto')?.value.trim() || '';
+      const nastro = document.getElementById('fiori-nastro')?.value.trim() || '';
+      const telefono = document.getElementById('fiori-telefono')?.value.trim() || '';
+      const email = document.getElementById('fiori-email')?.value.trim() || '';
+      const note = document.getElementById('fiori-note')?.value.trim() || '';
+
+      if (!selectedFlowerId) {
+        setFioriStatus('error', 'Seleziona una composizione floreale.');
+        return;
+      }
+
+      if (!mittente || !telefono || !email) {
+        setFioriStatus('error', 'Nome, telefono ed email sono obbligatori.');
+        return;
+      }
+
+      const originalText = fioriSubmitBtn.innerHTML;
+      fioriSubmitBtn.disabled = true;
+      fioriSubmitBtn.innerHTML = '<span class="spinner-inline"></span> Invio ordine...';
+      setFioriStatus('info', 'Stiamo inviando il tuo ordine alla fioreria.');
+
+      const payload = {
+        fiore_id: selectedFlowerId,
+        fiore_nome: selectedFlowerProduct,
+        prezzo: selectedFlowerPrice,
+        prezzo_label: selectedFlowerPriceLabel,
+        slug,
+        annuncio_id: annuncioId,
+        annuncio_slug: slug,
+        nominativo: mittente,
+        nome: mittente,
+        telefono,
+        email,
+        mail: email,
+        defunto,
+        nome_defunto: defuntoNome,
+        cognome_defunto: defuntoCognome,
+        nastro,
+        testo_nastro: nastro,
+        note,
+        privacy: true,
+        provenienza: 1
+      };
+
+      try {
+        const response = await fetch('/casper-api/public/v1/fiori-ordini', {
+          method: 'POST',
+          headers: {
+            'X-API-Key': apiKey,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const json = await response.json().catch(() => ({}));
+        if (!response.ok || json.success === false) {
+          throw new Error(json.message || json.error || json.data?.message || 'Non siamo riusciti a registrare l\'ordine.');
+        }
+
+        const checkoutUrl = json.data?.checkout_url || json.data?.payment_url || json.checkout_url || json.payment_url;
+
+        setFioriStatus('success', 'Ordine ricevuto. Il nostro staff ti contatterà per confermare consegna e pagamento.');
+        fioriOrderForm.reset();
+        const defuntoInput = document.getElementById('fiori-defunto');
+        if (defuntoInput) defuntoInput.value = nomeDefuntoCompleto || '';
+
+        if (checkoutUrl) {
+          window.location.href = checkoutUrl;
+        }
+      } catch (err) {
+        setFioriStatus('error', err.message || 'Si è verificato un errore durante l\'invio dell\'ordine. Riprova più tardi.');
+      } finally {
+        fioriSubmitBtn.disabled = false;
+        fioriSubmitBtn.innerHTML = originalText;
+      }
+
       return;
     }
 
-    const mittente  = document.getElementById('fiori-mittente')?.value.trim()  || '';
-    const defunto   = document.getElementById('fiori-defunto')?.value.trim()   || '';
-    const nastro    = document.getElementById('fiori-nastro')?.value.trim()    || '';
-    const biglietto = document.getElementById('fiori-biglietto')?.value.trim() || '';
-    const luogo     = document.getElementById('fiori-luogo')?.value.trim()     || '';
-    const note      = document.getElementById('fiori-note')?.value.trim()      || '';
-    const pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || '';
-
-    if (!mittente || !luogo) {
-      if (fioriOrderStatus) {
-        fioriOrderStatus.className = 'form-status status-error';
-        fioriOrderStatus.style.display = 'block';
-        fioriOrderStatus.textContent = 'Il tuo nome e il luogo di consegna sono obbligatori.';
-      }
-      return;
-    }
-
-    if (!pagamento) {
-      if (fioriOrderStatus) {
-        fioriOrderStatus.className = 'form-status status-error';
-        fioriOrderStatus.style.display = 'block';
-        fioriOrderStatus.textContent = 'Seleziona un metodo di pagamento.';
-      }
-      return;
-    }
-
-    // Build WhatsApp message
-    let msg = `🌸 *Ordine composizione floreale*\n\n`;
-    msg += `*Composizione:* ${selectedFlowerProduct}\n`;
-    msg += `*Prezzo:* € ${selectedFlowerPrice}\n\n`;
-    msg += `*Mittente:* ${mittente}\n`;
-    msg += `*Defunto:* ${defunto}\n`;
-    if (nastro)    msg += `*Scritta sul nastro:* ${nastro}\n`;
-    if (biglietto) msg += `*Biglietto:* ${biglietto}\n`;
-    msg += `*Luogo di consegna:* ${luogo}\n`;
-    if (note)      msg += `*Note:* ${note}\n`;
-    msg += `*Pagamento:* ${pagamento}\n`;
-    msg += `\n_Inviato tramite servizifadi.it_`;
-
-    const waNumber = '390963353321';
-    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
   });
 </script>
 

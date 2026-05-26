@@ -4,6 +4,7 @@ import { CasperClient } from '../../modules/necrologi-fiori-cordogli/api/casper-
 import { getCasperApiKey } from '../../modules/necrologi-fiori-cordogli/config';
 import { getFotoUrl } from '../../modules/necrologi-fiori-cordogli/utils/formatters';
 import CasperMemorialPage from '../../modules/necrologi-fiori-cordogli/components/CasperMemorialPage.astro';
+import type { AnnuncioData, FioreData } from '../../modules/necrologi-fiori-cordogli/types';
 
 export const prerender = false;
 
@@ -13,13 +14,20 @@ if (!slug) {
 }
 
 let apiKey: string | null = null;
-let item = null;
+let item: AnnuncioData | null = null;
+let fiori: FioreData[] = [];
 let error: string | null = null;
 
 try {
   apiKey = getCasperApiKey();
   const client = new CasperClient(apiKey);
   item = await client.getAnnuncioBySlug(slug);
+
+  try {
+    fiori = await client.getFiori();
+  } catch (fioriErr) {
+    console.warn('Error fetching fiori:', fioriErr);
+  }
 } catch (err: any) {
   console.error('Error fetching annuncio:', err);
   error = err.message || 'Impossibile caricare l\'annuncio in questo momento.';
@@ -40,7 +48,7 @@ const fotoSrc = item ? getFotoUrl(defunto, item.updated_at) : null;
   image={fotoSrc || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
 >
   {item && apiKey ? (
-    <CasperMemorialPage item={item} apiKey={apiKey} slug={slug} />
+    <CasperMemorialPage item={item} apiKey={apiKey} slug={slug} fiori={fiori} />
   ) : (
     <section class="section memorial-error">
       <div class="container text-center">

@@ -1,4 +1,4 @@
-import type { AnnuncioData, ApiResponse } from '../types';
+import type { AnnuncioData, ApiResponse, FioreData, FioriApiResponse } from '../types';
 import { applyCeremonyOverrides } from '../data/ceremony-overrides';
 
 export class CasperClient {
@@ -36,5 +36,30 @@ export class CasperClient {
   async getAnnuncioBySlug(slug: string): Promise<AnnuncioData | null> {
     const annunci = await this.getAnnunci();
     return annunci.find(item => item.slug === slug) || null;
+  }
+
+  /**
+   * Recupera il catalogo fiori pubblico dell'impresa.
+   */
+  async getFiori(): Promise<FioreData[]> {
+    const res = await fetch(`${this.baseUrl}/fiori`, {
+      headers: {
+        'X-API-Key': this.apiKey,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Errore API fiori: ${res.status} ${res.statusText}`);
+    }
+
+    const json: FioriApiResponse = await res.json();
+    const data = json.data;
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.fiori)) return data.fiori;
+    if (Array.isArray(json.fiori)) return json.fiori;
+
+    return [];
   }
 }
