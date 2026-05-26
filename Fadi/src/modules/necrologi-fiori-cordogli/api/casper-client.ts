@@ -1,4 +1,5 @@
 import type { AnnuncioData, ApiResponse } from '../types';
+import { applyCeremonyOverrides } from '../data/ceremony-overrides';
 
 export class CasperClient {
   private apiKey: string;
@@ -25,7 +26,7 @@ export class CasperClient {
     }
 
     const json: ApiResponse = await res.json();
-    return json.data || [];
+    return (json.data || []).map(applyCeremonyOverrides);
   }
 
   /**

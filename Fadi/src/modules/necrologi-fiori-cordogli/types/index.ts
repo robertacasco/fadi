@@ -16,6 +16,7 @@ export interface Funerale {
   luogo?: string;
   indirizzo?: string;
   comune?: string;
+  link_maps?: string;
 }
 
 export interface Rosario {
@@ -23,6 +24,7 @@ export interface Rosario {
   luogo?: string;
   indirizzo?: string;
   comune?: string;
+  link_maps?: string;
 }
 
 export interface Sepoltura {
@@ -30,6 +32,7 @@ export interface Sepoltura {
   luogo?: string;
   indirizzo?: string;
   comune?: string;
+  link_maps?: string;
 }
 
 export interface LuogoRiposo {
@@ -38,10 +41,12 @@ export interface LuogoRiposo {
   luogo?: string;
   indirizzo?: string;
   comune?: string;
+  link_maps?: string;
 }
 
 export interface Streaming {
   url?: string;
+  url_video?: string;
 }
 
 export interface Messaggio {
