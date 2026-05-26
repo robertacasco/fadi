@@ -102,14 +102,6 @@ function formatCerimonia(dateTimeStr?: string) {
             </div>
           </div>
         ) : null}
-
-        {!funerale.data_ora && !rosario.data_ora && (
-          <div class="ceremony-preview ceremony-preview--empty">
-            <div class="ceremony-text italic text-muted">
-              Contattare l'agenzia per orari e dettagli.
-            </div>
-          </div>
-        )}
       </div>
     </div>
   </a>
@@ -260,9 +252,6 @@ function formatCerimonia(dateTimeStr?: string) {
   .ceremony-icon--rosario { font-size: 0.85rem; }
   .ceremony-text { line-height: 1.4; }
   .ceremony-text strong { color: var(--text, #1a1f2e); font-weight: 600; }
-  .ceremony-preview--empty { justify-content: center; padding: 0.5rem 0; }
-  .italic { font-style: italic; }
-
   .card-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
