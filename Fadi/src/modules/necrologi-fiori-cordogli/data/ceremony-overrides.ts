@@ -8,6 +8,18 @@ type CeremonyOverride = {
 };
 
 const ceremonyOverrides: Record<string, CeremonyOverride> = {
+  'domenico-sorace': {
+    funerale: {
+      data_ora: '2026-05-05T16:00:00+02:00',
+      luogo: 'Chiesa di Santa Maria dei Latini',
+      comune: 'Acquaro'
+    },
+    luogo_riposo: {
+      luogo: 'Abitazione di famiglia',
+      indirizzo: "Via Sant'Antonio n. 1",
+      comune: 'Acquaro'
+    }
+  },
   'salvatore-raffaele': {
     funerale: {
       data_ora: '2026-01-02T15:30:00+01:00',
