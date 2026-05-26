@@ -2448,24 +2448,40 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
       const payload = {
         fiore_id: selectedFlowerId,
+        id_fiore: selectedFlowerId,
+        prodotto_id: selectedFlowerId,
         fiore_nome: selectedFlowerProduct,
+        prodotto: selectedFlowerProduct,
         prezzo: selectedFlowerPrice,
         prezzo_label: selectedFlowerPriceLabel,
+        quantita: 1,
         slug,
         annuncio_id: annuncioId,
+        id_annuncio: annuncioId,
         annuncio_slug: slug,
         nominativo: mittente,
         nome: mittente,
+        mittente,
+        mittente_nome: mittente,
         telefono,
+        mittente_telefono: telefono,
         email,
         mail: email,
+        mittente_email: email,
         defunto,
         nome_defunto: defuntoNome,
         cognome_defunto: defuntoCognome,
         nastro,
         testo_nastro: nastro,
+        messaggio_nastro: nastro,
+        biglietto: nastro,
         note,
+        messaggio: note,
+        luogo_consegna: 'Presso il luogo delle esequie',
+        metodo_pagamento: 'consegna',
+        pagamento: 'consegna',
         privacy: true,
+        accetta_privacy: true,
         provenienza: 1
       };
 
@@ -2482,7 +2498,10 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
         const json = await response.json().catch(() => ({}));
         if (!response.ok || json.success === false) {
-          throw new Error(json.message || json.error || json.data?.message || 'Non siamo riusciti a registrare l\'ordine.');
+          const validationMessage = json.errors
+            ? Object.values(json.errors).flat().join(' ')
+            : '';
+          throw new Error(json.message || json.error || json.data?.message || validationMessage || 'Non siamo riusciti a registrare l\'ordine.');
         }
 
         const checkoutUrl = json.data?.checkout_url || json.data?.payment_url || json.checkout_url || json.payment_url;
