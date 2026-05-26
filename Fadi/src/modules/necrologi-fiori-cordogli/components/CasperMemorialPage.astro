@@ -1335,11 +1335,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
   /* Cards grid (global for dynamic rendering) */
   .msg-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
+    column-count: 2;
+    column-gap: 1.25rem;
     margin-top: 2.5rem;
-    align-items: start;
   }
 
   /* Individual message card */
@@ -1353,6 +1351,8 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     gap: 0.75rem;
     animation: fadeInUp 0.4s ease both;
     position: relative;
+    break-inside: avoid;
+    margin: 0 0 1.25rem;
   }
 
   .msg-card::before {
@@ -1530,9 +1530,12 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
 
   @media (max-width: 560px) {
-    .msg-loading-wrap,
-    .msg-cards-grid {
+    .msg-loading-wrap {
       grid-template-columns: 1fr;
+    }
+
+    .msg-cards-grid {
+      column-count: 1;
     }
   }
 
