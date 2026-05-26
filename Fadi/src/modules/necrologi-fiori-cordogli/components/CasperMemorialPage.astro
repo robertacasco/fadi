@@ -1,5 +1,5 @@
 ---
-import type { AnnuncioData, FioreData } from '../types';
+import type { AnnuncioData, CordoglioData, FioreData, FotoCordoglioAlbum } from '../types';
 import CasperMemorialDetails from './CasperMemorialDetails.astro';
 import CasperMessagesList from './CasperMessagesList.astro';
 import CasperCondolenceForms from './CasperCondolenceForms.astro';
@@ -9,15 +9,17 @@ interface Props {
   apiKey: string;
   slug: string;
   fiori?: FioreData[];
+  cordogli?: CordoglioData[];
+  fotoCordogli?: FotoCordoglioAlbum[];
 }
 
-const { item, apiKey, slug, fiori = [] } = Astro.props;
+const { item, apiKey, slug, fiori = [], cordogli = [], fotoCordogli = [] } = Astro.props;
 const defunto = item.defunto || {};
 const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
 ---
 
 <CasperMemorialDetails item={item} />
-<CasperMessagesList item={item} />
+<CasperMessagesList item={item} cordogli={cordogli} fotoCordogli={fotoCordogli} />
 <CasperCondolenceForms item={item} fiori={fiori} />
 <style is:global>
   /* Memorial layout details */
@@ -2208,6 +2210,11 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     const msgEmpty    = document.getElementById('msg-empty');
     const fotoSection = document.getElementById('foto-section');
     const fotoGrid    = document.getElementById('foto-grid');
+    const hasServerMessages = msgList?.dataset.hasMessages === 'true';
+
+    if (hasServerMessages && msgLoading) {
+      msgLoading.style.display = 'none';
+    }
 
     function formatDate(str) {
       if (!str) return '';
@@ -2272,7 +2279,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
     function renderFotos(albums) {
       // Flatten all public photos from all albums.
-      const fotos = albums.flatMap(a => a.foto || []).filter(f => f.url && isPublicValue(f.approvata));
+      const fotos = albums
+        .flatMap(a => a.foto || a.photos || [])
+        .filter(f => f.url && isPublicValue(f.approvata) && isPublicValue(f.visibile));
       if (fotos.length === 0) return;
       const html = fotos.map(f => {
         const caption = escapeHtml(f.didascalia || 'Foto ricordo');
@@ -2305,10 +2314,14 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       if (res.ok) {
         const json = await res.json();
         renderMessages(getApiArray(json, ['cordogli', 'messaggi', 'messages']));
-      } else {
+      } else if (!hasServerMessages) {
         renderMessages([]);
       }
+    } catch {
+      if (!hasServerMessages) renderMessages([]);
+    }
 
+    try {
       const resF = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/fotocordogli/`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
@@ -2316,10 +2329,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
         const jsonF = await resF.json();
         renderFotos(getApiArray(jsonF, ['albums', 'album', 'fotocordogli']));
       }
-
-    } catch {
-      renderMessages([]);
-    }
+    } catch { /* foto-cordogli non disponibili */ }
   })();
 
   // ============================================

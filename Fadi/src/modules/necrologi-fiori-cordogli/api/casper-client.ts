@@ -1,4 +1,13 @@
-import type { AnnuncioData, ApiResponse, FioreData, FioriApiResponse } from '../types';
+import type {
+  AnnuncioData,
+  ApiResponse,
+  CordogliApiResponse,
+  CordoglioData,
+  FioreData,
+  FioriApiResponse,
+  FotoCordogliApiResponse,
+  FotoCordoglioAlbum
+} from '../types';
 import { applyCeremonyOverrides } from '../data/ceremony-overrides';
 
 export class CasperClient {
@@ -59,6 +68,56 @@ export class CasperClient {
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.fiori)) return data.fiori;
     if (Array.isArray(json.fiori)) return json.fiori;
+
+    return [];
+  }
+
+  /**
+   * Recupera i cordogli pubblici legati a un annuncio.
+   */
+  async getCordogli(annuncioId: number): Promise<CordoglioData[]> {
+    const res = await fetch(`${this.baseUrl}/annunci/${annuncioId}/cordogli/`, {
+      headers: {
+        'X-API-Key': this.apiKey,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Errore API cordogli: ${res.status} ${res.statusText}`);
+    }
+
+    const json: CordogliApiResponse = await res.json();
+    const data = json.data;
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.cordogli)) return data.cordogli;
+    if (Array.isArray(json.cordogli)) return json.cordogli;
+
+    return [];
+  }
+
+  /**
+   * Recupera gli album di foto-cordogli pubblici legati a un annuncio.
+   */
+  async getFotocordogli(annuncioId: number): Promise<FotoCordoglioAlbum[]> {
+    const res = await fetch(`${this.baseUrl}/annunci/${annuncioId}/fotocordogli/`, {
+      headers: {
+        'X-API-Key': this.apiKey,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Errore API foto-cordogli: ${res.status} ${res.statusText}`);
+    }
+
+    const json: FotoCordogliApiResponse = await res.json();
+    const data = json.data;
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.albums)) return data.albums;
+    if (Array.isArray(json.albums)) return json.albums;
 
     return [];
   }

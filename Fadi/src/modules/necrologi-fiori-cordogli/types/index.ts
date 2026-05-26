@@ -57,6 +57,43 @@ export interface Messaggio {
   stato?: string;
 }
 
+export interface CordoglioData {
+  id: number;
+  annuncio_id?: number;
+  testo?: string;
+  mittente?: string;
+  visibile?: boolean | number | string;
+  pubblico?: boolean | number | string;
+  pubblica?: boolean | number | string;
+  public?: boolean | number | string;
+  created_at?: string;
+  data_creazione?: string;
+  utente?: {
+    nome?: string;
+  };
+}
+
+export interface FotoCordoglioData {
+  id?: number;
+  url?: string;
+  foto_url?: string;
+  image_url?: string;
+  immagine_url?: string;
+  src?: string;
+  didascalia?: string;
+  caption?: string;
+  descrizione?: string;
+  approvata?: boolean | number | string;
+  approvato?: boolean | number | string;
+  visibile?: boolean | number | string;
+}
+
+export interface FotoCordoglioAlbum {
+  id?: number;
+  foto?: FotoCordoglioData[];
+  photos?: FotoCordoglioData[];
+}
+
 export interface AnnuncioData {
   id: number;
   slug: string;
@@ -101,4 +138,14 @@ export interface FioreData {
 export interface FioriApiResponse {
   data?: FioreData[] | { fiori?: FioreData[] };
   fiori?: FioreData[];
+}
+
+export interface CordogliApiResponse {
+  data?: CordoglioData[] | { cordogli?: CordoglioData[] };
+  cordogli?: CordoglioData[];
+}
+
+export interface FotoCordogliApiResponse {
+  data?: FotoCordoglioAlbum[] | { albums?: FotoCordoglioAlbum[] };
+  albums?: FotoCordoglioAlbum[];
 }

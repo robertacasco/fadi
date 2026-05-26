@@ -4,7 +4,7 @@ import { CasperClient } from '../../modules/necrologi-fiori-cordogli/api/casper-
 import { getCasperApiKey } from '../../modules/necrologi-fiori-cordogli/config';
 import { getFotoUrl } from '../../modules/necrologi-fiori-cordogli/utils/formatters';
 import CasperMemorialPage from '../../modules/necrologi-fiori-cordogli/components/CasperMemorialPage.astro';
-import type { AnnuncioData, FioreData } from '../../modules/necrologi-fiori-cordogli/types';
+import type { AnnuncioData, CordoglioData, FioreData, FotoCordoglioAlbum } from '../../modules/necrologi-fiori-cordogli/types';
 
 export const prerender = false;
 
@@ -16,6 +16,8 @@ if (!slug) {
 let apiKey: string | null = null;
 let item: AnnuncioData | null = null;
 let fiori: FioreData[] = [];
+let cordogli: CordoglioData[] = [];
+let fotoCordogli: FotoCordoglioAlbum[] = [];
 let error: string | null = null;
 
 try {
@@ -23,10 +25,25 @@ try {
   const client = new CasperClient(apiKey);
   item = await client.getAnnuncioBySlug(slug);
 
-  try {
-    fiori = await client.getFiori();
-  } catch (fioriErr) {
-    console.warn('Error fetching fiori:', fioriErr);
+  if (item) {
+    try {
+      [fiori, cordogli, fotoCordogli] = await Promise.all([
+        client.getFiori().catch((fioriErr) => {
+          console.warn('Error fetching fiori:', fioriErr);
+          return [];
+        }),
+        client.getCordogli(item.id).catch((cordogliErr) => {
+          console.warn('Error fetching cordogli:', cordogliErr);
+          return [];
+        }),
+        client.getFotocordogli(item.id).catch((fotoErr) => {
+          console.warn('Error fetching foto-cordogli:', fotoErr);
+          return [];
+        })
+      ]);
+    } catch (relatedErr) {
+      console.warn('Error fetching related memorial data:', relatedErr);
+    }
   }
 } catch (err: any) {
   console.error('Error fetching annuncio:', err);
@@ -48,7 +65,14 @@ const fotoSrc = item ? getFotoUrl(defunto, item.updated_at) : null;
   image={fotoSrc || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
 >
   {item && apiKey ? (
-    <CasperMemorialPage item={item} apiKey={apiKey} slug={slug} fiori={fiori} />
+    <CasperMemorialPage
+      item={item}
+      apiKey={apiKey}
+      slug={slug}
+      fiori={fiori}
+      cordogli={cordogli}
+      fotoCordogli={fotoCordogli}
+    />
   ) : (
     <section class="section memorial-error">
       <div class="container text-center">

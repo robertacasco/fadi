@@ -1,13 +1,58 @@
 ---
-import type { AnnuncioData } from '../types';
+import type { AnnuncioData, CordoglioData, FotoCordoglioAlbum, FotoCordoglioData } from '../types';
 
 interface Props {
   item: AnnuncioData;
+  cordogli?: CordoglioData[];
+  fotoCordogli?: FotoCordoglioAlbum[];
 }
 
-const { item } = Astro.props;
-const defunto  = item.defunto  || {};
+const { item, cordogli = [], fotoCordogli = [] } = Astro.props;
+const defunto = item.defunto || {};
 const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+
+function isPublicValue(value: unknown): boolean {
+  return value !== false && value !== 0 && value !== '0' && value !== 'false';
+}
+
+function formatDate(str?: string): string {
+  if (!str) return '';
+  const date = new Date(str);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function getMessageName(message: CordoglioData): string {
+  return message.utente?.nome || message.mittente || 'Anonimo';
+}
+
+function getMessageDate(message: CordoglioData): string {
+  return message.created_at || message.data_creazione || '';
+}
+
+function getMessageText(message: CordoglioData): string {
+  return message.testo || '';
+}
+
+function getMessageLines(message: CordoglioData): string[] {
+  return getMessageText(message).split(/\r?\n/);
+}
+
+function getPhotoUrl(photo: FotoCordoglioData): string {
+  return photo.url || photo.foto_url || photo.image_url || photo.immagine_url || photo.src || '';
+}
+
+function getPhotoCaption(photo: FotoCordoglioData): string {
+  return photo.didascalia || photo.caption || photo.descrizione || 'Foto ricordo';
+}
+
+const visibleMessages = cordogli.filter((message) => isPublicValue(message.visibile));
+const visiblePhotos = fotoCordogli
+  .flatMap((album) => album.foto || album.photos || [])
+  .filter((photo) => getPhotoUrl(photo) && isPublicValue(photo.approvata) && isPublicValue(photo.visibile));
+
+const hasMessages = visibleMessages.length > 0;
+const hasPhotos = visiblePhotos.length > 0;
 ---
 
 <section class="section messaggi-ricevuti-section" id="messaggi-ricevuti">
@@ -21,23 +66,51 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       </p>
     </div>
 
-    <!-- Foto carousel (shown if photos exist) -->
-    <div id="foto-section" class="foto-carousel-wrap" style="display:none;">
-      <div class="foto-carousel-track" id="foto-grid"></div>
+    <div id="foto-section" class="foto-carousel-wrap" style={hasPhotos ? 'display:block;' : 'display:none;'}>
+      <div class="foto-carousel-track" id="foto-grid" data-has-photos={hasPhotos ? 'true' : 'false'}>
+        {visiblePhotos.map((photo) => (
+          <div class="foto-thumb" title={getPhotoCaption(photo)}>
+            <img
+              src={getPhotoUrl(photo)}
+              alt={getPhotoCaption(photo)}
+              loading="lazy"
+              onerror="this.closest('.foto-thumb').remove()"
+            />
+          </div>
+        ))}
+      </div>
     </div>
 
-    <!-- Loading state -->
-    <div id="msg-loading" class="msg-loading-wrap">
+    <div id="msg-loading" class="msg-loading-wrap" style={hasMessages ? 'display:none;' : ''}>
       <div class="msg-skeleton"></div>
       <div class="msg-skeleton"></div>
       <div class="msg-skeleton"></div>
     </div>
 
-    <!-- Messages grid -->
-    <div id="msg-list" class="msg-cards-grid" style="display:none;"></div>
+    <div
+      id="msg-list"
+      class="msg-cards-grid"
+      data-has-messages={hasMessages ? 'true' : 'false'}
+      style={hasMessages ? 'display:block;' : 'display:none;'}
+    >
+      {visibleMessages.map((message, index) => (
+        <div class="msg-card" style={`animation-delay:${index * 0.07}s`}>
+          <div class="msg-card-top">
+            <div>
+              <div class="msg-name">{getMessageName(message)}</div>
+              {formatDate(getMessageDate(message)) && <div class="msg-date">{formatDate(getMessageDate(message))}</div>}
+            </div>
+          </div>
+          <div class="msg-text">
+            {getMessageLines(message).map((line, lineIndex) => (
+              <>{lineIndex > 0 && <br />}{line}</>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
 
-    <!-- Empty state -->
-    <div id="msg-empty" class="msg-empty-state" style="display:none;">
+    <div id="msg-empty" class="msg-empty-state" style={hasMessages ? 'display:none;' : 'display:flex;'}>
       <p>Se desideri inviare un messaggio o una foto in ricordo di <strong>{nomeCompleto}</strong> <a href="#cordoglio" class="gold-link">clicca qui</a>.</p>
     </div>
   </div>
