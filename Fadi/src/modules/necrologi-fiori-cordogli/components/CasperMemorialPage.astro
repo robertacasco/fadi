@@ -2267,7 +2267,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       const html = visible.map((m, i) =>
         makeCard(m.utente?.nome || m.mittente || 'Anonimo', m.testo, m.created_at, i * 0.07)
       ).join('');
-      if (msgList) { msgList.innerHTML = html; msgList.style.display = 'grid'; }
+      if (msgList) { msgList.innerHTML = html; msgList.style.display = 'block'; }
     }
 
     function renderFotos(albums) {
@@ -2294,7 +2294,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       const wrapper = document.createElement('div');
       wrapper.innerHTML = makeCard(nome, testo, new Date().toISOString(), 0);
       msgList.prepend(wrapper.firstElementChild);
-      msgList.style.display = 'grid';
+      msgList.style.display = 'block';
     };
 
     try {
