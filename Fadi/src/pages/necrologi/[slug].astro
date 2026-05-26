@@ -12,17 +12,26 @@ if (!slug) {
   return Astro.redirect('/404');
 }
 
-const apiKey = getCasperApiKey();
-const client = new CasperClient(apiKey);
-const item = await client.getAnnuncioBySlug(slug);
+let apiKey: string | null = null;
+let item = null;
+let error: string | null = null;
 
-if (!item) {
+try {
+  apiKey = getCasperApiKey();
+  const client = new CasperClient(apiKey);
+  item = await client.getAnnuncioBySlug(slug);
+} catch (err: any) {
+  console.error('Error fetching annuncio:', err);
+  error = err.message || 'Impossibile caricare l\'annuncio in questo momento.';
+}
+
+if (!item && !error) {
   return Astro.redirect('/404');
 }
 
-const defunto = item.defunto || {};
-const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
-const fotoSrc = getFotoUrl(defunto, item.updated_at);
+const defunto = item?.defunto || {};
+const nomeCompleto = item?.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
+const fotoSrc = item ? getFotoUrl(defunto, item.updated_at) : null;
 ---
 
 <Layout
@@ -30,5 +39,29 @@ const fotoSrc = getFotoUrl(defunto, item.updated_at);
   description={`Manifesto funebre di ${nomeCompleto}. Consulta gli orari delle cerimonie di commiato o invia un messaggio di cordoglio privato alla famiglia.`}
   image={fotoSrc || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
 >
-  <CasperMemorialPage item={item} apiKey={apiKey} slug={slug} />
+  {item && apiKey ? (
+    <CasperMemorialPage item={item} apiKey={apiKey} slug={slug} />
+  ) : (
+    <section class="section memorial-error">
+      <div class="container text-center">
+        <span class="section-label">Onoranze Funebri FADI</span>
+        <h1 class="section-title text-serif">Annuncio non disponibile</h1>
+        <div class="divider mx-auto"></div>
+        <p class="section-text mx-auto">
+          {error || 'Impossibile caricare questo annuncio in questo momento.'}
+        </p>
+        <a href="/necrologi/" class="btn btn-outline">Torna agli annunci</a>
+      </div>
+    </section>
+  )}
 </Layout>
+
+<style>
+  .memorial-error {
+    background-color: var(--bg-soft);
+    padding: 4.5rem 0;
+  }
+
+  .text-center { text-align: center; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+</style>

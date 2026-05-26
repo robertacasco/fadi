@@ -10,3 +10,5 @@ Fadi/.vercel/
 Fadi/_nested_git_backup_*/
 Fadi/tools/casper-research/
 path-backup-before-node24.txt
+
+.vercel

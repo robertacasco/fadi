@@ -13,22 +13,19 @@ export class CasperClient {
    * @param limit Limite massimo di risultati (default: 200)
    */
   async getAnnunci(limit: number = 200): Promise<AnnuncioData[]> {
-    try {
-      const res = await fetch(`${this.baseUrl}/annunci?limit=${limit}`, {
-        headers: {
-          'X-API-Key': this.apiKey,
-          'Accept': 'application/json'
-        }
-      });
-      if (!res.ok) {
-        throw new Error(`Errore API: ${res.status} ${res.statusText}`);
+    const res = await fetch(`${this.baseUrl}/annunci?limit=${limit}`, {
+      headers: {
+        'X-API-Key': this.apiKey,
+        'Accept': 'application/json'
       }
-      const json: ApiResponse = await res.json();
-      return json.data || [];
-    } catch (err) {
-      console.error('Error fetching annunci:', err);
-      return [];
+    });
+
+    if (!res.ok) {
+      throw new Error(`Errore API: ${res.status} ${res.statusText}`);
     }
+
+    const json: ApiResponse = await res.json();
+    return json.data || [];
   }
 
   /**
