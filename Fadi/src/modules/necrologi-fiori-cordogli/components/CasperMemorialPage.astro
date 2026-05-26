@@ -2295,7 +2295,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     };
 
     try {
-      const res = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/cordogli`, {
+      const res = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/cordogli/`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
 
@@ -2306,7 +2306,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
         renderMessages([]);
       }
 
-      const resF = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/fotocordogli`, {
+      const resF = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/fotocordogli/`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
       if (resF.ok) {
