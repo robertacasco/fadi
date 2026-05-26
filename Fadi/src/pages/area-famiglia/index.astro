@@ -79,7 +79,7 @@ export const prerender = false;
               Puoi consultare l'annuncio collegato alla tua area riservata.
             </p>
             <div class="session-actions">
-              <a class="btn btn-gold" href="/necrologi/" data-annuncio-link>Apri annuncio</a>
+              <a class="btn btn-gold" href="/area-famiglia/" data-annuncio-link>Apri area famiglia</a>
               <button class="btn btn-outline" type="button" data-logout-btn>Esci</button>
             </div>
           </div>
@@ -325,8 +325,8 @@ export const prerender = false;
 
 <script>
   const SESSION_KEY = 'fadi_area_famiglia_session';
-  const LOGIN_ENDPOINT = '/casper-api/v1/area-famiglia/auth/login';
   const LINK_TOKEN_ENDPOINT = '/casper-api/v1/area-famiglia/auth/link-token';
+  const FAMILY_AREA_BASE_URL = 'https://admin.annuncifunebri.it/famiglia';
 
   type AuthPayload = {
     token: string;
@@ -458,20 +458,39 @@ export const prerender = false;
     }
   }
 
+  function getFamilyAreaUrl(slug?: string) {
+    return slug ? `${FAMILY_AREA_BASE_URL}/${encodeURIComponent(slug)}` : FAMILY_AREA_BASE_URL;
+  }
+
+  function submitAdminLogin(slug: string, pin: string) {
+    const adminForm = document.createElement('form');
+    adminForm.method = 'post';
+    adminForm.action = `${getFamilyAreaUrl(slug)}/access`;
+
+    const pinInput = document.createElement('input');
+    pinInput.type = 'hidden';
+    pinInput.name = 'pin';
+    pinInput.value = pin;
+
+    adminForm.appendChild(pinInput);
+    document.body.appendChild(adminForm);
+    adminForm.submit();
+  }
+
   function renderSession(payload: AuthPayload) {
     form?.setAttribute('hidden', '');
     if (sessionBox) sessionBox.hidden = false;
     if (panelSubtitle) panelSubtitle.textContent = 'Accesso confermato.';
 
     if (payload.annuncioSlug) {
-      const href = `/necrologi/${encodeURIComponent(payload.annuncioSlug)}/`;
+      const href = getFamilyAreaUrl(payload.annuncioSlug);
       if (annuncioLink) annuncioLink.href = href;
-      if (sessionTitle) sessionTitle.textContent = 'Annuncio collegato';
-      if (sessionCopy) sessionCopy.textContent = `Area riservata collegata all'annuncio ${payload.annuncioSlug}.`;
+      if (sessionTitle) sessionTitle.textContent = 'Area famiglia collegata';
+      if (sessionCopy) sessionCopy.textContent = `Accesso confermato per l'annuncio ${payload.annuncioSlug}.`;
     } else {
-      if (annuncioLink) annuncioLink.href = '/necrologi/';
+      if (annuncioLink) annuncioLink.href = getFamilyAreaUrl();
       if (sessionTitle) sessionTitle.textContent = 'Accesso confermato';
-      if (sessionCopy) sessionCopy.textContent = 'Sessione attiva. Apri la sezione annunci per consultare le informazioni disponibili.';
+      if (sessionCopy) sessionCopy.textContent = "Sessione attiva. Apri l'area famiglia per consultare le informazioni disponibili.";
     }
   }
 
@@ -532,16 +551,13 @@ export const prerender = false;
     const annuncioSlug = String(data.get('annuncio_slug') || '').trim();
     const pin = String(data.get('pin') || '').trim();
 
-    try {
-      const payload = await postAuth(LOGIN_ENDPOINT, { annuncio_slug: annuncioSlug, pin });
-      saveSession(payload);
-      renderSession(payload);
-      showAlert('Accesso effettuato correttamente.', 'success');
-    } catch (error: any) {
-      showAlert(error?.message || 'Credenziali non valide.');
-    } finally {
+    if (!annuncioSlug || !pin) {
+      showAlert('Inserisci slug annuncio e PIN.');
       setLoading(false);
+      return;
     }
+
+    submitAdminLogin(annuncioSlug, pin);
   });
 
   logoutBtn?.addEventListener('click', resetSession);
