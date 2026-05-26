@@ -6,10 +6,9 @@ interface Props {
   fiori?: FioreData[];
 }
 
-const { item, fiori = [] } = Astro.props;
+const { item } = Astro.props;
 
 const fallbackFioreImage = '/fiori/composizione.png';
-const sourceFiori = fiori.filter((fiore) => fiore.attivo !== false);
 
 const localFioriCatalog = [
   {
@@ -54,15 +53,6 @@ const localFioriCatalog = [
   }
 ];
 
-function normalizeFioreName(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
 function getFioreName(fiore: FioreData): string {
   return fiore.nome || fiore.titolo || fiore.name || `Composizione ${fiore.id}`;
 }
@@ -71,27 +61,7 @@ function getFioreDescription(fiore: FioreData): string {
   return fiore.descrizione || fiore.descrizione_breve || fiore.description || '';
 }
 
-function findSourceFiore(aliases: string[]): FioreData | undefined {
-  const normalizedAliases = aliases.map(normalizeFioreName);
-  return sourceFiori.find((fiore) => {
-    const name = normalizeFioreName(getFioreName(fiore));
-    return normalizedAliases.some((alias) => name === alias || name.includes(alias));
-  });
-}
-
-const matchedLocalFiori: FioreData[] = localFioriCatalog.flatMap(({ aliases, ...fiore }) => {
-  const sourceFiore = findSourceFiore(aliases);
-  if (!sourceFiore) return [];
-
-  return [{
-    ...sourceFiore,
-    nome: fiore.nome,
-    descrizione: fiore.descrizione,
-    immagine: fiore.immagine,
-  }];
-});
-
-const activeFiori = matchedLocalFiori.length > 0 ? matchedLocalFiori : sourceFiori;
+const activeFiori: FioreData[] = localFioriCatalog.map(({ aliases, ...fiore }) => fiore);
 
 function getFioreImage(fiore: FioreData): string {
   return fiore.immagine_url || fiore.immagine || fiore.foto_url || fiore.image_url || fiore.url_immagine || fallbackFioreImage;
