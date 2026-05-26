@@ -1,0 +1,10 @@
+---
+export const prerender = false;
+
+const slug = Astro.params.slug;
+const destination = slug
+  ? `/area-famiglia/?slug=${encodeURIComponent(slug)}`
+  : '/area-famiglia/';
+
+return Astro.redirect(destination, 302);
+---

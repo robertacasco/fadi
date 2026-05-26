@@ -1,0 +1,560 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = false;
+---
+
+<Layout
+  title="Area Famiglia - FADI"
+  description="Accesso riservato alle famiglie per consultare le informazioni collegate agli annunci funebri FADI."
+>
+  <section class="family-area">
+    <div class="container family-shell">
+      <div class="family-copy">
+        <span class="section-label">Area riservata</span>
+        <h1 class="family-title">Area Famiglia</h1>
+        <div class="divider"></div>
+        <p class="family-lead">
+          Uno spazio privato per accedere alle informazioni dell'annuncio funebre tramite PIN o link personale.
+        </p>
+      </div>
+
+      <div class="family-panel" data-family-panel>
+        <div class="panel-head">
+          <div class="panel-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+              <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+            </svg>
+          </div>
+          <div>
+            <h2>Accesso famiglia</h2>
+            <p data-panel-subtitle>Inserisci le credenziali ricevute.</p>
+          </div>
+        </div>
+
+        <div class="token-state" data-token-state hidden>
+          <span class="loader" aria-hidden="true"></span>
+          <p>Verifica del link in corso...</p>
+        </div>
+
+        <form class="family-form" data-family-form>
+          <div class="field" data-slug-field>
+            <label for="family-slug">Slug annuncio</label>
+            <input
+              id="family-slug"
+              name="annuncio_slug"
+              type="text"
+              autocomplete="off"
+              placeholder="nome-cognome"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="family-pin">PIN</label>
+            <input
+              id="family-pin"
+              name="pin"
+              type="password"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              placeholder="PIN"
+              required
+            />
+          </div>
+
+          <button class="btn btn-gold family-submit" type="submit" data-submit-btn>
+            Accedi
+          </button>
+        </form>
+
+        <div class="family-alert" data-family-alert role="status" hidden></div>
+
+        <div class="family-session" data-family-session hidden>
+          <div class="session-card">
+            <span class="session-kicker">Sessione attiva</span>
+            <h3 data-session-title>Accesso confermato</h3>
+            <p data-session-copy>
+              Puoi consultare l'annuncio collegato alla tua area riservata.
+            </p>
+            <div class="session-actions">
+              <a class="btn btn-gold" href="/necrologi/" data-annuncio-link>Apri annuncio</a>
+              <button class="btn btn-outline" type="button" data-logout-btn>Esci</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .family-area {
+    min-height: calc(100vh - 85px);
+    background:
+      linear-gradient(135deg, rgba(250, 248, 245, 0.92), rgba(243, 239, 234, 0.82)),
+      url('../../img/sfondi/servizi.jpg') center/cover;
+    padding: 5rem 0;
+  }
+
+  .family-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(340px, 460px);
+    align-items: center;
+    gap: 4rem;
+  }
+
+  .family-copy {
+    max-width: 610px;
+  }
+
+  .family-title {
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    margin-bottom: 1rem;
+  }
+
+  .family-lead {
+    max-width: 560px;
+    color: var(--text-muted);
+    font-size: 1.14rem;
+    line-height: 1.9;
+  }
+
+  .family-panel {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 70px rgba(44, 38, 32, 0.12);
+    padding: 2rem;
+  }
+
+  .panel-head {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.75rem;
+  }
+
+  .panel-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  .panel-head h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .panel-head p {
+    color: var(--text-muted);
+    font-size: 0.96rem;
+    line-height: 1.5;
+  }
+
+  .family-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .field label {
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    padding: 0.9rem 1rem;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+  }
+
+  .field input:focus {
+    border-color: var(--gold);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(184, 150, 110, 0.12);
+  }
+
+  .family-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.25rem;
+  }
+
+  .family-alert {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius);
+    color: var(--text);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .family-alert.error {
+    color: #7d1f1f;
+    background: #fff3f0;
+    border-color: rgba(125, 31, 31, 0.22);
+  }
+
+  .family-alert.success {
+    color: #25543d;
+    background: #effaf4;
+    border-color: rgba(37, 84, 61, 0.2);
+  }
+
+  .token-state {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+  }
+
+  .loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(184, 150, 110, 0.25);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .family-session {
+    margin-top: 1.25rem;
+  }
+
+  .session-card {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 1.35rem;
+  }
+
+  .session-kicker {
+    display: inline-block;
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 0.45rem;
+  }
+
+  .session-card h3 {
+    font-size: 1.35rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .session-card p {
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .session-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.2rem;
+  }
+
+  .session-actions .btn {
+    flex: 1 1 150px;
+    justify-content: center;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 900px) {
+    .family-area {
+      padding: 3.5rem 0;
+    }
+
+    .family-shell {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .family-panel {
+      padding: 1.35rem;
+    }
+
+    .panel-head {
+      gap: 0.75rem;
+    }
+
+    .panel-icon {
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>
+
+<script>
+  const SESSION_KEY = 'fadi_area_famiglia_session';
+  const LOGIN_ENDPOINT = '/casper-api/v1/area-famiglia/auth/login';
+  const LINK_TOKEN_ENDPOINT = '/casper-api/v1/area-famiglia/auth/link-token';
+
+  type AuthPayload = {
+    token: string;
+    annuncioSlug?: string;
+    expiresAt?: string | number | null;
+    raw: unknown;
+  };
+
+  const form = document.querySelector('[data-family-form]') as HTMLFormElement | null;
+  const alertBox = document.querySelector('[data-family-alert]') as HTMLElement | null;
+  const sessionBox = document.querySelector('[data-family-session]') as HTMLElement | null;
+  const submitBtn = document.querySelector('[data-submit-btn]') as HTMLButtonElement | null;
+  const logoutBtn = document.querySelector('[data-logout-btn]') as HTMLButtonElement | null;
+  const annuncioLink = document.querySelector('[data-annuncio-link]') as HTMLAnchorElement | null;
+  const sessionTitle = document.querySelector('[data-session-title]') as HTMLElement | null;
+  const sessionCopy = document.querySelector('[data-session-copy]') as HTMLElement | null;
+  const tokenState = document.querySelector('[data-token-state]') as HTMLElement | null;
+  const panelSubtitle = document.querySelector('[data-panel-subtitle]') as HTMLElement | null;
+  const slugInput = document.getElementById('family-slug') as HTMLInputElement | null;
+  const slugField = document.querySelector('[data-slug-field]') as HTMLElement | null;
+
+  function showAlert(message: string, type: 'error' | 'success' = 'error') {
+    if (!alertBox) return;
+    alertBox.textContent = message;
+    alertBox.className = `family-alert ${type}`;
+    alertBox.hidden = false;
+  }
+
+  function clearAlert() {
+    if (!alertBox) return;
+    alertBox.textContent = '';
+    alertBox.hidden = true;
+    alertBox.className = 'family-alert';
+  }
+
+  function setLoading(isLoading: boolean) {
+    if (!submitBtn) return;
+    submitBtn.disabled = isLoading;
+    submitBtn.textContent = isLoading ? 'Accesso...' : 'Accedi';
+  }
+
+  function parseJwt(token: string) {
+    try {
+      const [, payload] = token.split('.');
+      if (!payload) return null;
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(normalized)
+          .split('')
+          .map((char) => `%${(`00${char.charCodeAt(0).toString(16)}`).slice(-2)}`)
+          .join('')
+      );
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+
+  function readToken(response: any) {
+    return response?.token
+      || response?.jwt
+      || response?.access_token
+      || response?.session_token
+      || response?.data?.token
+      || response?.data?.jwt
+      || response?.data?.access_token
+      || response?.data?.session_token
+      || null;
+  }
+
+  function readAnnuncioSlug(response: any, decoded: any) {
+    return response?.annuncio_slug
+      || response?.annuncioSlug
+      || response?.slug
+      || response?.annuncio?.slug
+      || response?.data?.annuncio_slug
+      || response?.data?.annuncioSlug
+      || response?.data?.slug
+      || response?.data?.annuncio?.slug
+      || decoded?.annuncio_slug
+      || decoded?.annuncioSlug
+      || decoded?.slug
+      || null;
+  }
+
+  function normalizeAuth(response: any): AuthPayload {
+    const token = readToken(response);
+    if (!token) {
+      throw new Error('Risposta di accesso non valida.');
+    }
+
+    const decoded = parseJwt(token);
+    return {
+      token,
+      annuncioSlug: readAnnuncioSlug(response, decoded) || undefined,
+      expiresAt: response?.expires_at || response?.data?.expires_at || decoded?.exp || null,
+      raw: response
+    };
+  }
+
+  async function postAuth(endpoint: string, body: Record<string, string>) {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const json = await res.json().catch(() => null);
+    if (!res.ok) {
+      throw new Error(json?.message || json?.error || 'Accesso non riuscito.');
+    }
+
+    return normalizeAuth(json);
+  }
+
+  function saveSession(payload: AuthPayload) {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
+  }
+
+  function loadSession() {
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY);
+      return stored ? JSON.parse(stored) as AuthPayload : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function renderSession(payload: AuthPayload) {
+    form?.setAttribute('hidden', '');
+    if (sessionBox) sessionBox.hidden = false;
+    if (panelSubtitle) panelSubtitle.textContent = 'Accesso confermato.';
+
+    if (payload.annuncioSlug) {
+      const href = `/necrologi/${encodeURIComponent(payload.annuncioSlug)}/`;
+      if (annuncioLink) annuncioLink.href = href;
+      if (sessionTitle) sessionTitle.textContent = 'Annuncio collegato';
+      if (sessionCopy) sessionCopy.textContent = `Area riservata collegata all'annuncio ${payload.annuncioSlug}.`;
+    } else {
+      if (annuncioLink) annuncioLink.href = '/necrologi/';
+      if (sessionTitle) sessionTitle.textContent = 'Accesso confermato';
+      if (sessionCopy) sessionCopy.textContent = 'Sessione attiva. Apri la sezione annunci per consultare le informazioni disponibili.';
+    }
+  }
+
+  function resetSession() {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionBox?.setAttribute('hidden', '');
+    form?.removeAttribute('hidden');
+    applyPrefilledSlug();
+    clearAlert();
+  }
+
+  function applyPrefilledSlug() {
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug') || params.get('annuncio_slug');
+
+    if (slug && slugInput) {
+      slugInput.value = slug;
+      slugField?.setAttribute('hidden', '');
+      if (panelSubtitle) panelSubtitle.textContent = 'Inserisci il PIN ricevuto per accedere.';
+      return;
+    }
+
+    slugField?.removeAttribute('hidden');
+    if (panelSubtitle) panelSubtitle.textContent = 'Inserisci le credenziali ricevute.';
+  }
+
+  async function exchangeTokenFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token') || params.get('link_token') || params.get('linkToken');
+    if (!token) return false;
+
+    if (tokenState) tokenState.hidden = false;
+    form?.setAttribute('hidden', '');
+    clearAlert();
+
+    try {
+      const payload = await postAuth(LINK_TOKEN_ENDPOINT, { token });
+      saveSession(payload);
+      renderSession(payload);
+      showAlert('Link verificato correttamente.', 'success');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return true;
+    } catch (error: any) {
+      resetSession();
+      showAlert(error?.message || 'Link non valido o scaduto.');
+      return false;
+    } finally {
+      if (tokenState) tokenState.hidden = true;
+    }
+  }
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearAlert();
+    setLoading(true);
+
+    const data = new FormData(form);
+    const annuncioSlug = String(data.get('annuncio_slug') || '').trim();
+    const pin = String(data.get('pin') || '').trim();
+
+    try {
+      const payload = await postAuth(LOGIN_ENDPOINT, { annuncio_slug: annuncioSlug, pin });
+      saveSession(payload);
+      renderSession(payload);
+      showAlert('Accesso effettuato correttamente.', 'success');
+    } catch (error: any) {
+      showAlert(error?.message || 'Credenziali non valide.');
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  logoutBtn?.addEventListener('click', resetSession);
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    applyPrefilledSlug();
+
+    const exchanged = await exchangeTokenFromUrl();
+    if (exchanged) return;
+
+    const session = loadSession();
+    if (session?.token) {
+      renderSession(session);
+    }
+  });
+</script>

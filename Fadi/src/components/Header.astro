@@ -33,6 +33,11 @@ const currentPath = Astro.url.pathname;
       ))}
     </nav>
 
+    <!-- Area Famiglia -->
+    <a href="/area-famiglia/" class="header-family" aria-label="Accedi all'Area Famiglia">
+      Area Famiglia
+    </a>
+
     <!-- CTA tel -->
     <a href="tel:+390963353321" class="header-tel" aria-label="Chiama FADI">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -64,6 +69,7 @@ const currentPath = Astro.url.pathname;
       </svg>
       0963 353321
     </a>
+    <a href="/area-famiglia/" class="nav-mobile-family">Area Famiglia</a>
   </nav>
 </header>
 
@@ -167,6 +173,33 @@ const currentPath = Astro.url.pathname;
     color: var(--gold);
   }
 
+  .header-family {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0.42rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.42);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .header-family:hover,
+  .header-family.active {
+    color: var(--gold);
+    border-color: rgba(184, 150, 110, 0.45);
+    background: var(--gold-dim);
+  }
+
   /* CTA tel */
   .header-tel {
     display: flex;
@@ -253,8 +286,31 @@ const currentPath = Astro.url.pathname;
     padding: 0.5rem 0;
   }
 
+  .nav-mobile-family {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.75rem;
+    padding: 0.72rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.45);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .nav-mobile-family:hover {
+    color: var(--gold);
+    border-color: rgba(184, 150, 110, 0.45);
+  }
+
   @media (max-width: 900px) {
     .nav-desktop,
+    .header-family,
     .header-tel {
       display: none;
     }
