@@ -1,0 +1,11 @@
+{
+  "name": "fadi-vercel-root",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "npm --prefix Fadi ci && npm --prefix Fadi run build && node tools/copy-vercel-output.mjs"
+  }
+}

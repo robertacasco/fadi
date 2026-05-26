@@ -1,0 +1,50 @@
+{
+  "cleanUrls": false,
+  "trailingSlash": true,
+  "redirects": [
+    {
+      "source": "/annunci-funebri",
+      "destination": "/necrologi/",
+      "permanent": true
+    },
+    {
+      "source": "/annunci-funebri/",
+      "destination": "/necrologi/",
+      "permanent": true
+    },
+    {
+      "source": "/annunci-funebri/:path*",
+      "destination": "/necrologi/",
+      "permanent": true
+    },
+    {
+      "source": "/annuncio",
+      "destination": "/necrologi/",
+      "permanent": true
+    },
+    {
+      "source": "/annuncio/",
+      "destination": "/necrologi/",
+      "permanent": true
+    },
+    {
+      "source": "/annuncio/:paese/:slug",
+      "destination": "/necrologi/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/annuncio/:paese/:slug/",
+      "destination": "/necrologi/:slug/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/casper-api/:path*/", "destination": "https://api.cas-per.it/api/:path*" },
+    { "source": "/casper-api/:path*", "destination": "https://api.cas-per.it/api/:path*" },
+    { "source": "/diretta", "destination": "https://testaf.lab.cas-per.it/diretta/" },
+    { "source": "/diretta/", "destination": "https://testaf.lab.cas-per.it/diretta/" },
+    { "source": "/diretta/:path*", "destination": "https://testaf.lab.cas-per.it/diretta/:path*" },
+    { "source": "/wp-content/:path*", "destination": "https://testaf.lab.cas-per.it/wp-content/:path*" },
+    { "source": "/wp-includes/:path*", "destination": "https://testaf.lab.cas-per.it/wp-includes/:path*" }
+  ]
+}
