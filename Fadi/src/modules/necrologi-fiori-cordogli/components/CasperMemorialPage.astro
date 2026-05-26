@@ -2275,49 +2275,29 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       msgList.style.display = 'grid';
     };
 
-    // ---- MOCK DATA (rimosso quando l'API sarà live) ----
-    const MOCK_CORDOGLI = {"success":true,"data":{"cordogli":[{"id":1247924,"testo":"Siamo spiacenti per non essere presenti e poter dare l'ultimo saluto a Domenico. Vi siamo comunque vicini con il pensiero, condividendo il vostro dolore.","visibile":false,"created_at":"2025-12-15T10:08:04.000Z","utente":{"nome":"Ida Condo e Peppe Farina"}},{"id":1247874,"testo":"Sentite condoglianze a voi tutti familiari, con l'associazione di preghiere di suffragio per il caro Domenico e di consolazione nella fede per tutti voi. D. Rocco Scaturchio","visibile":false,"created_at":"2025-12-15T04:25:04.000Z","utente":{"nome":"D. Rocco Scaturchio"}},{"id":1247788,"testo":"Sentite e sincere condoglianze","visibile":false,"created_at":"2025-12-14T16:07:16.000Z","utente":{"nome":"Bruno Sgro' - Primerano Lidia"}},{"id":1247726,"testo":"Sentite condoglianze a tutti i familiari","visibile":true,"created_at":"2025-12-14T11:48:38.000Z","utente":{"nome":"Francesco Ranieri"}},{"id":1247724,"testo":"Vi sono vicino in questo triste momento di dolore. Sentite condoglianze","visibile":false,"created_at":"2025-12-14T11:38:50.000Z","utente":{"nome":"Baldassarre Maggio"}},{"id":1247717,"testo":"Un abbraccio forte,\r\nSentite condoglianze\r\nPietro Filardo e famiglia","visibile":true,"created_at":"2025-12-14T11:14:23.000Z","utente":{"nome":"Pietro Filardo"}}],"total":6}};
-    const MOCK_FOTOS = {"success":true,"data":{"albums":[{"id":4588,"foto":[{"id":7127,"approvata":"2025-12-14T16:30:27.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726227.5633.jpg"},{"id":7128,"approvata":"2025-12-14T16:30:27.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726227.8882.jpg"},{"id":7129,"approvata":"2025-12-14T16:30:28.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726228.3867.jpg"},{"id":7130,"approvata":"2025-12-14T16:30:28.000Z","didascalia":"","url":"https://static.annuncifunebri.it/uploads/defunto/1/2/9/8/3/9/cordogli/domenico-de-nardo-1765726228.6057.jpg"}]}]}};
-
     try {
-      // --- Messages ---
-      const res = await fetch(`/casper-api/public/v1/cordogli?slug=${slug}`, {
+      const encodedSlug = encodeURIComponent(slug);
+      const res = await fetch(`/casper-api/public/v1/cordogli?slug=${encodedSlug}`, {
         headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
       });
 
-      let cordogli, albums;
-
       if (res.ok) {
         const json = await res.json();
-        cordogli = json?.data?.cordogli ?? json?.data ?? [];
+        renderMessages(getApiArray(json, ['cordogli', 'messaggi', 'messages']));
       } else {
-        // API non ancora disponibile: usa mock
-        cordogli = MOCK_CORDOGLI.data.cordogli;
-        albums   = MOCK_FOTOS.data.albums;
+        renderMessages([]);
       }
 
-      renderMessages(Array.isArray(cordogli) ? cordogli : []);
-
-      if (albums) {
-        renderFotos(Array.isArray(albums) ? albums : []);
-      } else {
-        // --- Photos (silent fail) ---
-        try {
-          const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${slug}`, {
-            headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
-          });
-          if (resF.ok) {
-            const jsonF = await resF.json();
-            const alb = jsonF?.data?.albums ?? jsonF?.data ?? [];
-            renderFotos(Array.isArray(alb) ? alb : []);
-          }
-        } catch { /* foto non disponibili */ }
+      const resF = await fetch(`/casper-api/public/v1/fotocordogli?slug=${encodedSlug}`, {
+        headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+      });
+      if (resF.ok) {
+        const jsonF = await resF.json();
+        renderFotos(getApiArray(jsonF, ['albums', 'album', 'fotocordogli']));
       }
 
     } catch {
-      // Fallback totale al mock
-      renderMessages(MOCK_CORDOGLI.data.cordogli);
-      renderFotos(MOCK_FOTOS.data.albums);
+      renderMessages([]);
     }
   })();
 
@@ -2340,6 +2320,32 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     fioriOrderStatus.className = `form-status status-${type}`;
     fioriOrderStatus.style.display = 'block';
     fioriOrderStatus.textContent = message;
+  }
+
+  function formatApiErrorDetail(detail) {
+    if (!detail) return '';
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) return detail.map(formatApiErrorDetail).filter(Boolean).join(' ');
+    if (typeof detail === 'object') {
+      const field = detail.path || detail.param || detail.field || detail.property || '';
+      const message = detail.msg || detail.message || detail.error || detail.detail || '';
+      if (field && message) return `${field}: ${message}`;
+      if (message) return String(message);
+      return Object.entries(detail)
+        .map(([key, value]) => `${key}: ${formatApiErrorDetail(value)}`)
+        .filter(Boolean)
+        .join(' ');
+    }
+    return String(detail);
+  }
+
+  function getFioriApiError(json) {
+    return formatApiErrorDetail(json?.message)
+      || formatApiErrorDetail(json?.error)
+      || formatApiErrorDetail(json?.data?.message)
+      || formatApiErrorDetail(json?.errors)
+      || formatApiErrorDetail(json?.data?.errors)
+      || 'Non siamo riusciti a registrare l\'ordine.';
   }
 
   function hideFioriStatus() {
@@ -2498,10 +2504,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
         const json = await response.json().catch(() => ({}));
         if (!response.ok || json.success === false) {
-          const validationMessage = json.errors
-            ? Object.values(json.errors).flat().join(' ')
-            : '';
-          throw new Error(json.message || json.error || json.data?.message || validationMessage || 'Non siamo riusciti a registrare l\'ordine.');
+          throw new Error(getFioriApiError(json));
         }
 
         const checkoutUrl = json.data?.checkout_url || json.data?.payment_url || json.checkout_url || json.payment_url;

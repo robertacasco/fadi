@@ -71,15 +71,21 @@ function findSourceFiore(aliases: string[]): FioreData | undefined {
   });
 }
 
-const activeFiori: FioreData[] = localFioriCatalog.map(({ aliases, ...fiore }) => {
+const matchedLocalFiori: FioreData[] = localFioriCatalog.flatMap(({ aliases, ...fiore }) => {
   const sourceFiore = findSourceFiore(aliases);
-  const sourceDescription = sourceFiore ? getFioreDescription(sourceFiore) : '';
+  if (!sourceFiore) return [];
 
-  return {
-    ...fiore,
+  const sourceDescription = getFioreDescription(sourceFiore);
+
+  return [{
+    ...sourceFiore,
+    nome: fiore.nome,
     descrizione: sourceDescription || fiore.descrizione,
-  };
+    immagine: fiore.immagine,
+  }];
 });
+
+const activeFiori = matchedLocalFiori.length > 0 ? matchedLocalFiori : sourceFiori;
 
 function getFioreName(fiore: FioreData): string {
   return fiore.nome || fiore.titolo || fiore.name || `Composizione ${fiore.id}`;
