@@ -325,10 +325,6 @@ const familyAreaUrl = familySlug
       <span class="family-area-modal-kicker">Accesso riservato</span>
       <h2 id="family-area-modal-title">Area famiglia</h2>
       <p>Accesso per la famiglia di {nomeCompleto}.</p>
-      <div class="family-area-slug-row">
-        <span>Annuncio</span>
-        <strong>{familySlug}</strong>
-      </div>
       <form method="post" action={`${familyAreaUrl}/access`} class="family-area-pin-form">
         <label for="family-area-pin">PIN ricevuto</label>
         <input
@@ -444,23 +440,6 @@ const familyAreaUrl = familySlug
     color: var(--text-muted);
     margin-bottom: 1.1rem;
     line-height: 1.6;
-  }
-
-  .family-area-slug-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 0;
-    margin-bottom: 1rem;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 0.82rem;
-  }
-
-  .family-area-slug-row strong {
-    color: var(--text);
-    text-align: right;
   }
 
   .family-area-pin-form {
