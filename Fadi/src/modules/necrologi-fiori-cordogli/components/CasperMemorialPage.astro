@@ -415,6 +415,24 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     border-color: var(--burgundy);
   }
 
+  .manifesto-share-feedback {
+    display: block;
+    width: 100%;
+    min-height: 1rem;
+    margin-top: 0.1rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-style: italic;
+    line-height: 1;
+    text-align: center;
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .manifesto-share-feedback.is-visible {
+    opacity: 1;
+  }
+
   /* Interactive section split */
   .interactive-memorial-section {
     background-color: var(--bg-soft);
@@ -2080,10 +2098,21 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
   document.querySelectorAll('[data-copy-share-url]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const url = btn.dataset.copyShareUrl || window.location.href;
+      const feedback = btn.closest('.manifesto-share-row')?.querySelector('[data-share-copy-feedback]');
+      const showCopiedFeedback = () => {
+        if (!feedback) return;
+        feedback.textContent = 'testo copiato';
+        feedback.classList.add('is-visible');
+        setTimeout(() => {
+          feedback.classList.remove('is-visible');
+          feedback.textContent = '';
+        }, 1600);
+      };
       try {
         await navigator.clipboard.writeText(url);
         btn.classList.add('is-copied');
         btn.setAttribute('title', 'Link copiato');
+        showCopiedFeedback();
         setTimeout(() => {
           btn.classList.remove('is-copied');
           btn.setAttribute('title', 'Copia link');
