@@ -113,7 +113,7 @@ const familyAreaUrl = familySlug
       )}
 
       {annuncio.epigrafe_url && (
-        <div class="manifesto-preview-wrapper" style="cursor: pointer; width: 100%; max-width: 270px; margin-bottom: 2rem;">
+        <div class="manifesto-preview-wrapper" style="cursor: pointer; width: 100%; max-width: 270px; margin-bottom: 0.85rem;">
           <div class="manifesto-thumbnail-card" id="open-manifesto-btn" style="position: relative; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all var(--transition);">
             <img src={annuncio.epigrafe_url} alt={`Manifesto di ${nomeCompleto}`} style="width: 100%; height: auto; display: block;" />
             <div class="manifesto-overlay" style="position: absolute; inset: 0; background: rgba(44, 38, 32, 0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition);">
@@ -121,17 +121,20 @@ const familyAreaUrl = familySlug
             </div>
           </div>
           <span style="display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); text-align: center;">Manifesto Funebre</span>
-          {familyAreaUrl && (
-            <button
-              type="button"
-              id="open-family-area-modal"
-              class="family-area-inline-btn"
-              aria-haspopup="dialog"
-              aria-controls="family-area-modal"
-            >
-              Area famiglia
-            </button>
-          )}
+        </div>
+      )}
+
+      {familyAreaUrl && (
+        <div class:list={['family-area-access-wrapper', { 'family-area-access-wrapper--solo': !annuncio.epigrafe_url }]}>
+          <button
+            type="button"
+            id="open-family-area-modal"
+            class="family-area-inline-btn"
+            aria-haspopup="dialog"
+            aria-controls="family-area-modal"
+          >
+            Area famiglia
+          </button>
         </div>
       )}
     </div>
@@ -362,6 +365,16 @@ const familyAreaUrl = familySlug
     text-transform: uppercase;
     cursor: pointer;
     transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .family-area-access-wrapper {
+    width: 100%;
+    max-width: 270px;
+    margin-bottom: 2rem;
+  }
+
+  .family-area-access-wrapper--solo {
+    margin-top: 1.35rem;
   }
 
   .family-area-inline-btn:hover {
