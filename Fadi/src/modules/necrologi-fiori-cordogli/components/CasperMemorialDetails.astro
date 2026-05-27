@@ -21,6 +21,10 @@ const haFoto   = !!defunto.foto_url;
 const fotoSrc = getFotoUrl(defunto, item.updated_at);
 const dataMorteIta = formatMorte(defunto.data_morte);
 const dataNascitaIta = formatNascita(defunto.data_nascita);
+const familySlug = item.slug || '';
+const familyAreaUrl = familySlug
+  ? `https://admin.annuncifunebri.it/famiglia/${encodeURIComponent(familySlug)}`
+  : '';
 ---
 
 <!-- Memorial Header Section -->
@@ -117,6 +121,17 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
             </div>
           </div>
           <span style="display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); text-align: center;">Manifesto Funebre</span>
+          {familyAreaUrl && (
+            <button
+              type="button"
+              id="open-family-area-modal"
+              class="family-area-inline-btn"
+              aria-haspopup="dialog"
+              aria-controls="family-area-modal"
+            >
+              Area famiglia
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -297,3 +312,218 @@ const dataNascitaIta = formatNascita(defunto.data_nascita);
     </div>
   </div>
 )}
+
+{familyAreaUrl && (
+  <div id="family-area-modal" class="family-area-modal-overlay" aria-hidden="true">
+    <div class="family-area-modal-content" role="dialog" aria-modal="true" aria-labelledby="family-area-modal-title">
+      <button id="close-family-area-modal" class="family-area-modal-close" type="button" aria-label="Chiudi area famiglia">
+        &times;
+      </button>
+      <span class="family-area-modal-kicker">Accesso riservato</span>
+      <h2 id="family-area-modal-title">Area famiglia</h2>
+      <p>Accesso per la famiglia di {nomeCompleto}.</p>
+      <div class="family-area-slug-row">
+        <span>Annuncio</span>
+        <strong>{familySlug}</strong>
+      </div>
+      <form method="post" action={`${familyAreaUrl}/access`} class="family-area-pin-form">
+        <label for="family-area-pin">PIN ricevuto</label>
+        <input
+          id="family-area-pin"
+          name="pin"
+          type="password"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          placeholder="Inserisci il PIN"
+          required
+        />
+        <button type="submit" class="btn btn-gold family-area-submit">Accedi</button>
+      </form>
+    </div>
+  </div>
+)}
+
+<style>
+  .family-area-inline-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.9rem;
+    padding: 0.62rem 0.8rem;
+    border: 1px solid rgba(184, 150, 110, 0.34);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.42);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .family-area-inline-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: var(--gold-dim);
+  }
+
+  .family-area-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    background: rgba(44, 38, 32, 0.56);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .family-area-modal-overlay.active {
+    display: flex;
+  }
+
+  .family-area-modal-content {
+    position: relative;
+    width: min(100%, 420px);
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(44, 38, 32, 0.24);
+  }
+
+  .family-area-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .family-area-modal-kicker {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .family-area-modal-content h2 {
+    margin-bottom: 0.4rem;
+    font-size: 1.55rem;
+  }
+
+  .family-area-modal-content p {
+    color: var(--text-muted);
+    margin-bottom: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .family-area-slug-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+
+  .family-area-slug-row strong {
+    color: var(--text);
+    text-align: right;
+  }
+
+  .family-area-pin-form {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .family-area-pin-form label {
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .family-area-pin-form input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    padding: 0.85rem 1rem;
+    outline: none;
+  }
+
+  .family-area-pin-form input:focus {
+    border-color: var(--gold);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(184, 150, 110, 0.12);
+  }
+
+  .family-area-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.35rem;
+  }
+
+  @media (max-width: 900px) {
+    .family-area-inline-btn {
+      max-width: 270px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+</style>
+
+<script>
+  const openFamilyArea = document.getElementById('open-family-area-modal');
+  const familyAreaModal = document.getElementById('family-area-modal');
+  const closeFamilyArea = document.getElementById('close-family-area-modal');
+  const familyPinInput = document.getElementById('family-area-pin');
+
+  function closeFamilyAreaModal() {
+    familyAreaModal?.classList.remove('active');
+    familyAreaModal?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  openFamilyArea?.addEventListener('click', () => {
+    familyAreaModal?.classList.add('active');
+    familyAreaModal?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => familyPinInput?.focus(), 30);
+  });
+
+  closeFamilyArea?.addEventListener('click', closeFamilyAreaModal);
+  familyAreaModal?.addEventListener('click', (event) => {
+    if (event.target === familyAreaModal) {
+      closeFamilyAreaModal();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && familyAreaModal?.classList.contains('active')) {
+      closeFamilyAreaModal();
+    }
+  });
+</script>
