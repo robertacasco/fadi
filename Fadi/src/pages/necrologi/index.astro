@@ -1,11 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { CasperClient } from '../../modules/necrologi-fiori-cordogli/api/casper-client';
+import { applyRealtimeCacheHeaders } from '../../modules/necrologi-fiori-cordogli/api/cache-control';
 import { getCasperApiKey } from '../../modules/necrologi-fiori-cordogli/config';
 import CasperNecrologiList from '../../modules/necrologi-fiori-cordogli/components/CasperNecrologiList.astro';
 
 // SSR: dati sempre freschi dall'API
 export const prerender = false;
+applyRealtimeCacheHeaders(Astro.response.headers);
 
 let annunci: any[] = [];
 let error: string | null = null;

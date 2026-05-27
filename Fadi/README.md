@@ -42,10 +42,9 @@ Imposta le variabili:
 
 ```env
 CASPER_API_KEY=...
-PUBLIC_CASPER_API_KEY=...
 ```
 
-`CASPER_API_KEY` viene usata lato server. `PUBLIC_CASPER_API_KEY` serve finché alcuni form client-side inviano direttamente a CasPer; per nascondere del tutto la chiave, il prossimo passo è creare endpoint server Astro che facciano da proxy ai POST dei form.
+`CASPER_API_KEY` deve restare solo lato server: le pagine e i form usano endpoint Astro interni, cosi' la chiave non finisce nel browser.
 
 ## Build
 

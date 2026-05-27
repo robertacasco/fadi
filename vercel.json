@@ -1,6 +1,48 @@
 {
   "cleanUrls": false,
   "trailingSlash": true,
+  "headers": [
+    {
+      "source": "/necrologi",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0, must-revalidate" },
+        { "key": "CDN-Cache-Control", "value": "no-store" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/necrologi/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0, must-revalidate" },
+        { "key": "CDN-Cache-Control", "value": "no-store" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/annuncio",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0, must-revalidate" },
+        { "key": "CDN-Cache-Control", "value": "no-store" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/annuncio/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0, must-revalidate" },
+        { "key": "CDN-Cache-Control", "value": "no-store" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/api/casper/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0, must-revalidate" },
+        { "key": "CDN-Cache-Control", "value": "no-store" },
+        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+      ]
+    }
+  ],
   "redirects": [
     {
       "source": "/annunci-funebri",
@@ -20,22 +62,22 @@
     {
       "source": "/annuncio",
       "destination": "/necrologi/",
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/annuncio/",
       "destination": "/necrologi/",
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/annuncio/:paese/:slug",
       "destination": "/necrologi/:slug/",
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/annuncio/:paese/:slug/",
       "destination": "/necrologi/:slug/",
-      "permanent": true
+      "permanent": false
     }
   ],
   "rewrites": [

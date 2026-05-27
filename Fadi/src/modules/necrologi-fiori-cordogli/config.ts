@@ -1,9 +1,17 @@
-const casperApiKey = import.meta.env.CASPER_API_KEY || import.meta.env.PUBLIC_CASPER_API_KEY;
+declare const process: {
+  env?: {
+    CASPER_API_KEY?: string;
+  };
+} | undefined;
 
 export function getCasperApiKey(): string {
+  const casperApiKey = typeof process !== 'undefined'
+    ? process.env?.CASPER_API_KEY
+    : undefined;
+
   if (!casperApiKey) {
     throw new Error(
-      'Configura CASPER_API_KEY oppure PUBLIC_CASPER_API_KEY nelle variabili ambiente.'
+      'Configura CASPER_API_KEY nelle variabili ambiente.'
     );
   }
 

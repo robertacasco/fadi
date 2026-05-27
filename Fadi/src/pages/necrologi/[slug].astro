@@ -1,19 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { CasperClient } from '../../modules/necrologi-fiori-cordogli/api/casper-client';
+import { applyRealtimeCacheHeaders } from '../../modules/necrologi-fiori-cordogli/api/cache-control';
 import { getCasperApiKey } from '../../modules/necrologi-fiori-cordogli/config';
 import { getFotoUrl } from '../../modules/necrologi-fiori-cordogli/utils/formatters';
 import CasperMemorialPage from '../../modules/necrologi-fiori-cordogli/components/CasperMemorialPage.astro';
 import type { AnnuncioData, CordoglioData, FioreData, FotoCordoglioAlbum } from '../../modules/necrologi-fiori-cordogli/types';
 
 export const prerender = false;
+applyRealtimeCacheHeaders(Astro.response.headers);
 
 const slug = Astro.params.slug;
 if (!slug) {
   return Astro.redirect('/404');
 }
 
-let apiKey: string | null = null;
 let item: AnnuncioData | null = null;
 let fiori: FioreData[] = [];
 let cordogli: CordoglioData[] = [];
@@ -21,7 +22,7 @@ let fotoCordogli: FotoCordoglioAlbum[] = [];
 let error: string | null = null;
 
 try {
-  apiKey = getCasperApiKey();
+  const apiKey = getCasperApiKey();
   const client = new CasperClient(apiKey);
   item = await client.getAnnuncioBySlug(slug);
 
@@ -64,10 +65,9 @@ const fotoSrc = item ? getFotoUrl(defunto, item.updated_at) : null;
   description={`Manifesto funebre di ${nomeCompleto}. Consulta gli orari delle cerimonie di commiato o invia un messaggio di cordoglio privato alla famiglia.`}
   image={fotoSrc || 'https://fadi-lake.vercel.app/logo-fadi-og.png'}
 >
-  {item && apiKey ? (
+  {item ? (
     <CasperMemorialPage
       item={item}
-      apiKey={apiKey}
       slug={slug}
       fiori={fiori}
       cordogli={cordogli}

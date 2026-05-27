@@ -5,7 +5,7 @@ Modulo Astro copiabile per integrare CasPer in un sito di onoranze funebri.
 ## Cosa contiene
 
 - `api/casper-client.ts`: client per gli annunci CasPer.
-- `config.ts`: lettura di `CASPER_API_KEY` e `PUBLIC_CASPER_API_KEY`.
+- `config.ts`: lettura server-side di `CASPER_API_KEY`.
 - `types/`: tipi TypeScript per annunci, defunti, cerimonie e messaggi.
 - `utils/formatters.ts`: formattazione date/orari e URL foto con cache-buster.
 - `components/CasperNecrologiList.astro`: lista annunci con ricerca, filtri e paginazione.
@@ -25,7 +25,6 @@ Modulo Astro copiabile per integrare CasPer in un sito di onoranze funebri.
 
 ```env
 CASPER_API_KEY=...
-PUBLIC_CASPER_API_KEY=...
 ```
 
 Per abilitare il pagamento online quando il gateway e gli endpoint CasPer saranno disponibili:
@@ -79,9 +78,9 @@ const item = slug ? await client.getAnnuncioBySlug(slug) : null;
 if (!item || !slug) return Astro.redirect('/404');
 ---
 
-<CasperMemorialPage item={item} apiKey={apiKey} slug={slug} />
+<CasperMemorialPage item={item} slug={slug} />
 ```
 
 ## Nota sicurezza
 
-Le chiamate SSR usano `CASPER_API_KEY`. L'ordine fiori passa da `/api/fiori/ordine`, quindi `fiore_id` e `importo` vengono ricalcolati sul server e poi inviati a CasPer. Alcuni form browser-side usano ancora `PUBLIC_CASPER_API_KEY`, quindi la chiave e' visibile nel bundle. Per una versione piu' riservata, porta anche cordogli, foto-cordogli e verifica OTP dietro endpoint server Astro.
+Le chiamate SSR e i POST dei form usano `CASPER_API_KEY` solo lato server. Cordogli, foto-cordogli, verifica OTP e refresh dei messaggi passano da `/api/casper/*`, una rotta server con allowlist stretta dei soli endpoint CasPer necessari. L'ordine fiori passa da `/api/fiori/ordine`, dove `fiore_id` e `importo` vengono ricalcolati sul server prima dell'invio a CasPer.

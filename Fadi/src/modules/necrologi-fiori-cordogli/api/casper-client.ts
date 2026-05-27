@@ -9,6 +9,7 @@ import type {
   FotoCordoglioAlbum
 } from '../types';
 import { applyCeremonyOverrides } from '../data/ceremony-overrides';
+import { withRealtimeFetchOptions } from './cache-control';
 
 export class CasperClient {
   private apiKey: string;
@@ -23,12 +24,12 @@ export class CasperClient {
    * @param limit Limite massimo di risultati (default: 200)
    */
   async getAnnunci(limit: number = 200): Promise<AnnuncioData[]> {
-    const res = await fetch(`${this.baseUrl}/annunci?limit=${limit}`, {
+    const res = await fetch(`${this.baseUrl}/annunci?limit=${limit}`, withRealtimeFetchOptions({
       headers: {
         'X-API-Key': this.apiKey,
         'Accept': 'application/json'
       }
-    });
+    }));
 
     if (!res.ok) {
       throw new Error(`Errore API: ${res.status} ${res.statusText}`);
@@ -51,12 +52,12 @@ export class CasperClient {
    * Recupera il catalogo fiori pubblico dell'impresa.
    */
   async getFiori(): Promise<FioreData[]> {
-    const res = await fetch(`${this.baseUrl}/fiori`, {
+    const res = await fetch(`${this.baseUrl}/fiori`, withRealtimeFetchOptions({
       headers: {
         'X-API-Key': this.apiKey,
         'Accept': 'application/json'
       }
-    });
+    }));
 
     if (!res.ok) {
       throw new Error(`Errore API fiori: ${res.status} ${res.statusText}`);
@@ -76,12 +77,12 @@ export class CasperClient {
    * Recupera i cordogli pubblici legati a un annuncio.
    */
   async getCordogli(annuncioId: number): Promise<CordoglioData[]> {
-    const res = await fetch(`${this.baseUrl}/annunci/${annuncioId}/cordogli/`, {
+    const res = await fetch(`${this.baseUrl}/annunci/${annuncioId}/cordogli/`, withRealtimeFetchOptions({
       headers: {
         'X-API-Key': this.apiKey,
         'Accept': 'application/json'
       }
-    });
+    }));
 
     if (!res.ok) {
       throw new Error(`Errore API cordogli: ${res.status} ${res.statusText}`);
@@ -101,12 +102,12 @@ export class CasperClient {
    * Recupera gli album di foto-cordogli pubblici legati a un annuncio.
    */
   async getFotocordogli(annuncioId: number): Promise<FotoCordoglioAlbum[]> {
-    const res = await fetch(`${this.baseUrl}/annunci/${annuncioId}/fotocordogli/`, {
+    const res = await fetch(`${this.baseUrl}/annunci/${annuncioId}/fotocordogli/`, withRealtimeFetchOptions({
       headers: {
         'X-API-Key': this.apiKey,
         'Accept': 'application/json'
       }
-    });
+    }));
 
     if (!res.ok) {
       throw new Error(`Errore API foto-cordogli: ${res.status} ${res.statusText}`);

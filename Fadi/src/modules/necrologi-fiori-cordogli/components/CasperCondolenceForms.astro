@@ -89,14 +89,17 @@ function formatFiorePrice(fiore: (typeof activeFiori)[number]): string {
 }
 ---
 
-<!-- Interactive Forms Section -->
-<section class="section interactive-memorial-section" id="interactive-area">
-  <div class="container interactive-grid">
+<!-- Interactive Forms Modal -->
+<div id="cordoglio-modal" class="memorial-action-modal-overlay" aria-hidden="true">
+  <div class="memorial-action-modal-content memorial-action-modal-content--cordoglio" role="dialog" aria-modal="true" aria-labelledby="cordoglio-modal-title" tabindex="-1">
+    <button type="button" class="memorial-action-modal-close" data-modal-close aria-label="Chiudi finestra">&times;</button>
+    <section class="section interactive-memorial-section" id="interactive-area">
+      <div class="container interactive-grid">
     <!-- CONDOLENCE FORM COLUMN -->
     <div class="condolence-column" id="cordoglio" style="width: 100%;">
       <div class="interactive-card card">
         <div class="card-title-header">
-          <h3>Esprimi il tuo cordoglio</h3>
+          <h3 id="cordoglio-modal-title">Esprimi il tuo cordoglio</h3>
           <p>Invia un pensiero di affetto o un ricordo fotografico alla famiglia.</p>
         </div>
 
@@ -256,16 +259,22 @@ function formatFiorePrice(fiore: (typeof activeFiori)[number]): string {
         </div>
       </div>
     </div>
+      </div>
 </section>
+  </div>
+</div>
 
 <!-- =========================================
      FIORI / FLOWER E-COMMERCE
      ========================================= -->
-<section class="section fiori-section" id="invia-fiori">
-  <div class="container">
+<div id="fiori-modal" class="memorial-action-modal-overlay" aria-hidden="true">
+  <div class="memorial-action-modal-content memorial-action-modal-content--fiori" role="dialog" aria-modal="true" aria-labelledby="fiori-modal-title" tabindex="-1">
+    <button type="button" class="memorial-action-modal-close" data-modal-close aria-label="Chiudi finestra">&times;</button>
+    <section class="section fiori-section" id="invia-fiori">
+      <div class="container">
     <div class="text-center section-header">
       <span class="section-label">Fioreria FADI</span>
-      <h2 class="section-title">Ordina una composizione floreale</h2>
+      <h2 class="section-title" id="fiori-modal-title">Ordina una composizione floreale</h2>
       <div class="divider mx-auto"></div>
       <p class="fiori-intro-text">
         Scegli la tua composizione floreale da inviare alla famiglia in segno di vicinanza.<br/>
@@ -461,6 +470,8 @@ function formatFiorePrice(fiore: (typeof activeFiori)[number]): string {
 
   </div>
 </section>
+  </div>
+</div>
 
 <!-- Preset Condolence Messages Modal -->
 <div id="presets-modal" class="presets-modal-overlay">

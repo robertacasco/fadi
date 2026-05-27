@@ -6,14 +6,13 @@ import CasperCondolenceForms from './CasperCondolenceForms.astro';
 
 interface Props {
   item: AnnuncioData;
-  apiKey: string;
   slug: string;
   fiori?: FioreData[];
   cordogli?: CordoglioData[];
   fotoCordogli?: FotoCordoglioAlbum[];
 }
 
-const { item, apiKey, slug, fiori = [], cordogli = [], fotoCordogli = [] } = Astro.props;
+const { item, slug, fiori = [], cordogli = [], fotoCordogli = [] } = Astro.props;
 const defunto = item.defunto || {};
 const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome || ''}`.trim();
 ---
@@ -381,6 +380,91 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     flex-direction: column;
   }
 
+  .memorial-action-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99980;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    background: rgba(26, 31, 46, 0.72);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .memorial-action-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .memorial-action-modal-content {
+    position: relative;
+    width: min(100%, 1080px);
+    max-height: min(88vh, 920px);
+    overflow: auto;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    padding: 2rem;
+    transform: translateY(14px);
+    transition: transform 0.25s ease;
+  }
+
+  .memorial-action-modal-overlay.active .memorial-action-modal-content {
+    transform: translateY(0);
+  }
+
+  .memorial-action-modal-content--cordoglio {
+    width: min(100%, 760px);
+  }
+
+  .memorial-action-modal-close {
+    position: sticky;
+    top: 0;
+    margin-left: auto;
+    margin-bottom: -2.2rem;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: #ffffff;
+    color: var(--text-muted);
+    font-size: 1.55rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .memorial-action-modal-close:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: rotate(90deg);
+  }
+
+  .memorial-action-modal-content .section {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .memorial-action-modal-content .container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .memorial-action-modal-content .interactive-card {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
   .card-title-header {
     margin-bottom: 2rem;
   }
@@ -537,12 +621,29 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     .interactive-card {
       padding: 2rem 1.5rem;
     }
+
+    .memorial-action-modal-content .interactive-card {
+      padding: 0;
+    }
   }
 
   @media (max-width: 480px) {
     .form-row {
       grid-template-columns: 1fr;
       gap: 1.25rem;
+    }
+
+    .memorial-action-modal-overlay {
+      padding: 0.75rem;
+    }
+
+    .memorial-action-modal-content {
+      max-height: 92vh;
+      padding: 1.25rem;
+    }
+
+    .memorial-action-modal-close {
+      margin-bottom: -1.25rem;
     }
   }
 
@@ -1735,7 +1836,7 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 </style>
 
 <!-- Client Side Forms and Actions -->
-<script define:vars={{ slug, apiKey, annuncioId: item.id, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '', nomeDefuntoCompleto: nomeCompleto || '' }}>
+<script define:vars={{ slug, annuncioId: item.id, defuntoNome: defunto.nome || '', defuntoCognome: defunto.cognome || '', nomeDefuntoCompleto: nomeCompleto || '' }}>
 // 1. SUBMIT CONDOLENCE ACTION
   const cordoglioForm = document.getElementById('cordoglio-form');
   const cordoglioStatus = document.getElementById('cordoglio-status');
@@ -1784,10 +1885,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     };
 
     try {
-      const response = await fetch('/casper-api/public/v1/cordogli', {
+      const response = await fetch('/api/casper/cordogli', {
         method: 'POST',
         headers: {
-          'X-API-Key': apiKey,
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
@@ -1830,25 +1930,97 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
   const tabBtnPhoto = document.getElementById('tab-btn-photo');
   const containerMessage = document.getElementById('form-container-message');
   const containerPhoto = document.getElementById('form-container-photo');
+  const cordoglioModal = document.getElementById('cordoglio-modal');
+  const fioriModal = document.getElementById('fiori-modal');
+  let activeMemorialModal = null;
+  let lastMemorialModalTrigger = null;
 
-  tabBtnMessage?.addEventListener('click', () => {
+  function showCordoglioMessageTab() {
     tabBtnMessage.classList.add('active');
     tabBtnPhoto.classList.remove('active');
     if (containerMessage) containerMessage.style.display = 'block';
     if (containerPhoto) containerPhoto.style.display = 'none';
-  });
+  }
 
-  tabBtnPhoto?.addEventListener('click', () => {
+  function showCordoglioPhotoTab() {
     tabBtnPhoto.classList.add('active');
     tabBtnMessage.classList.remove('active');
     if (containerPhoto) containerPhoto.style.display = 'block';
     if (containerMessage) containerMessage.style.display = 'none';
+  }
+
+  function openMemorialActionModal(modal, trigger) {
+    if (!modal) return;
+    if (activeMemorialModal && activeMemorialModal !== modal) {
+      closeMemorialActionModal(activeMemorialModal, false);
+    }
+    lastMemorialModalTrigger = trigger || document.activeElement;
+    activeMemorialModal = modal;
+    modal.style.display = 'flex';
+    modal.offsetHeight;
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    const dialog = modal.querySelector('[role="dialog"]');
+    setTimeout(() => dialog?.focus(), 40);
+  }
+
+  function closeMemorialActionModal(modal = activeMemorialModal, restoreFocus = true) {
+    if (!modal) return;
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      modal.style.display = 'none';
+      if (activeMemorialModal === modal) activeMemorialModal = null;
+      if (restoreFocus) lastMemorialModalTrigger?.focus?.();
+    }, 250);
+  }
+
+  tabBtnMessage?.addEventListener('click', showCordoglioMessageTab);
+  tabBtnPhoto?.addEventListener('click', showCordoglioPhotoTab);
+
+  document.querySelectorAll('.memorial-action-modal-overlay').forEach((modal) => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeMemorialActionModal(modal);
+    });
+    modal.querySelector('[data-modal-close]')?.addEventListener('click', () => {
+      closeMemorialActionModal(modal);
+    });
   });
 
   // Hero "Invia una Foto" button → scroll to section and activate photo tab
-  document.getElementById('hero-btn-photo')?.addEventListener('click', () => {
-    tabBtnPhoto?.click();
+  document.getElementById('hero-btn-cordoglio')?.addEventListener('click', (e) => {
+    showCordoglioMessageTab();
+    openMemorialActionModal(cordoglioModal, e.currentTarget);
   });
+
+  document.getElementById('hero-btn-photo')?.addEventListener('click', (e) => {
+    showCordoglioPhotoTab();
+    openMemorialActionModal(cordoglioModal, e.currentTarget);
+  });
+
+  document.getElementById('hero-btn-fiori')?.addEventListener('click', (e) => {
+    openMemorialActionModal(fioriModal, e.currentTarget);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && activeMemorialModal) {
+      closeMemorialActionModal(activeMemorialModal);
+    }
+  });
+
+  function openActionFromHash() {
+    if (window.location.hash === '#cordoglio') {
+      showCordoglioMessageTab();
+      openMemorialActionModal(cordoglioModal);
+    } else if (window.location.hash === '#invia-fiori') {
+      openMemorialActionModal(fioriModal);
+    }
+  }
+
+  openActionFromHash();
+  window.addEventListener('hashchange', openActionFromHash);
 
   // 6. PHOTO SELECTION AND PREVIEW
   const photoDropzone = document.getElementById('photo-dropzone');
@@ -1999,10 +2171,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
     try {
       // Step A: Create empty album
-      const createRes = await fetch('/casper-api/public/v1/fotocordogli/albums/create', {
+      const createRes = await fetch('/api/casper/fotocordogli/albums/create', {
         method: 'POST',
         headers: {
-          'X-API-Key': apiKey,
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
@@ -2030,10 +2201,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
         const fileData = new FormData();
         fileData.append('foto', file);
 
-        const uploadRes = await fetch(`/casper-api/public/v1/fotocordogli/albums/${albumId}/add-photo`, {
+        const uploadRes = await fetch(`/api/casper/fotocordogli/albums/${albumId}/add-photo`, {
           method: 'POST',
           headers: {
-            'X-API-Key': apiKey,
             'Accept': 'application/json'
           },
           body: fileData
@@ -2049,10 +2219,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
       fotocordoglioStatus.textContent = 'Finalizzazione e invio codice di verifica...';
       fotocordoglioBtn.innerHTML = '<span class="spinner-inline"></span> Finalizzazione...';
 
-      const finalizeRes = await fetch(`/casper-api/public/v1/fotocordogli/albums/${albumId}/finalize`, {
+      const finalizeRes = await fetch(`/api/casper/fotocordogli/albums/${albumId}/finalize`, {
         method: 'POST',
         headers: {
-          'X-API-Key': apiKey,
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
@@ -2108,10 +2277,9 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     };
 
     try {
-      const verifyRes = await fetch('/casper-api/public/v1/fotocordogli/verify', {
+      const verifyRes = await fetch('/api/casper/fotocordogli/verify', {
         method: 'POST',
         headers: {
-          'X-API-Key': apiKey,
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
@@ -2348,8 +2516,8 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     };
 
     try {
-      const res = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/cordogli/`, {
-        headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+      const res = await fetch(`/api/casper/annunci/${annuncioId}/cordogli/`, {
+        headers: { 'Accept': 'application/json' }
       });
 
       if (res.ok) {
@@ -2363,8 +2531,8 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     }
 
     try {
-      const resF = await fetch(`/casper-api/public/v1/annunci/${annuncioId}/fotocordogli/`, {
-        headers: { 'X-API-Key': apiKey, 'Accept': 'application/json' }
+      const resF = await fetch(`/api/casper/annunci/${annuncioId}/fotocordogli/`, {
+        headers: { 'Accept': 'application/json' }
       });
       if (resF.ok) {
         const jsonF = await resF.json();
