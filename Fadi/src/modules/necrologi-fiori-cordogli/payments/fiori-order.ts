@@ -90,8 +90,11 @@ export async function validateFioriOrderInput(input: FioriOrderInput): Promise<V
   const nastro = asString(input.nastro);
   const note = asString(input.note);
   const privacy = asBoolean(input.privacy || input.accetta_privacy);
-  const requestedMethod = asString(input.metodo_pagamento);
-  const metodoPagamento: FioriPaymentMethod = requestedMethod === 'online' ? 'online' : 'consegna';
+  const requestedMethod = asString(input.metodo_pagamento) || 'online';
+  if (requestedMethod !== 'online') {
+    throw new Error('Il pagamento online sicuro e l\'unico metodo disponibile.');
+  }
+  const metodoPagamento: FioriPaymentMethod = 'online';
 
   if (!Number.isInteger(fioreId) || fioreId <= 0) {
     throw new Error('fiore_id non valido.');
@@ -133,7 +136,7 @@ export async function validateFioriOrderInput(input: FioriOrderInput): Promise<V
   }
 
   const fioreNome = asString(input.fiore_nome) || getFioreName(fiore);
-  const paymentLabel = metodoPagamento === 'online' ? 'online' : 'consegna';
+  const paymentLabel = 'online';
 
   return {
     fiore,
@@ -176,7 +179,7 @@ export async function validateFioriOrderInput(input: FioriOrderInput): Promise<V
       luogo_consegna: 'Presso il luogo delle esequie',
       metodo_pagamento: paymentLabel,
       pagamento: paymentLabel,
-      stato_pagamento: metodoPagamento === 'online' ? 'in_attesa_pagamento' : 'pagamento_consegna',
+      stato_pagamento: 'in_attesa_pagamento',
       privacy: true,
       accetta_privacy: true,
       provenienza: 1,

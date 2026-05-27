@@ -1,4 +1,4 @@
-export type FioriPaymentMethod = 'consegna' | 'online';
+export type FioriPaymentMethod = 'online';
 
 export interface PaymentRuntimeConfig {
   onlineEnabled: boolean;

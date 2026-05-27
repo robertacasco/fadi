@@ -473,23 +473,8 @@ function formatFiorePrice(fiore: FioreData): string {
           <div class="form-group fiori-form-full">
             <label class="form-label">Metodo di pagamento</label>
             <div class="fiori-payment-options">
-              <label class="fiori-payment-option">
-                <input type="radio" name="metodo_pagamento" value="consegna" checked />
-                <span class="fiori-payment-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="5" width="18" height="14" rx="2" />
-                    <path d="M3 10h18" />
-                    <path d="M7 15h3" />
-                  </svg>
-                </span>
-                <span>
-                  <strong>Pagamento alla consegna</strong>
-                  <small>Contanti, POS o Satispay alla consegna</small>
-                </span>
-              </label>
-
               <label class={`fiori-payment-option ${onlinePaymentEnabled ? '' : 'fiori-payment-option-disabled'}`}>
-                <input type="radio" name="metodo_pagamento" value="online" disabled={!onlinePaymentEnabled} />
+                <input type="radio" name="metodo_pagamento" value="online" checked disabled={!onlinePaymentEnabled} />
                 <span class="fiori-payment-icon" aria-hidden="true">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -505,7 +490,7 @@ function formatFiorePrice(fiore: FioreData): string {
               </label>
             </div>
             <p class="fiori-payment-note">
-              L'ordine viene validato sul server e comunicato al backoffice Cas-Per.
+              L'ordine viene validato sul server, pagato tramite checkout sicuro e comunicato al backoffice Cas-Per.
             </p>
           </div>
 
