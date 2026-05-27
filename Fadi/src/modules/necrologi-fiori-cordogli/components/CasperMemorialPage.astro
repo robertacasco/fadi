@@ -360,6 +360,61 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
     box-shadow: 0 6px 24px rgba(46, 204, 113, 0.25);
   }
 
+  .manifesto-share-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .manifesto-share-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  .manifesto-share-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .manifesto-share-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    transition: color var(--transition), background-color var(--transition), border-color var(--transition), transform var(--transition);
+  }
+
+  .manifesto-share-btn:hover,
+  .manifesto-share-btn:focus-visible {
+    color: #ffffff;
+    background: var(--gold);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .manifesto-share-btn.is-copied {
+    color: #ffffff;
+    background: var(--burgundy);
+    border-color: var(--burgundy);
+  }
+
   /* Interactive section split */
   .interactive-memorial-section {
     background-color: var(--bg-soft);
@@ -2021,6 +2076,23 @@ const nomeCompleto = item.nominativo || `${defunto.nome || ''} ${defunto.cognome
 
   openActionFromHash();
   window.addEventListener('hashchange', openActionFromHash);
+
+  document.querySelectorAll('[data-copy-share-url]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = btn.dataset.copyShareUrl || window.location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+        btn.classList.add('is-copied');
+        btn.setAttribute('title', 'Link copiato');
+        setTimeout(() => {
+          btn.classList.remove('is-copied');
+          btn.setAttribute('title', 'Copia link');
+        }, 1600);
+      } catch {
+        window.prompt('Copia il link dell\'annuncio', url);
+      }
+    });
+  });
 
   // 6. PHOTO SELECTION AND PREVIEW
   const photoDropzone = document.getElementById('photo-dropzone');
