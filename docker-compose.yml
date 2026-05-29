@@ -1,0 +1,16 @@
+services:
+  fadi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fadi:latest
+    container_name: fadi
+    restart: unless-stopped
+    env_file:
+      - ./Fadi/.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4321
+    ports:
+      - "${FADI_PORT:-4321}:4321"
